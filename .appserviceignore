@@ -11,10 +11,16 @@
 *.ts
 .git*
 .tsbuildinfo
+.eslintrc.js
+.eslintignore
+.prettierrc.js
+.prettierignore
 CHANGELOG.md
 readme.md
 local.settings.json
+jest.config.js
 test
+tsconfig.elint.json
 tsconfig.json
 .DS_Store
 m365agents.yml

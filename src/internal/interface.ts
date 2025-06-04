@@ -1,6 +1,6 @@
-import { TurnState } from "@microsoft/teams-ai";
+import { TurnState } from '@microsoft/teams-ai'
 
 export interface ConversationState {
-  count: number;
+  count: number
 }
-export type ApplicationTurnState = TurnState<ConversationState>;
+export type ApplicationTurnState = TurnState<ConversationState>

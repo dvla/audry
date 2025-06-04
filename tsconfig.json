@@ -1,15 +1,41 @@
 {
   "compilerOptions": {
+    "types": [
+      "node",
+      "jest"
+    ],
+    "baseUrl": ".",
     "declaration": true,
-    "target": "es2017",
-    "module": "commonjs",
-    "outDir": "./lib",
+    "target": "ES2023",
+    "module": "nodenext",
+    "outDir": "lib",
     "rootDir": "./",
-    "moduleResolution": "nodenext",
+    "moduleResolution": "NodeNext",
     "sourceMap": true,
     "incremental": true,
-    "tsBuildInfoFile": "./lib/.tsbuildinfo",
+    "tsBuildInfoFile": "lib/.tsbuildinfo",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-  }
+    "isolatedModules": true,
+    "typeRoots": [
+      "node_modules/@types",
+      "src/types"
+    ],
+    "paths": {
+      "@tests/*": [
+        "tests/*",
+        "src/__tests__/__utils__/*"
+      ]
+    }
+  },
+  "include": [
+    "src/*.ts",
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules/**/*",
+    ".vscode/**/*",
+    "src/**/*.test.ts",
+    "src/**/__tests__/**/*"
+  ]
 }

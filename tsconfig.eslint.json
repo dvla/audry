@@ -1,0 +1,11 @@
+// tsconfig.eslint.json
+{
+    "extends": "./tsconfig.json",
+    "include": [
+        "**/*"
+    ],
+    "exclude": [
+        "node_modules/**/*",
+        ".vscode/**/*",
+    ]
+}

@@ -1,0 +1,29 @@
+*.yml
+README.md
+
+# dotfiles
+.eslintrc.js
+.prettierrc.js
+
+# config files
+jest.config.js
+webpack.config.js
+package-lock.json
+tsconfig.eslint.json
+tsconfig.json
+package.json
+
+# dot directories
+.vscode
+.webpack
+
+# config / build directories
+coverage
+coverage-unit/
+coverage-integration/
+deploy-config
+lib
+node_modules
+.serverless/
+functional-tests/vendor
+target/

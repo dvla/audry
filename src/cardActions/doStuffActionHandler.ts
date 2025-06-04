@@ -1,7 +1,7 @@
-import { AdaptiveCard } from "@microsoft/teams-ai";
-import * as ACData from "adaptivecards-templating";
-import { TurnContext } from "botbuilder";
-import responseCard from "../adaptiveCards/doStuffActionResponse.json";
+import { AdaptiveCard } from '@microsoft/teams-ai'
+import * as ACData from 'adaptivecards-templating'
+import { TurnContext } from 'botbuilder'
+import responseCard from '../adaptiveCards/doStuffActionResponse.json'
 
 /**
  * The `DoStuffActionHandler` responds
@@ -12,7 +12,7 @@ export class DoStuffActionHandler {
    * A global unique string associated with the `Action.Execute` action.
    * The value should be the same as the `verb` property which you define in your adaptive card JSON.
    */
-  triggerVerb = "doStuff";
+  triggerVerb = 'doStuff'
 
   async handleActionInvoked(context: TurnContext, actionData: any): Promise<string | AdaptiveCard> {
     /**
@@ -20,11 +20,11 @@ export class DoStuffActionHandler {
      */
     const cardJson = new ACData.Template(responseCard).expand({
       $root: {
-        title: "Hello World Bot",
-        body: "Congratulations! Your task is processed successfully.",
+        title: 'Hello World Bot',
+        body: 'Congratulations! Your task is processed successfully.',
       },
-    });
-    return cardJson as AdaptiveCard;
+    })
+    return cardJson as AdaptiveCard
 
     /**
      * If you want to send invoke response with text message, you can:
