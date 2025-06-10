@@ -24,3 +24,5 @@ lib/
 
 # Dev tool directories
 /devTools/
+
+/coverage
