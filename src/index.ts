@@ -1,8 +1,6 @@
 import { TurnContext } from 'botbuilder'
 import express from 'express'
-import { DoStuffActionHandler } from './cardActions/doStuffActionHandler'
 import { GenericCommandHandler } from './commands/genericCommandHandler'
-import { HelloWorldCommandHandler } from './commands/helloworldCommandHandler'
 import { adapter } from './internal/initialize'
 import { ApplicationTurnState } from './internal/interface'
 import { app } from './teamsBot'
@@ -38,16 +36,6 @@ app.adaptiveCards.actionExecute(extractTextActionHandler.triggerVerb, async (con
   return await extractTextActionHandler.handleActionInkvoked(context, state, data)
 })
 
-// Listen for user to say 'helloWorld'
-const helloworldCommandHandler = new HelloWorldCommandHandler()
-app.message(helloworldCommandHandler.triggerPatterns, async (context: TurnContext, state: ApplicationTurnState) => {
-  const reply = await helloworldCommandHandler.handleCommandReceived(context, state)
-
-  if (reply) {
-    await context.sendActivity(reply)
-  }
-})
-
 const genericCommandHandler = new GenericCommandHandler()
 app.message(genericCommandHandler.triggerPatterns, async (context: TurnContext, state: ApplicationTurnState) => {
   const reply = await genericCommandHandler.handleCommandReceived(context, state)
@@ -55,11 +43,6 @@ app.message(genericCommandHandler.triggerPatterns, async (context: TurnContext, 
   if (reply) {
     await context.sendActivity(reply)
   }
-})
-
-const doStuffActionHandler = new DoStuffActionHandler()
-app.adaptiveCards.actionExecute(doStuffActionHandler.triggerVerb, async (context: TurnContext, state, data) => {
-  return await doStuffActionHandler.handleActionInvoked(context, data)
 })
 
 /**
