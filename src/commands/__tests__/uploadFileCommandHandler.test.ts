@@ -1,13 +1,13 @@
+import { describe, beforeEach, it, expect, vi, afterEach } from 'vitest'
 import { UploadFileCommandHandler, ATTACHMENT_CONTENT_TYPE, FILE_TIGGER_PATTERN } from '../uploadFileCommandHandler'
-import { TurnContext, MessageFactory } from 'botbuilder'
 import { ApplicationTurnState } from '../../internal/interface'
 import fs from 'fs'
 import { Readable } from 'stream'
 
-jest.mock('fs')
-jest.mock('stream/promises', () => ({ pipeline: jest.fn(() => Promise.resolve()) }))
+vi.mock('fs')
+vi.mock('stream/promises', () => ({ pipeline: vi.fn(() => Promise.resolve()) }))
 
-global.fetch = jest.fn()
+global.fetch = vi.fn()
 
 describe('UploadFileCommandHandler', () => {
   let handler: UploadFileCommandHandler
@@ -33,19 +33,24 @@ describe('UploadFileCommandHandler', () => {
           },
         ],
       },
-      sendActivity: jest.fn(),
+      sendActivity: vi.fn(),
     }
-    ;(fs.createWriteStream as jest.Mock).mockReturnValue({
-      on: jest.fn().mockImplementation(function (event, cb) {
+    // Use type assertion to 'any' for compatibility with Vitest mocks
+    ;(fs.createWriteStream as any).mockReturnValue({
+      on: vi.fn().mockImplementation(function (event, cb) {
         if (event === 'finish') setImmediate(cb)
         return this
       }),
     })
   })
 
+  afterEach(() => {
+    vi.clearAllMocks()
+  })
+
   it('should handle valid PDF file upload', async () => {
     const readableMock = new Readable({ read() {} })
-    ;(global.fetch as jest.Mock).mockResolvedValue({
+    ;(global.fetch as any).mockResolvedValue({
       ok: true,
       body: readableMock,
     })
@@ -63,7 +68,7 @@ describe('UploadFileCommandHandler', () => {
   })
 
   it('should handle file download errors gracefully', async () => {
-    ;(global.fetch as jest.Mock).mockResolvedValue({ ok: false, status: 404, statusText: 'Not Found' })
+    ;(global.fetch as any).mockResolvedValue({ ok: false, status: 404, statusText: 'Not Found' })
     await expect(handler.handleCommandReceived(context, state)).rejects.toThrow('Failed to download file')
   })
 

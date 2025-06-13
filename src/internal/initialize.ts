@@ -2,11 +2,11 @@ import { TeamsAdapter } from '@microsoft/teams-ai'
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
 import { ConfigurationServiceClientCredentialFactory, TurnContext } from 'botbuilder'
-import config from './config'
+import { Config } from './config'
 
 // Create adapter.
 // See https://aka.ms/about-bot-adapter to learn more about how bots work.
-export const adapter = new TeamsAdapter({}, new ConfigurationServiceClientCredentialFactory(config))
+export const adapter = new TeamsAdapter({}, new ConfigurationServiceClientCredentialFactory(Config))
 
 // Catch-all for errors.
 const onTurnErrorHandler = async (context: TurnContext, error: any) => {

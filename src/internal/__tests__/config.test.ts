@@ -1,10 +1,11 @@
-import config from '../config'
+import { Config } from '../../internal/config'
+import { describe, expect, test, vi, beforeEach, afterAll } from 'vitest'
 
 describe('config test', () => {
   const originalEnv = process.env
 
   beforeEach(() => {
-    jest.resetModules()
+    vi.resetModules()
     process.env = { ...originalEnv }
   })
 
@@ -12,7 +13,7 @@ describe('config test', () => {
     process.env = originalEnv
   })
 
-  test('should handle undefined environment variables', () => {
+  test('should handle environment variables', () => {
     // Setup
     delete process.env.BOT_ID
     delete process.env.BOT_TYPE
@@ -20,12 +21,16 @@ describe('config test', () => {
     delete process.env.BOT_PASSWORD
 
     // Re-import to get fresh config with deleted env variables
-    jest.resetModules()
+    vi.resetModules()
 
     // Assert
-    expect(config.MicrosoftAppId).toBeUndefined()
-    expect(config.MicrosoftAppType).toBeUndefined()
-    expect(config.MicrosoftAppTenantId).toBeUndefined()
-    expect(config.MicrosoftAppPassword).toBeUndefined()
+    expect(Config.MicrosoftAppId).toBeUndefined()
+    expect(Config.MicrosoftAppType).toBeUndefined()
+    expect(Config.MicrosoftAppTenantId).toBeUndefined()
+    expect(Config.MicrosoftAppPassword).toBeUndefined()
+
+    expect(Config.ELEVENLABS_API_KEY).toBeUndefined()
+    expect(Config.FILES_DIR).toBeDefined() // Should default to os.tmpdir()
+    expect(Config.MAX_PAGES).toEqual(80) // Should default to 80 if not set
   })
 })

@@ -2,7 +2,7 @@
   "compilerOptions": {
     "types": [
       "node",
-      "jest"
+      "vitest/globals"
     ],
     "baseUrl": ".",
     "declaration": true,
@@ -18,8 +18,9 @@
     "esModuleInterop": true,
     "isolatedModules": true,
     "typeRoots": [
-      "node_modules/@types",
-      "src/types"
+      "./src/types",
+      "./node_modules/@types",
+      "./node_modules"
     ],
     "paths": {
       "@tests/*": [
@@ -33,9 +34,7 @@
     "src/**/*.ts"
   ],
   "exclude": [
-    "node_modules/**/*",
+    "node_modules",
     ".vscode/**/*",
-    "src/**/*.test.ts",
-    "src/**/__tests__/**/*"
   ]
 }

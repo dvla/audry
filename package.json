@@ -24,9 +24,10 @@
         "resolve-audit": "resolve-audit --registry=https://registry.npmjs.org",
         "outdated": "ncu --errorLevel 2 --color -x npm-audit-resolver,eslint*",
         "check": "npm run build && npm run lint && npm run prettier && npm run test && npm run audit && npm run outdated",
-        "test": "jest --verbose --maxWorkers=1 --coverage"
+        "test": "vitest run --coverage"
     },
     "dependencies": {
+        "@elevenlabs/elevenlabs-js": "^2.2.0",
         "@microsoft/teams-ai": "^1.7.4",
         "adaptive-expressions": "^4.23.2",
         "adaptivecards-templating": "^2.3.1",
@@ -38,28 +39,27 @@
     "devDependencies": {
         "@eslint/js": "^9.27.0",
         "@types/express": "^5.0.2",
-        "@types/jest": "^29.5.14",
         "@types/json-schema": "^7.0.15",
         "@types/node": "^22.15.24",
         "@typescript-eslint/eslint-plugin": "^8.33.0",
         "@typescript-eslint/parser": "^8.33.0",
+        "@vitest/coverage-v8": "^3.2.3",
+        "@vitest/eslint-plugin": "^1.2.2",
         "env-cmd": "^10.1.0",
         "eslint": "^8.57.1",
         "eslint-config-prettier": "^10.1.5",
         "eslint-config-standard": "^17.1.0",
         "eslint-import-resolver-typescript": "^4.4.1",
         "eslint-plugin-import": "^2.31.0",
-        "eslint-plugin-jest": "^28.11.1",
         "eslint-plugin-prettier": "^5.4.0",
-        "jest": "^29.7.0",
         "nodemon": "^3.1.10",
         "npm-audit-resolver": "^3.0.0-RC.0",
         "npm-check-updates": "^18.0.1",
         "prettier": "^3.5.3",
         "shx": "^0.3.4",
-        "ts-jest": "^29.3.4",
         "ts-node": "^10.9.2",
         "typescript": "^5.8.3",
-        "typescript-eslint": "^8.33.0"
+        "typescript-eslint": "^8.33.0",
+        "vitest": "^3.2.3"
     }
 }

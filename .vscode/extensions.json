@@ -1,6 +1,7 @@
 {
   "recommendations": [
     "TeamsDevApp.ms-teams-vscode-extension",
-    "esbenp.prettier-vscode"
+    "esbenp.prettier-vscode",
+    "vitest.explorer"
   ]
 }

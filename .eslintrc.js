@@ -1,8 +1,7 @@
 module.exports = {
   env: {
     browser: false,
-    es2021: true,
-    jest: true,
+    es2021: true
   },
   settings: {
     "import/resolver": {
@@ -18,7 +17,7 @@ module.exports = {
   },
   extends: [
     "plugin:prettier/recommended",
-    "plugin:jest/recommended",
+    "plugin:@vitest/legacy-recommended",
     "plugin:import/errors",
     "plugin:import/warnings",
     "plugin:import/typescript",
@@ -29,9 +28,6 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: "module",
   },
-  env: {
-    "jest/globals": true,
-  },
-  plugins: ["jest", "import", "@typescript-eslint"],
+  plugins: ["@vitest", "import", "@typescript-eslint"],
   ignorePatterns: ["prettierrc.js"],
 };
