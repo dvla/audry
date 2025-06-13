@@ -32,6 +32,7 @@
         "adaptivecards-templating": "^2.3.1",
         "botbuilder": "^4.23.2",
         "express": "^5.1.0",
+        "pdfjs-dist": "^5.3.31",
         "uuid": "^11.1.0"
     },
     "devDependencies": {
