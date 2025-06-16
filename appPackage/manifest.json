@@ -33,7 +33,6 @@
           "scopes": ["personal", "team", "groupChat"],
           "commands": [
             {
-          
               "title": "Help",
               "description": "Type 'help' if you need instructions."
             }

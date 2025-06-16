@@ -1,0 +1,175 @@
+trigger:
+  batch: true
+  branches:
+    include:
+      - main
+      - feature/*
+      - fix/*
+    exclude:
+      - releases/*
+
+variables:
+  # Service Connection
+  - name: azureSubscriptionSvcConn
+    value: 'ETL-MI-Audry-SvcConnection'
+  #Bicep files
+  - name: templateFile
+    value: '$(Build.SourcesDirectory)/infra/azure.bicep'
+  - name: csmParametersFile
+    value: '$(Build.SourcesDirectory)/infra/azure.bicepparam'
+# Used by Bicep
+  # These values are used for all branches other than main (i.e. dev work)
+  - name: BOT_ID
+    value: '9d93dbf5-3e71-4b82-a70d-b0ff179da20a' #ETL-Bot-Genny-Dev
+  - name: LOCATION
+    value: 'uksouth'
+  - name: TENANT_ID
+    value: '99d20d2d-8923-45d8-b9ad-5038c97582e3'
+  - name: RESOURCE_BASE_NAME
+    value: 'Audry'
+  - name: ENV_NAME
+    value: 'dev'
+  - name: WEB_APP_SKU
+    value: 'B1'
+  - name: BOT_DISPLAY_NAME
+    value: 'Bot-$(RESOURCE_BASE_NAME)-$(ENV_NAME)'
+  - name: TEAMSAPP_CLI_VERSION
+    value: "3.0.4"
+  
+  # These values will override the above if the branch is main (i.e. for production)
+  - ${{ if contains(variables['Build.SourceBranchName'], 'main') }}:
+      - name: BOT_ID
+        value: 'bf2365b2-d7fd-4a72-8036-fa9872e85fb2' #ETL-Bot-Genny-Prod
+      - name: ENV_NAME
+        value: 'prod'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+# Deploy the infrastructure via Bicep
+  - stage: Infrastructure
+    displayName: Create infrastructure
+    jobs:
+    - job: CreateInfrastructure
+      displayName: Create infrastructure
+      steps:
+      - task: AzureKeyVault@2
+        displayName: 'Download secrets from Azure Key Vault'
+        inputs:
+          azureSubscription: '$(azureSubscriptionSvcConn)'
+          KeyVaultName: 'kv-lab-shared-prod'
+          SecretsFilter: 'ETL-Bot-Genny-$(ENV_NAME)-Secret'
+          RunAsPreJob: false
+      - task: AzureResourceManagerTemplateDeployment@3
+        name: BicepDeploy
+        env:
+          BOT_PASSWORD: $(ETL-Bot-Genny-$(ENV_NAME)-Secret)
+        inputs: 
+          deploymentScope: 'Subscription'
+          location: '$(LOCATION)'
+          csmFile: '$(templateFile)'
+          csmParametersFile: '$(csmParametersFile)'
+          deploymentMode: 'Incremental'
+          deploymentName: 'DeployPipelineTemplate'
+          connectedServiceName: '$(azureSubscriptionSvcConn)'
+          deploymentOutputs: bicepOutputs
+      - task: PowerShell@2
+        displayName: Get Bicep outputs
+        inputs:
+          targetType: 'inline'
+          script: |
+            echo '##vso[task.setvariable variable=bicepouts;]$(bicepOutputs)'
+            echo $bicepouts
+            mkdir -p $(Pipeline.Workspace)/bicep
+            echo '$(bicepOutputs)' > $(Pipeline.Workspace)/bicep/bicepOutputs.json
+      - publish: $(Pipeline.Workspace)/bicep/bicepOutputs.json
+        artifact: bicepOutputsJsonFile
+
+  - stage: BuildApp
+    dependsOn: Infrastructure
+    displayName: Build and Test
+    jobs:
+    - job: BuildAndTest
+      displayName: Build and Test
+      steps:
+      # Install Node.js
+      - task: UseNode@1
+        displayName: 'Install Node.js'
+        inputs:
+          version: "22"
+          checkLatest: true
+      #Install Team Toolkit
+      - script: |
+          npm install -g @microsoft/teamsapp-cli
+        displayName: "Install Teams SDK CLI"
+      # Install dependencies
+      - script: |
+          npm ci
+        displayName: 'Install dependencies'
+      - script: |
+          npm run prettier
+        displayName: 'Run prettier'
+      - script: |
+          npm run lint
+        displayName: 'Run Linter'
+        condition: always()
+      - script: |
+          npm run audit
+        displayName: 'Run Audit'
+        condition: always()
+        continueOnError: true
+      - script: |
+          npm run outdated
+        displayName: 'Run Outdated'
+        condition: always()
+        continueOnError: true
+
+    #- job: NPMTest
+    #  displayName: NPM Test
+    #  dependsOn: BuildAndTest
+    #  condition: always()
+    #  steps:
+      - script: |
+          npm run test
+        displayName: 'Run Tests'
+        condition: always()
+
+
+  - stage: ZipDeploy
+    dependsOn: BuildApp
+    # This stage will run if the NPMTest job in BuildApp succeeded
+    #condition: succeeded('BuildApp/NPMTest')
+    displayName: Zip deploy
+    jobs:
+      - job: ZipDeploy
+        displayName: Zip deploy
+        steps:
+        - checkout: self
+        - task: CopyFiles@2
+          displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
+          inputs:
+            Contents: |
+              $(Build.SourcesDirectory)/appPackage/**
+              $(Build.SourcesDirectory)/src/**
+              $(Build.SourcesDirectory)/pack*.json
+            TargetFolder: '$(Build.ArtifactStagingDirectory)'
+        - task: ArchiveFiles@2
+          displayName: 'Archive files'
+          inputs:
+            rootFolderOrFile: '$(Build.ArtifactStagingDirectory)'
+            includeRootFolder: false
+            archiveType: 'zip'
+            archiveFile: '$(Pipeline.Workspace)/audry.zip'
+            replaceExistingArchive: true
+        - publish: '$(Pipeline.Workspace)/audry.zip'
+          artifact: AudryZipDeployFile
+        - task: AzureWebApp@1
+          displayName: 'Zip Deploy to Azure Web App'
+          inputs:
+            azureSubscription: '$(azureSubscriptionSvcConn)'
+            appType: 'webApp'
+            appName: 'app-$(RESOURCE_BASE_NAME)-$(ENV_NAME)-uks'
+            package: '$(Pipeline.Workspace)/audry.zip'
+            deploymentMethod: 'zipDeploy'
+
