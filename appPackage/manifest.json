@@ -4,33 +4,33 @@
   "version": "1.0.0",
   "id": "${{TEAMS_APP_ID}}",
   "developer": {
-    "name": "My App, Inc.",
-    "websiteUrl": "https://www.example.com",
-    "privacyUrl": "https://www.example.com/privacy",
-    "termsOfUseUrl": "https://www.example.com/termofuse"
+    "name": "Emerging Tech labs",
+    "websiteUrl": "https://dvla.sharepoint.com/sites/TechLab",
+    "privacyUrl": "https://dvla.sharepoint.com/sites/TechLab",
+    "termsOfUseUrl": "https://dvla.sharepoint.com/sites/TechLab"
   },
   "icons": {
-    "color": "color.png",
+    "color": "Green-Podcast.png",
     "outline": "outline.png"
   },
   "name": {
-    "short": "Audry${{APP_NAME_SUFFIX}}",
-    "full": "Full name for Audry"
+    "short": "Audry",
+    "full": "Audry Podcast Generator"
   },
   "description": {
-    "short": "Podcast Generator. Upload a PDF to turn content into audio.",
-    "full": "Full description of Audry"
+    "short": "Upload a PDF to turn content into audio.${{APP_NAME_SUFFIX}}",
+    "full": "Easily convert your PDFs into immersive podcast style audio in just a few simple steps. Upload your document and we'll seamlessly transform it into high quality spoken word."
   },
   "accentColor": "#FFFFFF",
   "bots": [
     {
       "botId": "${{BOT_ID}}",
-      "scopes": ["personal", "team", "groupChat"],
+      "scopes": ["personal"],
       "supportsFiles": true,
       "isNotificationOnly": false,
       "commandLists": [
         {
-          "scopes": ["personal", "team", "groupChat"],
+          "scopes": ["personal"],
           "commands": [
             {
               "title": "Help",
@@ -44,6 +44,6 @@
   "composeExtensions": [],
   "configurableTabs": [],
   "staticTabs": [],
-  "permissions": ["identity", "messageTeamMembers"],
+  "permissions": ["identity"],
   "validDomains": []
 }
