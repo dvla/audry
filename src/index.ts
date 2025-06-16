@@ -10,6 +10,7 @@ import {
   UploadFileCommandHandler,
 } from './commands/uploadFileCommandHandler'
 import { ExtractTextActionHandler } from './cardActions/extractTextActionHandler'
+import { TextToTranscriptActionHandler } from './cardActions/textToTranscriptHandler'
 
 // This template uses `express` to serve HTTP responses.
 // Create express application.
@@ -34,6 +35,12 @@ app.message(uploadFileCommandHandler.triggerPatterns, async (context: TurnContex
 const extractTextActionHandler = new ExtractTextActionHandler()
 app.adaptiveCards.actionExecute(extractTextActionHandler.triggerVerb, async (context: TurnContext, state, data) => {
   return await extractTextActionHandler.handleActionInkvoked(context, state, data)
+})
+
+// Listen for action invoked on Adaptive Card with verb 'textToTranscript'
+const textToTranscriptActionHandler = new TextToTranscriptActionHandler()
+app.adaptiveCards.actionExecute(textToTranscriptActionHandler.triggerVerb, async (context: TurnContext, state) => {
+  return await textToTranscriptActionHandler.handleActionInvoked(context, state)
 })
 
 const genericCommandHandler = new GenericCommandHandler()

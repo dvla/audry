@@ -81,6 +81,8 @@ deploy:
         BOT_ID: ${{BOT_ID}}
         BOT_PASSWORD: ${{SECRET_BOT_PASSWORD}}
         BOT_TYPE: 'MultiTenant'
+        GEMINI_API_KEY: ${{GEMINI_API_KEY}}
+        GEMINI_MODEL: ${{GEMINI_MODEL}}
         ELEVENLABS_API_KEY: ${{ELEVENLABS_API_KEY||''}}
         AUDRY_FILES_DIR: ${{AUDRY_FILES_DIR||''}}
         AUDRY_MAX_PAGES: ${{AUDRY_MAX_PAGES||''}}

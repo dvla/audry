@@ -75,8 +75,7 @@ export class UploadFileCommandHandler {
     console.log(`Downloading file to: ${filePath}`)
     await this.writeFile(file.content.downloadUrl, filePath)
 
-    const reply = MessageFactory.text(`<b>${file.name}</b> received and ready to use`)
-    await context.sendActivity(reply)
+    console.log(`File downloaded successfully: ${filePath}`)
   }
 
   /**

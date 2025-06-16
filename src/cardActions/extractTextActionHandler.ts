@@ -6,7 +6,7 @@ import responseCard from '../adaptiveCards/extractTextActionResponse.json'
 import { AdaptiveCard } from '@microsoft/teams-ai'
 import { TurnContext, ActivityTypes } from 'botbuilder'
 import { ApplicationTurnState } from 'src/internal/interface'
-import { extractTextFromPdf } from '../internal/utils/pdfUtils'
+import { extractTextFromPdf } from '../internal/utils/fileUtils'
 
 const EXTRACT_TEXT_TRIGGER_VERB = 'extractText'
 const MAX_PAGES = 80
@@ -36,6 +36,7 @@ export class ExtractTextActionHandler {
       // Use the same UUID for the extracted file name
       const tempFilePath = path.join(os.tmpdir(), `extracted_${documentId}.txt`)
       await fs.writeFile(tempFilePath, extractedText, 'utf8')
+      state.conversation.extractedTextPath = tempFilePath
       console.log('Extracted text saved to:', tempFilePath)
 
       const cardJson = new ACData.Template(responseCard).expand({

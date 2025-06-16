@@ -1,0 +1,67 @@
+{
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "TextBlock",
+      "size": "Medium",
+      "weight": "Bolder",
+      "text": "${title}"
+    },
+    {
+      "type": "TextBlock",
+      "id": "truncatedText",
+      "text": "${transcript}",
+      "wrap": true,
+      "maxLines": 5
+    },
+    {
+      "type": "TextBlock",
+      "id": "fullText",
+      "text": "${transcript}",
+      "wrap": true,
+      "isVisible": false
+    },
+    {
+      "type": "RichTextBlock",
+      "id": "showMore",
+      "targetWidth": "AtLeast:Narrow",
+      "inlines": [
+        {
+          "type": "TextRun",
+          "text": "Show Full Transcript",
+          "selectAction": {
+            "type": "Action.ToggleVisibility",
+            "targetElements": ["truncatedText", "fullText", "showMore", "showLess"]
+          }
+        }
+      ]
+    },
+    {
+      "type": "RichTextBlock",
+      "id": "showLess",
+      "targetWidth": "AtLeast:Narrow",
+      "inlines": [
+        {
+          "type": "TextRun",
+          "text": "Show Preview",
+          "selectAction": {
+            "type": "Action.ToggleVisibility",
+            "targetElements": ["truncatedText", "fullText", "showMore", "showLess"]
+          }
+        }
+      ],
+      "isVisible": false
+    },
+    {
+      "type": "ActionSet",
+      "actions": [
+        {
+          "type": "Action.Execute",
+          "verb": "transcriptToAudio",
+          "title": "Convert to Audio"
+        }
+      ]
+    }
+  ]
+}

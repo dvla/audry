@@ -58,7 +58,6 @@ describe('UploadFileCommandHandler', () => {
     expect(result).toBeDefined()
     expect(state.conversation.documentId).toBeDefined()
     expect(state.conversation.documentPath).toContain('file.pdf')
-    expect(context.sendActivity).toHaveBeenCalled()
   })
 
   it('should reject non-PDF files', async () => {

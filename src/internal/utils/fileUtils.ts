@@ -23,3 +23,19 @@ export async function extractTextFromPdf(filePath: string, maxPages: number): Pr
 
   return extractedText
 }
+
+/**
+ * Read text from a file
+ * @param filePath - The path to the file.
+ * @returns A promise that resolves to the text content of the file.
+ * @throws An error if the file cannot be read.
+ */
+export async function readTextFromFile(filePath: string): Promise<string> {
+  try {
+    const text = await fs.readFile(filePath, 'utf8')
+    return text
+  } catch (error) {
+    console.error(`Error reading file at ${filePath}:`, error)
+    throw new Error(`Could not read file: ${error.message}`)
+  }
+}
