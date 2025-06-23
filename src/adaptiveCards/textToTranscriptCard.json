@@ -1,0 +1,99 @@
+{
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "Container",
+      "style": "default",
+      "bleed": true,
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "✅",
+                  "size": "Large"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${title}",
+                  "weight": "Bolder",
+                  "size": "Medium",
+                  "color": "Default",
+                  "wrap": true
+                },
+                {
+                  "type": "TextBlock",
+                  "id": "truncatedText",
+                  "text": "${transcript}",
+                  "wrap": true,
+                  "maxLines": 5
+                },
+                {
+                  "type": "TextBlock",
+                  "id": "fullText",
+                  "text": "${transcript}",
+                  "wrap": true,
+                  "isVisible": false
+                },
+                {
+                  "type": "RichTextBlock",
+                  "id": "showMore",
+                  "targetWidth": "AtLeast:Narrow",
+                  "inlines": [
+                    {
+                      "type": "TextRun",
+                      "text": "Show Full Transcript",
+                      "selectAction": {
+                        "type": "Action.ToggleVisibility",
+                        "targetElements": ["truncatedText", "fullText", "showMore", "showLess"]
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "RichTextBlock",
+                  "id": "showLess",
+                  "targetWidth": "AtLeast:Narrow",
+                  "inlines": [
+                    {
+                      "type": "TextRun",
+                      "text": "Show Preview",
+                      "selectAction": {
+                        "type": "Action.ToggleVisibility",
+                        "targetElements": ["truncatedText", "fullText", "showMore", "showLess"]
+                      }
+                    }
+                  ],
+                  "isVisible": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ActionSet",
+      "actions": [
+        {
+          "type": "Action.Execute",
+          "verb": "transcriptToAudio",
+          "title": "Create Podcast",
+          "style": "positive"
+        }
+      ]
+    }
+  ]
+}

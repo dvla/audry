@@ -1,14 +1,9 @@
-import fs from 'fs/promises'
-import path from 'path'
-import os from 'os'
-import { AdaptiveCard, Selector } from '@microsoft/teams-ai'
-import * as ACData from 'adaptivecards-templating'
-import responseCard from '../adaptiveCards/textToTranscriptActionResponse.json'
-import { GoogleGenAI } from '@google/genai'
-import { TurnContext } from 'botbuilder'
-import { ApplicationTurnState } from 'src/internal/interface'
-import { readTextFromFile } from '../internal/utils/fileUtils'
+import { Selector } from '@microsoft/teams-ai'
+import { ActivityContext } from '../internal/conversationHandlers'
 import { Config } from '../internal/config'
+import { getExtractedText, writeTranscript } from '../internal/utils/documentUtils'
+import { getGoogleClient } from '../tts/textoSpeechGoogle'
+import { errorCard, processingCard, textToTranscriptCard } from '../internal/cards'
 
 const FILE_TRIGGER_PATTERN = 'textToTranscript'
 const SYSTEM_INSTRUCTIONS = `You are the a world-class podcast writer, you have worked as a ghost writer for Joe Rogan, Lex Fridman, Richard Osman, The Beast.
@@ -35,7 +30,6 @@ ALWAYS START YOUR RESPONSE DIRECTLY WITH SPEAKER 1:
 DO NOT GIVE EPISODE TITLES SEPARATELY, LET SPEAKER 1 TITLE IT IN HER SPEECH
 DO NOT GIVE CHAPTER TITLES OR MENTION THE SPEAKERS' NAMES BEFORE THE COLON
 IT SHOULD STRICTLY BE THE DIALOGUES
-LIMIT THE RESPONSE TO 2 TURNS PER SPEAKER
 
 It is ESSENTIAL to follow the turn based structure of the conversation, for example:
 Speaker 1: dialogue text here
@@ -46,55 +40,55 @@ Speaker 2: dialogue text here`
 /**
  * TextToTranscriptActionHandler is a class that handles the action of converting text to a transcript.
  */
-export class TextToTranscriptActionHandler {
+export class TextToTranscriptHandler {
   triggerVerb: string | RegExp | Selector | (string | RegExp | Selector)[] = FILE_TRIGGER_PATTERN
 
   /**
-   * Handles the action when invoked.
-   * @param context - The turn context.
-   * @param state - The application state.
-   * @param data - The action data.
-   * @returns A promise that resolves to the result of the action.
+   * Handles the action when invoked from a button on an adaptive card.
+   * @param context - The activity context containing the conversation and activity.
+   * @returns An Adaptive Card indicating the processing state.
    */
-  async handleActionInvoked(context: TurnContext, state: ApplicationTurnState) {
-    // Create a new instance of GoogleGenAI with the API key
-    const ai = new GoogleGenAI({
-      apiKey: Config.GEMINI_API_KEY,
-    })
-    const documentId = state.conversation.documentId // <-- get the UUID
+  async handleActionInvoked(context: ActivityContext) {
+    setImmediate(async () => this.generateTranscript(context))
 
-    // Stream the response using system instructions and file text
-    const config = {
-      responseMimeType: 'text/plain',
-      systemInstruction: SYSTEM_INSTRUCTIONS,
+    return processingCard('Generating transcript... This may take a few minutes.')
+  }
+
+  /**
+   * Generates a transcript from the extracted text.
+   * @param context - The activity context containing the conversation and proactiveSendCard.
+   * @return A promise that resolves when the transcript is generated and sent as an Adaptive Card.
+   */
+  async generateTranscript({ proactiveSendCard, conversation }: ActivityContext): Promise<void> {
+    try {
+      const ai = getGoogleClient()
+      const documentId = conversation.documentId // <-- get the UUID
+      const extractedText = await getExtractedText(documentId)
+      // Stream the response using system instructions and file text
+      const config = {
+        responseMimeType: 'text/plain',
+        systemInstruction: SYSTEM_INSTRUCTIONS,
+      }
+
+      const response = await ai.models.generateContentStream({
+        model: Config.GEMINI_MODEL,
+        config,
+        contents: extractedText,
+      })
+
+      // Process the streamed response
+      let responseText = ''
+      for await (const chunk of response) {
+        console.log(chunk.text)
+        responseText += chunk.text
+      }
+
+      await writeTranscript(responseText, documentId)
+
+      await proactiveSendCard(textToTranscriptCard('Transcript Created - transcriptToAudio', responseText))
+    } catch (error) {
+      console.error('Error generating transcript:', error)
+      await proactiveSendCard(errorCard('An error occurred while generating the transcript. Please try again later.'))
     }
-
-    const response = await ai.models.generateContentStream({
-      model: Config.GEMINI_MODEL,
-      config,
-      contents: await readTextFromFile(state.conversation.extractedTextPath),
-    })
-
-    // Process the streamed response
-    let responseText = ''
-    for await (const chunk of response) {
-      console.log(chunk.text)
-      responseText += chunk.text
-    }
-
-    // Use the same UUID for the extracted file name
-    const tempFilePath = path.join(os.tmpdir(), `transcript_${documentId}.txt`)
-    await fs.writeFile(tempFilePath, responseText, 'utf8')
-    state.conversation.transcriptTextPath = tempFilePath
-    console.log('Transcript text saved to:', tempFilePath)
-
-    // Return the response as an Adaptive Card
-    const cardJson = new ACData.Template(responseCard).expand({
-      $root: {
-        title: 'Transcript Created',
-        transcript: responseText,
-      },
-    })
-    return cardJson as AdaptiveCard
   }
 }

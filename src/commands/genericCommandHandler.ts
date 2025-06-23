@@ -1,6 +1,6 @@
 import { Selector } from '@microsoft/teams-ai'
 import { Activity, TurnContext } from 'botbuilder'
-import { ApplicationTurnState } from '../internal/interface'
+import { ApplicationTurnState } from '../internal/conversationHandlers'
 
 /**
  * The `GenericCommandHandler` responds

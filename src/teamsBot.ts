@@ -1,6 +1,6 @@
 import { Application } from '@microsoft/teams-ai'
 import { MemoryStorage } from 'botbuilder'
-import { ApplicationTurnState } from './internal/interface'
+import { ApplicationTurnState } from './internal/conversationHandlers'
 
 // Define storage and application
 const storage = new MemoryStorage()

@@ -1,5 +1,7 @@
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs'
 import fs from 'fs/promises'
+import { createWriteStream } from 'fs'
+import { pipeline } from 'stream/promises'
 
 /**
  * Extracts text from a PDF file at the given path, up to maxPages.
@@ -7,7 +9,10 @@ import fs from 'fs/promises'
  * @param maxPages Maximum number of pages to extract
  * @returns Extracted text as a string
  */
-export async function extractTextFromPdf(filePath: string, maxPages: number): Promise<string> {
+export async function extractTextFromPdf(
+  filePath: string,
+  maxPages: number
+): Promise<{ extractedText: string; pages: number }> {
   const pdfBuffer = await fs.readFile(filePath)
   const pdfData = new Uint8Array(pdfBuffer)
   const pdf = await getDocument({ data: pdfData }).promise
@@ -21,21 +26,25 @@ export async function extractTextFromPdf(filePath: string, maxPages: number): Pr
     extractedText += pageText + '\n\n'
   }
 
-  return extractedText
+  return {
+    extractedText,
+    pages: extractUpTo,
+  }
 }
 
 /**
- * Read text from a file
- * @param filePath - The path to the file.
- * @returns A promise that resolves to the text content of the file.
- * @throws An error if the file cannot be read.
+ * Downloads the file from the given URL and saves it to the specified path using fetch and stream.pipeline.
+ * @param {string} contentUrl - The URL of the file to download.
+ * @param {string} filePath - The path where the file will be saved.
+ * @returns {Promise<void>}
  */
-export async function readTextFromFile(filePath: string): Promise<string> {
+export async function writeContentToFile(contentUrl, filePath) {
   try {
-    const text = await fs.readFile(filePath, 'utf8')
-    return text
+    const res = await fetch(contentUrl)
+    const fileStream = createWriteStream(filePath)
+    await pipeline(res.body, fileStream)
   } catch (error) {
-    console.error(`Error reading file at ${filePath}:`, error)
-    throw new Error(`Could not read file: ${error.message}`)
+    console.error('Error downloading the file:', error.message)
+    throw new Error('Failed to download file')
   }
 }

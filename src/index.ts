@@ -2,16 +2,18 @@ import { TurnContext } from 'botbuilder'
 import express from 'express'
 import { GenericCommandHandler } from './commands/genericCommandHandler'
 import { adapter } from './internal/initialize'
-import { ApplicationTurnState } from './internal/interface'
+import { ApplicationTurnState, MessageHandler } from './internal/conversationHandlers'
 import { app } from './teamsBot'
 import {
   ATTACHMENT_CONTENT_TYPE,
   FILE_TIGGER_PATTERN,
   UploadFileCommandHandler,
-} from './commands/uploadFileCommandHandler'
-import { ExtractTextActionHandler } from './cardActions/extractTextActionHandler'
-import { TextToTranscriptActionHandler } from './cardActions/textToTranscriptHandler'
+} from './handlers/uploadFileCommandHandler'
+import { TranscriptToAudioHandler } from './handlers/transcriptToAudioHandler'
+import { TextToTranscriptHandler } from './handlers/textToTranscriptHandler'
+import { warningCard } from './internal/cards'
 
+const MATCH_ALL = /.*/g
 // This template uses `express` to serve HTTP responses.
 // Create express application.
 const expressApp = express()
@@ -25,22 +27,24 @@ const server = expressApp.listen(process.env.port || process.env.PORT || 3978, (
 // Listen for uploaded files
 const uploadFileCommandHandler = new UploadFileCommandHandler()
 app.message(uploadFileCommandHandler.triggerPatterns, async (context: TurnContext, state: ApplicationTurnState) => {
-  const reply = await uploadFileCommandHandler.handleCommandReceived(context, state)
-  if (reply) {
-    await context.sendActivity(reply)
+  await uploadFileCommandHandler.handleInvoked(MessageHandler(context, state))
+})
+
+/**
+ * Handle Adaptive Card actions.
+ */
+const textToTranscriptHandler = new TextToTranscriptHandler()
+const transcriptToAudioHandler = new TranscriptToAudioHandler()
+app.adaptiveCards.actionExecute(MATCH_ALL, async (context: TurnContext, state) => {
+  switch (context.activity.value?.action?.verb) {
+    case textToTranscriptHandler.triggerVerb:
+      return await textToTranscriptHandler.handleActionInvoked(MessageHandler(context, state))
+    case transcriptToAudioHandler.triggerVerb:
+      return await transcriptToAudioHandler.handleActionInvoked(MessageHandler(context, state))
+    default:
+      console.warn(`Unhandled action: ${context.activity.value?.verb}`)
+      return warningCard(`Unhandled action: ${context.activity.value?.action?.verb}`)
   }
-})
-
-// Listen for action invoked on Adaptive Card with verb 'extractText'
-const extractTextActionHandler = new ExtractTextActionHandler()
-app.adaptiveCards.actionExecute(extractTextActionHandler.triggerVerb, async (context: TurnContext, state, data) => {
-  return await extractTextActionHandler.handleActionInkvoked(context, state, data)
-})
-
-// Listen for action invoked on Adaptive Card with verb 'textToTranscript'
-const textToTranscriptActionHandler = new TextToTranscriptActionHandler()
-app.adaptiveCards.actionExecute(textToTranscriptActionHandler.triggerVerb, async (context: TurnContext, state) => {
-  return await textToTranscriptActionHandler.handleActionInvoked(context, state)
 })
 
 const genericCommandHandler = new GenericCommandHandler()

@@ -76,7 +76,7 @@ const textToSpeechStream = async (
     const chunks: Buffer[] = []
     for await (const chunk of audioStream) {
       if (ping) ping()
-      chunks.push(chunk)
+      chunks.push(Buffer.from(chunk))
     }
     return Buffer.concat(chunks)
   } catch (error) {
