@@ -20,6 +20,10 @@ const expressApp = express()
 // eslint-disable-next-line import/no-named-as-default-member
 expressApp.use(express.json())
 
+expressApp.get('/', function (req, res) {
+  res.send('Audry is running.')
+})
+
 const server = expressApp.listen(process.env.port || process.env.PORT || 3978, () => {
   console.log(`\nBot Started, ${expressApp.name} listening to`, server.address())
 })

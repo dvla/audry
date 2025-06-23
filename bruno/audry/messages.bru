@@ -1,0 +1,62 @@
+meta {
+  name: messages
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{HOST}}/api/messages
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "text": "hello",
+    "textFormat": "plain",
+    "type": "message",
+    "timestamp": "2025-06-23T11:37:16.5242237Z",
+    "localTimestamp": "2025-06-23T12:37:16.5242237+01:00",
+    "id": "1750678636506",
+    "channelId": "msteams",
+    "serviceUrl": "https://smba.trafficmanager.net/uk/99d923-45d8-b9ad-97582e3/",
+    "from": {
+      "id": "29:1_Pn8HdZTKZJpEHUrHnPyEKOxBkqA",
+      "name": "Fred Jones",
+      "aadObjectId": "92046db5-43490834d693"
+    },
+    "conversation": {
+      "conversationType": "personal",
+      "tenantId": "99d20d2d--5038c97582e3",
+      "id": "a:167WAzf3wTHok5jlLSB3y-Tq-z_ZlMAOcpiBMmrp6nWbbL"
+    },
+    "recipient": {
+      "id": "28:0e4cb2a8-e1b3-78e512",
+      "name": "Audry"
+    },
+    "entities": [
+      {
+        "locale": "en-GB",
+        "country": "GB",
+        "platform": "Windows",
+        "timezone": "Europe/London",
+        "type": "clientInfo"
+      }
+    ],
+    "channelData": { "tenant": { "id": "99d20d2d-c97582e3" } },
+    "locale": "en-GB",
+    "localTimezone": "Europe/London"
+  }
+  
+}
+
+assert {
+  res.status: eq 401
+}
+
+tests {
+  test("Request is unauthorised", function () {
+      expect(res.getStatus()).to.equal(401);
+  })
+  
+}
