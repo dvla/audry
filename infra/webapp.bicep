@@ -1,6 +1,4 @@
 param botId string
-@secure()
-param botPassword string
 param cosmosDbEndpoint string
 param cosmosDbDatabase string
 param cosmosDbContainer string
@@ -14,10 +12,13 @@ param webAppName string
 param webAppSKU string
 
 // Compute resources for your Web App
-resource serverfarm 'Microsoft.Web/serverfarms@2021-02-01' = {
-  kind: 'app'
+resource appServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
+  kind: 'app,linux'
   location: location
   name: serverfarmName
+  properties: {
+    reserved: true // Indicates that the App Service Plan is for Linux
+  }
   sku: {
     name: webAppSKU
   }
@@ -25,11 +26,11 @@ resource serverfarm 'Microsoft.Web/serverfarms@2021-02-01' = {
 
 // Web App that hosts your bot
 resource webApp 'Microsoft.Web/sites@2021-02-01' = {
-  kind: 'app'
+  //kind: 'app'
   location: location
   name: webAppName
   properties: {
-    serverFarmId: serverfarm.id
+    serverFarmId: appServicePlan.id
     httpsOnly: true
     siteConfig: {
       alwaysOn: true
@@ -49,10 +50,6 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
         {
           name: 'BOT_ID'
           value: botId
-        }
-        {
-          name: 'BOT_PASSWORD'
-          value: botPassword
         }
         {
           name: 'BOT_TENANT_ID'
@@ -84,6 +81,7 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
         }
       ]
       ftpsState: 'FtpsOnly'
+      linuxFxVersion: 'NODE|22' // Set NodeJS version to 22.x for your site
     }
   }
   identity: {

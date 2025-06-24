@@ -47,47 +47,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 stages:
-# Deploy the infrastructure via Bicep
-  - stage: Infrastructure
-    displayName: Create infrastructure
-    jobs:
-    - job: CreateInfrastructure
-      displayName: Create infrastructure
-      steps:
-      - task: AzureKeyVault@2
-        displayName: 'Download secrets from Azure Key Vault'
-        inputs:
-          azureSubscription: '$(azureSubscriptionSvcConn)'
-          KeyVaultName: 'kv-lab-shared-prod'
-          SecretsFilter: 'ETL-Bot-Genny-$(ENV_NAME)-Secret'
-          RunAsPreJob: false
-      - task: AzureResourceManagerTemplateDeployment@3
-        name: BicepDeploy
-        env:
-          BOT_PASSWORD: $(ETL-Bot-Genny-$(ENV_NAME)-Secret)
-        inputs: 
-          deploymentScope: 'Subscription'
-          location: '$(LOCATION)'
-          csmFile: '$(templateFile)'
-          csmParametersFile: '$(csmParametersFile)'
-          deploymentMode: 'Incremental'
-          deploymentName: 'DeployPipelineTemplate'
-          connectedServiceName: '$(azureSubscriptionSvcConn)'
-          deploymentOutputs: bicepOutputs
-      - task: PowerShell@2
-        displayName: Get Bicep outputs
-        inputs:
-          targetType: 'inline'
-          script: |
-            echo '##vso[task.setvariable variable=bicepouts;]$(bicepOutputs)'
-            echo $bicepouts
-            mkdir -p $(Pipeline.Workspace)/bicep
-            echo '$(bicepOutputs)' > $(Pipeline.Workspace)/bicep/bicepOutputs.json
-      - publish: $(Pipeline.Workspace)/bicep/bicepOutputs.json
-        artifact: bicepOutputsJsonFile
-
   - stage: BuildApp
-    dependsOn: Infrastructure
     displayName: Build and Test
     jobs:
     - job: BuildAndTest
@@ -108,8 +68,12 @@ stages:
           npm ci
         displayName: 'Install dependencies'
       - script: |
+          npm run build
+        displayName: 'Build the project'
+      - script: |
           npm run prettier
         displayName: 'Run prettier'
+        condition: always()
       - script: |
           npm run lint
         displayName: 'Run Linter'
@@ -124,46 +88,76 @@ stages:
         displayName: 'Run Outdated'
         condition: always()
         continueOnError: true
-
-    #- job: NPMTest
-    #  displayName: NPM Test
-    #  dependsOn: BuildAndTest
-    #  condition: always()
-    #  steps:
       - script: |
           npm run test
         displayName: 'Run Tests'
         condition: always()
+      - task: CopyFiles@2
+        displayName: 'Copy Files to: ArtifactStagingDirectory'
+        inputs:
+          Contents: |
+            $(Build.SourcesDirectory)/lib/**
+            $(Build.SourcesDirectory)/node_modules/**
+            $(Build.SourcesDirectory)/package.json
+          TargetFolder: '$(Build.ArtifactStagingDirectory)'
+      - task: ArchiveFiles@2
+        displayName: 'Archive files'
+        inputs:
+          rootFolderOrFile: '$(Build.ArtifactStagingDirectory)'
+          includeRootFolder: false
+          archiveType: 'zip'
+          archiveFile: '$(Pipeline.Workspace)/audry.zip'
+          replaceExistingArchive: true
+      - publish: '$(Pipeline.Workspace)/audry.zip'
+        artifact: AudryZipDeployFile
+
+
+# Deploy the infrastructure via Bicep
+  - stage: Infrastructure
+    dependsOn: BuildApp
+    displayName: Create infrastructure
+    jobs:
+    - job: CreateInfrastructure
+      displayName: Create infrastructure
+      steps:
+      - task: AzureResourceManagerTemplateDeployment@3
+        name: BicepDeploy
+        inputs:
+          deploymentScope: 'Subscription'
+          location: '$(LOCATION)'
+          csmFile: '$(templateFile)'
+          csmParametersFile: '$(csmParametersFile)'
+          deploymentMode: 'Incremental'
+          deploymentName: 'DeployPipelineTemplate'
+          connectedServiceName: '$(azureSubscriptionSvcConn)'
+          deploymentOutputs: bicepOutputs
+      - task: PowerShell@2
+        displayName: Get Bicep outputs
+        inputs:
+          targetType: 'inline'
+          script: |
+            echo '##vso[task.setvariable variable=bicepouts;]$(bicepOutputs)'
+            echo $bicepouts
+            mkdir -p $(Pipeline.Workspace)/bicep
+            echo '$(bicepOutputs)' > $(Pipeline.Workspace)/bicep/bicepOutputs.json
+      - publish: $(Pipeline.Workspace)/bicep/bicepOutputs.json
+        artifact: bicepOutputsJsonFile
 
 
   - stage: ZipDeploy
-    dependsOn: BuildApp
-    # This stage will run if the NPMTest job in BuildApp succeeded
-    #condition: succeeded('BuildApp/NPMTest')
+    dependsOn: Infrastructure
     displayName: Zip deploy
     jobs:
       - job: ZipDeploy
         displayName: Zip deploy
         steps:
         - checkout: self
-        - task: CopyFiles@2
-          displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
+        - task: DownloadPipelineArtifact@2
+          displayName: 'Download Audry Zip Deploy File'
           inputs:
-            Contents: |
-              $(Build.SourcesDirectory)/appPackage/**
-              $(Build.SourcesDirectory)/src/**
-              $(Build.SourcesDirectory)/pack*.json
-            TargetFolder: '$(Build.ArtifactStagingDirectory)'
-        - task: ArchiveFiles@2
-          displayName: 'Archive files'
-          inputs:
-            rootFolderOrFile: '$(Build.ArtifactStagingDirectory)'
-            includeRootFolder: false
-            archiveType: 'zip'
-            archiveFile: '$(Pipeline.Workspace)/audry.zip'
-            replaceExistingArchive: true
-        - publish: '$(Pipeline.Workspace)/audry.zip'
-          artifact: AudryZipDeployFile
+            buildType: 'current'
+            artifactName: 'AudryZipDeployFile'
+            targetPath: '$(Pipeline.Workspace)'
         - task: AzureWebApp@1
           displayName: 'Zip Deploy to Azure Web App'
           inputs:

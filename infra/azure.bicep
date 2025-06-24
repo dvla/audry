@@ -7,9 +7,6 @@ param resourceBaseName string
 
 @maxLength(42)
 param botDisplayName string
-param botId string
-@secure()
-param botPassword string
 param environmentName string
 param location string
 param tenantId string
@@ -37,8 +34,7 @@ module webapp './webapp.bicep' = {
     location: location
     serverfarmName: 'farm-${resourceBaseName}-${environmentName}-uks'
     webAppName: 'app-${resourceBaseName}-${environmentName}-uks'
-    botId: botId
-    botPassword: botPassword
+    botId: identity.outputs.clientId
     tenantId: tenantId
     webAppSKU: webAppSKU
     identityId: identity.outputs.identityId
