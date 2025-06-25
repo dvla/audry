@@ -92,6 +92,10 @@ stages:
           npm run test
         displayName: 'Run Tests'
         condition: always()
+      - script: |
+          npm prune --omit=dev
+        displayName: 'Remove dev dependencies'
+        condition: always()
       - task: CopyFiles@2
         displayName: 'Copy Files to: ArtifactStagingDirectory'
         inputs:
