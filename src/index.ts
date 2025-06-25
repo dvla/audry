@@ -4,11 +4,7 @@ import { GenericCommandHandler } from './commands/genericCommandHandler'
 import { adapter } from './internal/initialize'
 import { ApplicationTurnState, MessageHandler } from './internal/conversationHandlers'
 import { app } from './teamsBot'
-import {
-  ATTACHMENT_CONTENT_TYPE,
-  FILE_TIGGER_PATTERN,
-  UploadFileCommandHandler,
-} from './handlers/uploadFileCommandHandler'
+import { ATTACHMENT_CONTENT_TYPE, FILE_TIGGER_PATTERN, UploadFileCommandHandler } from './handlers/uploadFileHandler'
 import { TranscriptToAudioHandler } from './handlers/transcriptToAudioHandler'
 import { TextToTranscriptHandler } from './handlers/textToTranscriptHandler'
 import { warningCard } from './internal/cards'

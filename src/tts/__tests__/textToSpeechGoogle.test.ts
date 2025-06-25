@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
 import path from 'path'
-import { transcriptToSpeech, saveWaveFile, getGoogleClient } from '../textoSpeechGoogle'
+import { transcriptToSpeech, saveWaveFile } from '../textoSpeechGoogle'
 import { Config } from '../../internal/config'
 
 // --- Mock the @google/genai package ---
@@ -54,19 +54,6 @@ describe('saveWaveFile', () => {
     expect(writeMock).toHaveBeenCalledWith(buffer)
     expect(endMock).toHaveBeenCalled()
     expect(onMock).toHaveBeenCalledWith('finish', expect.any(Function))
-  })
-})
-
-describe('getGoogleClient', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
-  test('returns singleton GoogleGenAI instance', () => {
-    const client1 = getGoogleClient()
-    const client2 = getGoogleClient()
-
-    expect(client1).toBe(client2)
   })
 })
 

@@ -1,14 +1,12 @@
-import { AdaptiveCard, Selector } from '@microsoft/teams-ai'
+import { Selector } from '@microsoft/teams-ai'
 import { Attachment, ActivityTypes } from 'botbuilder'
 import { ActivityContext } from '../internal/conversationHandlers'
-import * as ACData from 'adaptivecards-templating'
-import responseCard from '../adaptiveCards/extractTextActionResponse.json'
 import path from 'path'
 import { v7 as uuidv7 } from 'uuid'
 import { extractTextFromPdf, writeContentToFile } from '../internal/utils/fileUtils'
 import { Config } from '../internal/config'
 import { writeExtractedText } from '../internal/utils/documentUtils'
-import { warningCard } from '../internal/cards'
+import { uploadFileCard, warningCard } from '../internal/cards'
 
 // Content type for Teams file download info attachments
 export const ATTACHMENT_CONTENT_TYPE = 'application/vnd.microsoft.teams.file.download.info'
@@ -32,14 +30,7 @@ export class UploadFileCommandHandler {
    * @param state application state
    * @returns adaptive card or a message indicating only PDF files are accepted
    */
-  async handleInvoked({
-    proactiveSendCard,
-    sendCard,
-    send,
-    ref,
-    conversation,
-    activity,
-  }: ActivityContext): Promise<void> {
+  async handleInvoked({ proactiveSendCard, sendCard, send, conversation, activity }: ActivityContext): Promise<void> {
     console.log(`File Uploading: ${activity.text}`)
 
     // Check if the activity has attachments and if the first attachment is a pdf
@@ -48,9 +39,6 @@ export class UploadFileCommandHandler {
       await sendCard(warningCard('Sorry! I can only handle PDF files. Please upload a valid PDF file.'))
       return
     }
-
-    // Get the unique ID from the attachment content
-    const id = activity.attachments[0].content.uniqueId
 
     // Download the file and save it to the temp folder
     const fileDownloadPath = await this.handleFileDownload(attachment)
@@ -63,14 +51,7 @@ export class UploadFileCommandHandler {
     try {
       const { extractedText, pages } = await extractTextFromPdf(fileDownloadPath, Number(Config.MAX_PAGES))
       await writeExtractedText(extractedText, conversation.documentId)
-
-      const cardJson = new ACData.Template(responseCard).expand({
-        $root: {
-          title: 'Text Extracted',
-          body: `Extracted text from ${pages} page(s). - textToTranscript`,
-        },
-      })
-      await proactiveSendCard(cardJson)
+      await proactiveSendCard(uploadFileCard('Text Extracted', `Extracted text from ${pages} page(s).`))
     } catch (err) {
       console.error('Failed to extract text:', err)
       await proactiveSendCard(

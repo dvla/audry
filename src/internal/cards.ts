@@ -1,6 +1,7 @@
 import errorCardJson from '../adaptiveCards/errorCard.json'
 import warningCardJson from '../adaptiveCards/warningCard.json'
 import processingCardJson from '../adaptiveCards/processingCard.json'
+import uploadFileCardJson from '../adaptiveCards/uploadFileCard.json'
 import textToTranscriptCardJson from '../adaptiveCards/textToTranscriptCard.json'
 import transcriptToAudioCardJson from '../adaptiveCards/transcriptToAudioCard.json'
 import * as ACData from 'adaptivecards-templating'
@@ -40,6 +41,21 @@ export const processingCard = (message: string) => {
   return new ACData.Template(processingCardJson).expand({
     $root: {
       message: message,
+    },
+  })
+}
+
+/**
+ * Generates an upload file card with the provided title and body text.
+ * @param title The title of the card.
+ * @param body The body text of the card.
+ * @returns An Adaptive Card with the title and body text.
+ */
+export const uploadFileCard = (title: string, body: string) => {
+  return new ACData.Template(uploadFileCardJson).expand({
+    $root: {
+      title: title,
+      body: body,
     },
   })
 }
