@@ -59,10 +59,10 @@ stages:
         inputs:
           version: "22"
           checkLatest: true
-      #Install Team Toolkit
+      #Install 365 Agents Toolkit
       - script: |
-          npm install -g @microsoft/teamsapp-cli
-        displayName: "Install Teams SDK CLI"
+          npm install -g @microsoft/m365agentstoolkit-cli
+        displayName: "Install 365 Agents Toolkit"
       # Install dependencies
       - script: |
           npm ci
@@ -114,7 +114,13 @@ stages:
           replaceExistingArchive: true
       - publish: '$(Pipeline.Workspace)/audry.zip'
         artifact: AudryZipDeployFile
-
+      - script: |
+          npx atk package --env $(ENV_NAME)
+          ls -lh appPackage/build/appPackage.$(ENV_NAME).zip
+        displayName: 'Package application for Teams'
+      - publish: '$(Build.SourcesDirectory)/appPackage/build/appPackage.$(ENV_NAME).zip'
+        displayName: 'Publish Teams app package'
+        artifact: AudryAppPackage
 
 # Deploy the infrastructure via Bicep
   - stage: Infrastructure
