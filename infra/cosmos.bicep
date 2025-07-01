@@ -3,7 +3,6 @@ param cosmosDbAccountName string
 param databaseName string = 'agents-audry'
 param containerName string = 'bot-storage'
 param location string = resourceGroup().location
-//param currentUserId string
 
 // Create Cosmos DB account
 resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2024-05-15' = {

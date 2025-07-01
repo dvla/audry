@@ -26,7 +26,6 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
 
 // Web App that hosts your bot
 resource webApp 'Microsoft.Web/sites@2021-02-01' = {
-  //kind: 'app'
   location: location
   name: webAppName
   properties: {
@@ -81,7 +80,7 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
         }
       ]
       ftpsState: 'FtpsOnly'
-      linuxFxVersion: 'NODE|22' // Set NodeJS version to 22.x for your site
+      linuxFxVersion: 'NODE|22-lts' // Set NodeJS version to 22.x for your site
     }
   }
   identity: {

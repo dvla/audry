@@ -5,6 +5,7 @@ trigger:
       - main
       - feature/*
       - fix/*
+      - infra/*
     exclude:
       - releases/*
 
@@ -26,7 +27,7 @@ variables:
   - name: TENANT_ID
     value: '99d20d2d-8923-45d8-b9ad-5038c97582e3'
   - name: RESOURCE_BASE_NAME
-    value: 'Audry'
+    value: 'audry'
   - name: ENV_NAME
     value: 'dev'
   - name: WEB_APP_SKU
@@ -60,9 +61,9 @@ stages:
           version: "22"
           checkLatest: true
       #Install 365 Agents Toolkit
-      - script: |
-          npm install -g @microsoft/m365agentstoolkit-cli
-        displayName: "Install 365 Agents Toolkit"
+      # - script: |
+      #     npm install -g @microsoft/m365agentstoolkit-cli
+      #   displayName: "Install 365 Agents Toolkit"
       # Install dependencies
       - script: |
           npm ci
@@ -114,17 +115,17 @@ stages:
           replaceExistingArchive: true
       - publish: '$(Pipeline.Workspace)/audry.zip'
         artifact: AudryZipDeployFile
-      - script: |
-          npx atk package --env $(ENV_NAME)
-          ls -lh appPackage/build/appPackage.$(ENV_NAME).zip
-        displayName: 'Package application for Teams'
-      - publish: '$(Build.SourcesDirectory)/appPackage/build/appPackage.$(ENV_NAME).zip'
-        displayName: 'Publish Teams app package'
-        artifact: AudryAppPackage
+      # - script: |
+      #     npx atk package --env $(ENV_NAME)
+      #     ls -lh appPackage/build/appPackage.$(ENV_NAME).zip
+      #   displayName: 'Package application for Teams'
+      # - publish: '$(Build.SourcesDirectory)/appPackage/build/appPackage.$(ENV_NAME).zip'
+      #   displayName: 'Publish Teams app package'
+      #   artifact: AudryAppPackage
 
 # Deploy the infrastructure via Bicep
   - stage: Infrastructure
-    dependsOn: BuildApp
+    #condition: contains(variables['Build.SourceBranchName'], 'infra')
     displayName: Create infrastructure
     jobs:
     - job: CreateInfrastructure
@@ -160,6 +161,7 @@ stages:
     jobs:
       - job: ZipDeploy
         displayName: Zip deploy
+        timeoutInMinutes: '5' #AzureCLI@2/az webapp deploy gets stuck - the site can be up but it never seems to stop polling for a response, so forcing a timeout here
         steps:
         - checkout: self
         - task: DownloadPipelineArtifact@2
@@ -168,12 +170,12 @@ stages:
             buildType: 'current'
             artifactName: 'AudryZipDeployFile'
             targetPath: '$(Pipeline.Workspace)'
-        - task: AzureWebApp@1
-          displayName: 'Zip Deploy to Azure Web App'
+        - task: AzureCLI@2
+          displayName: 'Create Azure Web App'
           inputs:
             azureSubscription: '$(azureSubscriptionSvcConn)'
-            appType: 'webApp'
-            appName: 'app-$(RESOURCE_BASE_NAME)-$(ENV_NAME)-uks'
-            package: '$(Pipeline.Workspace)/audry.zip'
-            deploymentMethod: 'zipDeploy'
-
+            scriptType: 'pscore'
+            scriptLocation: 'inlineScript'
+            inlineScript: |
+              echo 'Deploying web app...'
+              az webapp deploy --resource-group "rg-$(RESOURCE_BASE_NAME)-$(ENV_NAME)-uks" --name "app-$(RESOURCE_BASE_NAME)-$(ENV_NAME)-uks" --src-path '$(Pipeline.Workspace)/audry.zip' --track-status false

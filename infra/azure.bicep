@@ -12,7 +12,6 @@ param location string
 param tenantId string
 param webAppSKU string
 
-
 resource rg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
   name: 'rg-${resourceBaseName}-${environmentName}-uks'
   location: location
@@ -46,7 +45,6 @@ module webapp './webapp.bicep' = {
   }
 }
 
-
 // Register your web service as a bot with the Bot Framework
 module azureBotRegistration './bot.bicep' = {
   name: 'Azure-Bot-Registration'
@@ -60,13 +58,13 @@ module azureBotRegistration './bot.bicep' = {
     botServiceName: 'bot-${resourceBaseName}-${environmentName}-uks'
   }
 }
+
 module cosmosDB './cosmos.bicep' = {
   name: 'Azure-CosmosDB'
   scope: rg
   params: {
     cosmosDbAccountName: 'cosmos-${resourceBaseName}-${environmentName}-uks'
     userAssignedIdentityPrincipalId: identity.outputs.principalId
-    //currentUserId: principalType == 'User' ? currentUserId : ''
   }
 }
 
