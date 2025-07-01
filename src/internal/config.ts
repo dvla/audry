@@ -2,12 +2,11 @@ import os from 'os'
 
 // Environment variable placeholder
 export const ENV_PLACEHOLDER = '<not_set>'
+export const DEFAULT_EMPTY = ''
 
 // Default values for environment variables
-export const DEFAULT_ELEVENLABS_API_KEY = ''
 export const DEFAULT_FILES_DIR = os.tmpdir()
 export const DEFAULT_MAX_PAGES = '80'
-export const DEFAULT_GEMINI_API_KEY = ''
 export const DEFAULT_GEMINI_MODEL = 'gemini-2.0-flash-001'
 
 /**
@@ -30,13 +29,17 @@ export const Config = {
   MicrosoftAppTenantId: process.env.BOT_TENANT_ID,
   MicrosoftAppPassword: process.env.BOT_PASSWORD,
   // ElevenLabs API Key
-  ELEVENLABS_API_KEY: checkOptionalVariable(process.env.ELEVENLABS_API_KEY, DEFAULT_ELEVENLABS_API_KEY),
+  ELEVENLABS_API_KEY: checkOptionalVariable(process.env.ELEVENLABS_API_KEY, DEFAULT_EMPTY),
   // Audry Temporary Files Directory
   FILES_DIR: checkOptionalVariable(process.env.AUDRY_FILES_DIR, DEFAULT_FILES_DIR),
   // Audry PDF max pages to process
   MAX_PAGES: checkOptionalVariable(process.env.AUDRY_MAX_PAGES, DEFAULT_MAX_PAGES),
   //Gemini API Key
-  GEMINI_API_KEY: checkOptionalVariable(process.env.GEMINI_API_KEY, DEFAULT_GEMINI_API_KEY),
+  GEMINI_API_KEY: checkOptionalVariable(process.env.GEMINI_API_KEY, DEFAULT_EMPTY),
   //Gemini Model
   GEMINI_MODEL: checkOptionalVariable(process.env.GEMINI_MODEL, DEFAULT_GEMINI_MODEL),
+
+  COSMOSDB_ENDPOINT: checkOptionalVariable(process.env.COSMOSDB_ENDPOINT, DEFAULT_EMPTY),
+  COSMOSDB_DATABASE: checkOptionalVariable(process.env.COSMOSDB_DATABASE, DEFAULT_EMPTY),
+  COSMOSDB_CONTAINER: checkOptionalVariable(process.env.COSMOSDB_CONTAINER, DEFAULT_EMPTY),
 }

@@ -1,8 +1,7 @@
 import {
   ENV_PLACEHOLDER,
-  DEFAULT_ELEVENLABS_API_KEY,
+  DEFAULT_EMPTY,
   DEFAULT_FILES_DIR,
-  DEFAULT_GEMINI_API_KEY,
   DEFAULT_GEMINI_MODEL,
   DEFAULT_MAX_PAGES,
 } from '../../internal/config'
@@ -41,10 +40,10 @@ describe('config test', () => {
     expect(Config.MicrosoftAppType).toBeUndefined()
     expect(Config.MicrosoftAppTenantId).toBeUndefined()
     expect(Config.MicrosoftAppPassword).toBeUndefined()
-    expect(Config.ELEVENLABS_API_KEY).toEqual(DEFAULT_ELEVENLABS_API_KEY)
+    expect(Config.ELEVENLABS_API_KEY).toEqual(DEFAULT_EMPTY)
     expect(Config.FILES_DIR).toEqual(DEFAULT_FILES_DIR)
     expect(Config.MAX_PAGES).toEqual(DEFAULT_MAX_PAGES)
-    expect(Config.GEMINI_API_KEY).toEqual(DEFAULT_GEMINI_API_KEY)
+    expect(Config.GEMINI_API_KEY).toEqual(DEFAULT_EMPTY)
     expect(Config.GEMINI_MODEL).toEqual(DEFAULT_GEMINI_MODEL)
   })
 
@@ -89,10 +88,10 @@ describe('config test', () => {
     const { Config } = await import('../../internal/config.js')
 
     // Assert
-    expect(Config.ELEVENLABS_API_KEY).toEqual(DEFAULT_ELEVENLABS_API_KEY)
+    expect(Config.ELEVENLABS_API_KEY).toEqual(DEFAULT_EMPTY)
     expect(Config.FILES_DIR).toEqual(DEFAULT_FILES_DIR)
     expect(Config.MAX_PAGES).toEqual(DEFAULT_MAX_PAGES)
-    expect(Config.GEMINI_API_KEY).toEqual(DEFAULT_GEMINI_API_KEY)
+    expect(Config.GEMINI_API_KEY).toEqual(DEFAULT_EMPTY)
     expect(Config.GEMINI_MODEL).toEqual(DEFAULT_GEMINI_MODEL)
   })
 
@@ -109,10 +108,10 @@ describe('config test', () => {
     const { Config } = await import('../../internal/config.js')
 
     // Assert
-    expect(Config.ELEVENLABS_API_KEY).toEqual(DEFAULT_ELEVENLABS_API_KEY)
+    expect(Config.ELEVENLABS_API_KEY).toEqual(DEFAULT_EMPTY)
     expect(Config.FILES_DIR).toEqual(DEFAULT_FILES_DIR)
     expect(Config.MAX_PAGES).toEqual(DEFAULT_MAX_PAGES)
-    expect(Config.GEMINI_API_KEY).toEqual(DEFAULT_GEMINI_API_KEY)
+    expect(Config.GEMINI_API_KEY).toEqual(DEFAULT_EMPTY)
     expect(Config.GEMINI_MODEL).toEqual(DEFAULT_GEMINI_MODEL)
   })
 })

@@ -1,7 +1,7 @@
 param userAssignedIdentityPrincipalId string
 param cosmosDbAccountName string
-param databaseName string = 'agents-escalation'
-param containerName string = 'conversations'
+param databaseName string = 'agents-audry'
+param containerName string = 'bot-storage'
 param location string = resourceGroup().location
 //param currentUserId string
 
@@ -53,26 +53,6 @@ resource cosmosDbDatabase 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@20
   }
 }
 
-resource container 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2024-05-15' = {
-  name: containerName
-  location: location
-  parent: cosmosDbDatabase
-  properties: {
-    resource: {
-      id: containerName
-      createMode: 'Default'
-      partitionKey: {
-        kind: 'Hash'
-        paths: [
-          '/partitionKey'
-        ]
-      }
-      defaultTtl: 604800 // Time to Live set to 7 days (in seconds)
-    }
-    options: {}
-  }
-}
-
 /*
   SEE
     https://github.com/Azure/azure-quickstart-templates/blob/master/quickstarts/microsoft.kusto/kusto-cosmos-db/main.bicep
@@ -108,5 +88,5 @@ resource sqlRoleAssignment 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignm
 } */
 
 output cosmosDbDatabase string = cosmosDbDatabase.name
-output cosmosDbContainer string = container.name
+output cosmosDbContainer string = containerName
 output cosmosDbEndpoint string = cosmosDbAccount.properties.documentEndpoint

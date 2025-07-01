@@ -1,9 +1,41 @@
 import { Application } from '@microsoft/teams-ai'
-import { MemoryStorage } from 'botbuilder'
 import { ApplicationTurnState } from './internal/conversationHandlers'
+import { MemoryStorage, Storage } from 'botbuilder'
+import { Config } from './internal/config'
+import { CosmosDbPartitionedStorage } from 'botbuilder-azure'
+
+/**
+ * Returns a storage instance based on the current configuration.
+ *
+ * If the required CosmosDB configuration values are present, this function returns a
+ * `CosmosDbPartitionedStorage` instance for persistent storage. Otherwise, it falls back
+ * to using `MemoryStorage` for in-memory storage.
+ *
+ * It is designed to be called once so there is no caching of the storage instance.
+ *
+ * @returns {Storage} An instance of either `CosmosDbPartitionedStorage` or `MemoryStorage`
+ *                    depending on the configuration.
+ */
+export const getMemory = (): Storage => {
+  if (Config.COSMOSDB_ENDPOINT && Config.COSMOSDB_DATABASE && Config.COSMOSDB_CONTAINER) {
+    try {
+      const cosmosStorage = new CosmosDbPartitionedStorage({
+        cosmosDbEndpoint: Config.COSMOSDB_ENDPOINT,
+        databaseId: Config.COSMOSDB_DATABASE,
+        containerId: Config.COSMOSDB_CONTAINER,
+        compatibilityMode: false,
+      })
+      console.info('Using CosmosDB for storage')
+      return cosmosStorage
+    } catch (error) {
+      console.error('Error initializing CosmosDB storage:', error)
+    }
+  }
+  console.info('Using Memory for storage')
+  return new MemoryStorage()
+}
 
 // Define storage and application
-const storage = new MemoryStorage()
 export const app = new Application<ApplicationTurnState>({
-  storage,
+  storage: getMemory(),
 })
