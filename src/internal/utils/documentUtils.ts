@@ -52,3 +52,12 @@ export const getTranscript = async (documentId: string): Promise<string> => {
   const transcriptFilePath = path.join(Config.FILES_DIR, `transcript_${documentId}.txt`)
   return await fs.readFile(transcriptFilePath, 'utf8')
 }
+
+/**
+ * Generates a unique file name for the podcast based on the current date and time.
+ * @returns A string representing the podcast file name.
+ */
+export const generatePodcastFileName = (): string => {
+  const now = new Date()
+  return `podcast_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`
+}
