@@ -1,6 +1,7 @@
-import { ActivityContext } from '../internal/conversationHandlers'
-import { createFileInfoAttachment, errorCard } from '../internal/cards'
 import fs from 'fs/promises'
+
+import { createFileInfoAttachment, errorCard } from '../internal/cards'
+import { ActivityContext } from '../internal/conversationHandlers'
 
 const FILE_UPLOAD_ACTION = 'fileUpload'
 

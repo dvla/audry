@@ -1,11 +1,12 @@
-import errorCardJson from '../adaptiveCards/errorCard.json'
-import warningCardJson from '../adaptiveCards/warningCard.json'
-import processingCardJson from '../adaptiveCards/processingCard.json'
-import uploadFileCardJson from '../adaptiveCards/uploadFileCard.json'
-import textToTranscriptCardJson from '../adaptiveCards/textToTranscriptCard.json'
-import transcriptToAudioCardJson from '../adaptiveCards/transcriptToAudioCard.json'
 import * as ACData from 'adaptivecards-templating'
 import * as path from 'path'
+
+import errorCardJson from '../adaptiveCards/errorCard.json'
+import processingCardJson from '../adaptiveCards/processingCard.json'
+import textToTranscriptCardJson from '../adaptiveCards/textToTranscriptCard.json'
+import transcriptToAudioCardJson from '../adaptiveCards/transcriptToAudioCard.json'
+import uploadFileCardJson from '../adaptiveCards/uploadFileCard.json'
+import warningCardJson from '../adaptiveCards/warningCard.json'
 
 /**
  * Generates an error card with the provided message.

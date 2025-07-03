@@ -1,8 +1,9 @@
 import { Application } from '@microsoft/teams-ai'
-import { ApplicationTurnState } from './internal/conversationHandlers'
 import { MemoryStorage, Storage } from 'botbuilder'
-import { Config } from './internal/config'
 import { CosmosDbPartitionedStorage } from 'botbuilder-azure'
+
+import { Config } from './internal/config'
+import { ApplicationTurnState } from './internal/conversationHandlers'
 
 /**
  * Returns a storage instance based on the current configuration.

@@ -6,6 +6,12 @@ module.exports = {
   useTabs: false,
   printWidth: 120,
   semi: false,
+  importOrder: ["<THIRD_PARTY_MODULES>", "^[./]"],
+  importOrderSeparation: true,
+  importOrderSortSpecifiers: true,
+  plugins: [
+    "@trivago/prettier-plugin-sort-imports"
+  ],
   overrides: [
     {
       files: ["*.yml"],

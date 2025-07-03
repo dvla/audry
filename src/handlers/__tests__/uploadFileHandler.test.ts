@@ -1,9 +1,10 @@
-import { describe, beforeEach, it, expect, vi, afterEach, Mock } from 'vitest'
-import { UploadFileCommandHandler, ATTACHMENT_CONTENT_TYPE, FILE_TIGGER_PATTERN } from '../uploadFileHandler'
 import { Readable } from 'stream'
-import * as fileutils from '../../internal/utils/fileUtils'
+import { Mock, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import * as cards from '../../internal/cards'
 import { ActivityContext } from '../../internal/conversationHandlers'
+import * as fileutils from '../../internal/utils/fileUtils'
+import { ATTACHMENT_CONTENT_TYPE, FILE_TIGGER_PATTERN, UploadFileCommandHandler } from '../uploadFileHandler'
 
 vi.mock('stream/promises', () => ({
   pipeline: vi.fn(() => Promise.resolve()),

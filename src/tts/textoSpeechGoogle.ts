@@ -1,6 +1,7 @@
 import { GenerateContentResponse, GoogleGenAI, SpeakerVoiceConfig } from '@google/genai'
-import * as wav from 'wav'
 import * as path from 'path'
+import * as wav from 'wav'
+
 import { Config } from '../internal/config'
 import { generatePodcastFileName } from '../internal/utils/documentUtils'
 

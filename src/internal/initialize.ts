@@ -2,6 +2,7 @@ import { TeamsAdapter } from '@microsoft/teams-ai'
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
 import { ConfigurationServiceClientCredentialFactory, TurnContext } from 'botbuilder'
+
 import { Config } from './config'
 
 // Create adapter.

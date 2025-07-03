@@ -1,12 +1,13 @@
 import { Selector } from '@microsoft/teams-ai'
-import { Attachment, ActivityTypes } from 'botbuilder'
-import { ActivityContext } from '../internal/conversationHandlers'
+import { ActivityTypes, Attachment } from 'botbuilder'
 import path from 'path'
 import { v7 as uuidv7 } from 'uuid'
-import { extractTextFromPdf, writeContentToFile } from '../internal/utils/fileUtils'
-import { Config } from '../internal/config'
-import { writeExtractedText } from '../internal/utils/documentUtils'
+
 import { uploadFileCard, warningCard } from '../internal/cards'
+import { Config } from '../internal/config'
+import { ActivityContext } from '../internal/conversationHandlers'
+import { writeExtractedText } from '../internal/utils/documentUtils'
+import { extractTextFromPdf, writeContentToFile } from '../internal/utils/fileUtils'
 
 // Content type for Teams file download info attachments
 export const ATTACHMENT_CONTENT_TYPE = 'application/vnd.microsoft.teams.file.download.info'

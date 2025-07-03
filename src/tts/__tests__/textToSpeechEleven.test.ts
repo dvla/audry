@@ -1,7 +1,9 @@
-import { describe, beforeEach, test, expect, vi } from 'vitest'
 import os from 'os'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
+
 import { Config } from '../../internal/config'
 import { textToSpeech, writeFile } from '../textToSpeechEleven'
+
 describe('textToSpeechEleven config test', () => {
   const originalEnv = process.env
 

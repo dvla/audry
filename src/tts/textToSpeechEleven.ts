@@ -1,8 +1,9 @@
 import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js'
+import { promises as fs } from 'fs'
 import * as path from 'path'
 import { v7 as uuidv7 } from 'uuid'
+
 import { Config } from '../internal/config'
-import { promises as fs } from 'fs'
 
 const MODEL_ID = 'eleven_multilingual_v2'
 const OUTPUT_FORMAT = 'mp3_44100_128'

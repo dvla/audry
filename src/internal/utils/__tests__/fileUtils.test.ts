@@ -1,6 +1,8 @@
-import { describe, it, expect } from 'vitest'
-import { extractTextFromPdf } from '../fileUtils' // adjust to match your file path
+// adjust to match your file path
 import path from 'path'
+import { describe, expect, it } from 'vitest'
+
+import { extractTextFromPdf } from '../fileUtils'
 
 describe('extractTextFromPdf (real file)', () => {
   const pdfPath = path.resolve(__dirname, './test.pdf')

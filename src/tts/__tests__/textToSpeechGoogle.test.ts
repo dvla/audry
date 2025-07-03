@@ -1,7 +1,8 @@
-import { describe, test, expect, beforeEach, vi } from 'vitest'
 import path from 'path'
-import { transcriptToSpeech, saveWaveFile, splitTranscript, processChunks, config } from '../textoSpeechGoogle'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
+
 import { Config } from '../../internal/config'
+import { config, processChunks, saveWaveFile, splitTranscript, transcriptToSpeech } from '../textoSpeechGoogle'
 
 const SMALL_TEST_TRANSCRIPT = `Speaker 1: Alright, Ellie, buckle up, because today we're diving deep into the digital heart of… the DVLA!
 

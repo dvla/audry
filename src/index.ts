@@ -1,15 +1,15 @@
-import { TurnContext, ActivityTypes } from 'botbuilder'
+import { ActivityTypes, TurnContext } from 'botbuilder'
 import express from 'express'
+
 import { GenericCommandHandler } from './commands/genericCommandHandler'
-import { adapter } from './internal/initialize'
-import { ApplicationTurnState, MessageHandler } from './internal/conversationHandlers'
-import { app } from './teamsBot'
-import { ATTACHMENT_CONTENT_TYPE, FILE_TIGGER_PATTERN, UploadFileCommandHandler } from './handlers/uploadFileHandler'
-import { TranscriptToAudioHandler } from './handlers/transcriptToAudioHandler'
 import { FileConsentHandler } from './handlers/fileConsentHandler'
 import { TextToTranscriptHandler } from './handlers/textToTranscriptHandler'
-
+import { TranscriptToAudioHandler } from './handlers/transcriptToAudioHandler'
+import { ATTACHMENT_CONTENT_TYPE, FILE_TIGGER_PATTERN, UploadFileCommandHandler } from './handlers/uploadFileHandler'
 import { warningCard } from './internal/cards'
+import { ApplicationTurnState, MessageHandler } from './internal/conversationHandlers'
+import { adapter } from './internal/initialize'
+import { app } from './teamsBot'
 
 const MATCH_ALL = /.*/g
 // This template uses `express` to serve HTTP responses.

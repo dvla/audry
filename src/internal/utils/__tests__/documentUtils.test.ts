@@ -1,7 +1,8 @@
 import fs from 'fs/promises'
 import path from 'path'
+
 import { Config } from '../../config'
-import { writeExtractedText, getExtractedText, writeTranscript, getTranscript } from '../documentUtils'
+import { getExtractedText, getTranscript, writeExtractedText, writeTranscript } from '../documentUtils'
 
 describe('documentUtils', () => {
   const FILES_DIR = '/mock/files'

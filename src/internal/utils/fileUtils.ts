@@ -1,6 +1,6 @@
-import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs'
-import fs from 'fs/promises'
 import { createWriteStream } from 'fs'
+import fs from 'fs/promises'
+import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs'
 import { pipeline } from 'stream/promises'
 
 /**

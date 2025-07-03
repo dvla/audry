@@ -1,9 +1,10 @@
-import * as fs from 'fs'
 import { Selector } from '@microsoft/teams-ai'
+import * as fs from 'fs'
+
+import { createFileConsentCard, processingCard, warningCard } from '../internal/cards'
 import { ActivityContext } from '../internal/conversationHandlers'
-import { transcriptToSpeech } from '../tts/textoSpeechGoogle'
 import { getTranscript } from '../internal/utils/documentUtils'
-import { warningCard, processingCard, createFileConsentCard } from '../internal/cards'
+import { transcriptToSpeech } from '../tts/textoSpeechGoogle'
 
 const FILE_TRIGGER_PATTERN = 'transcriptToAudio'
 

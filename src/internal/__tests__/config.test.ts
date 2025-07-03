@@ -1,11 +1,12 @@
+import { afterAll, beforeEach, describe, expect, test, vi } from 'vitest'
+
 import {
-  ENV_PLACEHOLDER,
   DEFAULT_EMPTY,
   DEFAULT_FILES_DIR,
   DEFAULT_GEMINI_MODEL,
   DEFAULT_MAX_PAGES,
+  ENV_PLACEHOLDER,
 } from '../../internal/config'
-import { describe, expect, test, vi, beforeEach, afterAll } from 'vitest'
 
 describe('config test', () => {
   const originalEnv = process.env

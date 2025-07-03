@@ -1,7 +1,8 @@
 import { Selector } from '@microsoft/teams-ai'
+
+import { processingCard, textToTranscriptCard, warningCard } from '../internal/cards'
 import { ActivityContext } from '../internal/conversationHandlers'
 import { getExtractedText, writeTranscript } from '../internal/utils/documentUtils'
-import { processingCard, textToTranscriptCard, warningCard } from '../internal/cards'
 import { textToTranscript } from '../tts/textToTranscript'
 
 const FILE_TRIGGER_PATTERN = 'textToTranscript'

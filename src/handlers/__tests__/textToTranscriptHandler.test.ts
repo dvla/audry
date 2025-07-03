@@ -1,9 +1,10 @@
-import { describe, it, expect, vi, beforeEach, afterEach, Mock } from 'vitest'
-import { TextToTranscriptHandler } from '../textToTranscriptHandler'
-import * as documentUtils from '../../internal/utils/documentUtils'
-import * as cards from '../../internal/cards'
-import { textToTranscript } from '../../tts/textToTranscript'
 import { ActivityContext } from 'src/internal/conversationHandlers'
+import { Mock, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import * as cards from '../../internal/cards'
+import * as documentUtils from '../../internal/utils/documentUtils'
+import { textToTranscript } from '../../tts/textToTranscript'
+import { TextToTranscriptHandler } from '../textToTranscriptHandler'
 
 const EXTRACTED_TEXT = 'Information Technology Services  Digital and Technology Strategic Plan  2021 24'
 const TRANSCRIPT =
