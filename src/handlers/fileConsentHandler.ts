@@ -2,6 +2,7 @@ import fs from 'fs/promises'
 
 import { createFileInfoAttachment, errorCard } from '../internal/cards'
 import { ActivityContext } from '../internal/conversationHandlers'
+import { log } from '../internal/logger'
 
 const FILE_UPLOAD_ACTION = 'fileUpload'
 
@@ -17,18 +18,18 @@ export class FileConsentHandler {
       const action = fileConsentValue?.action // "accept" or "decline"
       const type = fileConsentValue?.type // "fileUpload"
 
-      console.log(`File consent - action: ${action}, type: ${type}`)
+      log.debug(`File consent - action: ${action}, type: ${type}`)
 
       if (type === FILE_UPLOAD_ACTION && action === 'accept') {
         // Handle file consent accept
         await this.handleFileConsentAccept(activity, send, sendCard)
       } else {
         // Handle file consent decline
-        console.warn('File consent declined')
+        log.warn('File consent declined')
         await this.handleFileConsentDecline(activity)
       }
     } catch (error) {
-      console.error('Error handling file consent invoke:', error)
+      log.error('Error handling file consent invoke:', error)
       await sendCard(errorCard('Error processing file consent request.'))
     }
   }
@@ -37,14 +38,8 @@ export class FileConsentHandler {
    * @param context - The activity context
    */
   async handleFileConsentAccept(activity, send, sendCard): Promise<void> {
-    console.log('[FileConsentAccept] Handler invoked', {
-      activityType: activity.type,
-      activityName: activity.name,
-      activityValue: activity.value,
-    })
-
     try {
-      console.log('[FileConsentAccept] Received file consent accept activity.')
+      log.debug('[FileConsentAccept] Received file consent accept activity.')
 
       const consentContext = activity.value
       const uploadUrl = consentContext.uploadInfo?.uploadUrl
@@ -53,12 +48,12 @@ export class FileConsentHandler {
       const contentUrl = consentContext.uploadInfo?.contentUrl
 
       if (!uploadUrl) {
-        console.error('[FileConsentAccept] Upload URL not provided in consent response.')
+        log.error('[FileConsentAccept] Upload URL not provided in consent response.')
         throw new Error('Upload URL not provided in consent response')
       }
 
       // Upload file to Microsoft Teams using proper SharePoint upload session
-      console.log('[FileConsentAccept] Uploading file to Teams...')
+      log.debug('[FileConsentAccept] Uploading file to Teams...')
 
       try {
         // Get the transcript file path for the current conversation
@@ -74,10 +69,10 @@ export class FileConsentHandler {
         const uploadResponse = await this.uploadFileToTeams(uploadUrl, audio, fileSize)
 
         if (uploadResponse.success) {
-          console.log(`[FileConsentAccept] Upload successful`)
+          log.info(`[FileConsentAccept] Upload successful`)
 
           // Create file info attachment using the contentUrl from the consent response
-          console.log('[FileConsentAccept] Creating file info attachment...')
+          log.debug('[FileConsentAccept] Creating file info attachment...')
           const fileInfoAttachment = createFileInfoAttachment(
             fileName,
             contentUrl, // Use contentUrl instead of uploadUrl
@@ -85,7 +80,7 @@ export class FileConsentHandler {
           )
 
           // Send file info to complete the upload process
-          console.log('[FileConsentAccept] Sending file info attachment to Teams...')
+          log.debug('[FileConsentAccept] Sending file info attachment to Teams...')
           await send({
             type: 'message',
             attachments: [fileInfoAttachment],
@@ -94,11 +89,11 @@ export class FileConsentHandler {
           throw new Error(`Upload failed: ${uploadResponse.error}`)
         }
       } catch (uploadError) {
-        console.error(`[FileConsentAccept] Upload failed:`, uploadError)
+        log.error(`[FileConsentAccept] Upload failed:`, uploadError)
         throw new Error(`Upload failed: ${uploadError.message}`)
       }
     } catch (error) {
-      console.error('[FileConsentAccept] Error handling file consent accept:', error)
+      log.error('[FileConsentAccept] Error handling file consent accept:', error)
       await sendCard(errorCard('Failed to upload audio file to Teams. Please try again.'))
     }
   }
@@ -120,7 +115,7 @@ export class FileConsentHandler {
 
       if (fileSize <= chunkSize) {
         // Single chunk upload
-        console.log('[FileUpload] Uploading single chunk...')
+        log.debug('[FileUpload] Uploading single chunk...')
 
         const response = await this.uploadFile(uploadUrl, fileBuffer, fileSize, `bytes 0-${fileSize - 1}/${fileSize}`)
 
@@ -131,7 +126,7 @@ export class FileConsentHandler {
         }
       } else {
         // Multi-chunk upload
-        console.log('[FileUpload] Uploading multiple chunks...')
+        log.debug('[FileUpload] Uploading multiple chunks...')
         let uploadedBytes = 0
 
         while (uploadedBytes < fileSize) {
@@ -142,7 +137,7 @@ export class FileConsentHandler {
           const rangeStart = uploadedBytes
           const rangeEnd = uploadedBytes + currentChunkSize - 1
 
-          console.log(`[FileUpload] Uploading chunk: bytes ${rangeStart}-${rangeEnd}/${fileSize}`)
+          log.debug(`[FileUpload] Uploading chunk: bytes ${rangeStart}-${rangeEnd}/${fileSize}`)
 
           const response = await this.uploadFile(
             uploadUrl,
@@ -161,7 +156,7 @@ export class FileConsentHandler {
         return { success: true }
       }
     } catch (error) {
-      console.error('[FileUpload] Upload error:', error)
+      log.error('[FileUpload] Upload error:', error)
       if (error instanceof TypeError && error.message.includes('fetch')) {
         return { success: false, error: 'Network error during upload' }
       } else {
@@ -177,7 +172,7 @@ export class FileConsentHandler {
   async handleFileConsentDecline(sendCard): Promise<void> {
     await sendCard(errorCard('File upload was declined. The audio file will not be shared.'))
 
-    console.log('User declined file upload consent')
+    log.debug('User declined file upload consent')
   }
 
   /**

@@ -3,6 +3,8 @@ import fs from 'fs/promises'
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs'
 import { pipeline } from 'stream/promises'
 
+import { log } from '../logger'
+
 /**
  * Extracts text from a PDF file at the given path, up to maxPages.
  * @param filePath Path to the PDF file
@@ -44,7 +46,7 @@ export async function writeContentToFile(contentUrl, filePath) {
     const fileStream = createWriteStream(filePath)
     await pipeline(res.body, fileStream)
   } catch (error) {
-    console.error('Error downloading the file:', error.message)
+    log.error('Error downloading the file.', error)
     throw new Error('Failed to download file')
   }
 }

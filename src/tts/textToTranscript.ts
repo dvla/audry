@@ -1,4 +1,5 @@
 import { Config } from '../internal/config'
+import { log } from '../internal/logger'
 import { getGoogleClient } from './textoSpeechGoogle'
 
 const SYSTEM_INSTRUCTIONS = `You are the a world-class podcast writer, you have worked as a ghost writer for Joe Rogan, Lex Fridman, Richard Osman, The Beast.
@@ -56,7 +57,7 @@ export const textToTranscript = async (extractedText: string) => {
   // Process the streamed response
   let responseText = ''
   for await (const chunk of response) {
-    console.log(chunk.text)
+    log.debug(chunk.text)
     responseText += chunk.text
   }
 

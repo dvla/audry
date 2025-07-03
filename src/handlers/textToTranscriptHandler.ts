@@ -2,6 +2,7 @@ import { Selector } from '@microsoft/teams-ai'
 
 import { processingCard, textToTranscriptCard, warningCard } from '../internal/cards'
 import { ActivityContext } from '../internal/conversationHandlers'
+import { log } from '../internal/logger'
 import { getExtractedText, writeTranscript } from '../internal/utils/documentUtils'
 import { textToTranscript } from '../tts/textToTranscript'
 
@@ -42,7 +43,7 @@ export class TextToTranscriptHandler {
       // Send a proactive card with the transcript
       await proactiveSendCard(textToTranscriptCard('Transcript Created', transcriptText))
     } catch (error) {
-      console.error('Error generating transcript:', error)
+      log.error('Error generating transcript:', error)
       await proactiveSendCard(warningCard('The transcript could not be generated. Please try again later.'))
     }
   }

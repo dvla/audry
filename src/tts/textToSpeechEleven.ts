@@ -4,6 +4,7 @@ import * as path from 'path'
 import { v7 as uuidv7 } from 'uuid'
 
 import { Config } from '../internal/config'
+import { log } from '../internal/logger'
 
 const MODEL_ID = 'eleven_multilingual_v2'
 const OUTPUT_FORMAT = 'mp3_44100_128'
@@ -81,7 +82,7 @@ const textToSpeechStream = async (
     }
     return Buffer.concat(chunks)
   } catch (error) {
-    console.error('Failed to convert text to speech:', error)
+    log.error('Failed to convert text to speech.', error)
     return null // Return null to indicate failure
   }
 }

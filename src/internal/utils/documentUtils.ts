@@ -2,6 +2,7 @@ import fs from 'fs/promises'
 import path from 'path'
 
 import { Config } from '../config'
+import { log } from '../logger'
 
 /**
  * Writes the extracted text to a file.
@@ -12,7 +13,7 @@ import { Config } from '../config'
 export const writeExtractedText = async (text: string, documentId: string): Promise<string> => {
   const filePath = path.join(Config.FILES_DIR, `extracted_text_${documentId}.txt`)
   await fs.writeFile(filePath, text, 'utf8')
-  console.log('Extracted text saved to:', filePath)
+  log.debug(`Extracted text saved to: ${filePath}`)
   return filePath
 }
 
@@ -26,7 +27,7 @@ export const getExtractedText = async (documentId: string): Promise<string> => {
   try {
     return await fs.readFile(filePath, 'utf8')
   } catch (error) {
-    console.error(`Error reading extracted text file at ${filePath}:`, error)
+    log.error(`Error reading extracted text file at ${filePath}:`, error)
     throw new Error(`Could not read extracted text file: ${error.message}`)
   }
 }
@@ -40,7 +41,7 @@ export const getExtractedText = async (documentId: string): Promise<string> => {
 export const writeTranscript = async (text: string, documentId: string): Promise<string> => {
   const transcriptFilePath = path.join(Config.FILES_DIR, `transcript_${documentId}.txt`)
   await fs.writeFile(transcriptFilePath, text, 'utf8')
-  console.log('Transcript text saved to:', transcriptFilePath)
+  log.info(`Transcript text saved to: ${transcriptFilePath}`)
   return transcriptFilePath
 }
 

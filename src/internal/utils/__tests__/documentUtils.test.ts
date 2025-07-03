@@ -1,7 +1,3 @@
-import fs from 'fs/promises'
-import path from 'path'
-
-import { Config } from '../../config'
 import { getExtractedText, getTranscript, writeExtractedText, writeTranscript } from '../documentUtils'
 
 describe('documentUtils', () => {

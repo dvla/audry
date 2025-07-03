@@ -4,6 +4,7 @@ import { CosmosDbPartitionedStorage } from 'botbuilder-azure'
 
 import { Config } from './internal/config'
 import { ApplicationTurnState } from './internal/conversationHandlers'
+import { log } from './internal/logger'
 
 /**
  * Returns a storage instance based on the current configuration.
@@ -26,13 +27,13 @@ export const getMemory = (): Storage => {
         containerId: Config.COSMOSDB_CONTAINER,
         compatibilityMode: false,
       })
-      console.info('Using CosmosDB for storage')
+      log.info('Using CosmosDB for storage')
       return cosmosStorage
     } catch (error) {
-      console.error('Error initializing CosmosDB storage:', error)
+      log.error('Error initializing CosmosDB storage:', error)
     }
   }
-  console.info('Using Memory for storage')
+  log.info('Using Memory for storage')
   return new MemoryStorage()
 }
 

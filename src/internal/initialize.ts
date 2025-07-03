@@ -1,9 +1,8 @@
 import { TeamsAdapter } from '@microsoft/teams-ai'
-// Import required bot services.
-// See https://aka.ms/bot-services to learn more about the different parts of a bot.
 import { ConfigurationServiceClientCredentialFactory, TurnContext } from 'botbuilder'
 
 import { Config } from './config'
+import { log } from './logger'
 
 // Create adapter.
 // See https://aka.ms/about-bot-adapter to learn more about how bots work.
@@ -14,8 +13,7 @@ const onTurnErrorHandler = async (context: TurnContext, error: any) => {
   // This check writes out errors to console log .vs. app insights.
   // NOTE: In production environment, you should consider logging this to Azure
   //       application insights.
-  console.error(`\n [onTurnError] unhandled error: ${error}`)
-  console.log(error)
+  log.error('[onTurnError] unhandled error: ', error)
 
   // Send a trace activity, which will be displayed in Bot Framework Emulator
   await context.sendTraceActivity(

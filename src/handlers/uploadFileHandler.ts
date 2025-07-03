@@ -6,6 +6,7 @@ import { v7 as uuidv7 } from 'uuid'
 import { uploadFileCard, warningCard } from '../internal/cards'
 import { Config } from '../internal/config'
 import { ActivityContext } from '../internal/conversationHandlers'
+import { log } from '../internal/logger'
 import { writeExtractedText } from '../internal/utils/documentUtils'
 import { extractTextFromPdf, writeContentToFile } from '../internal/utils/fileUtils'
 
@@ -32,8 +33,6 @@ export class UploadFileCommandHandler {
    * @returns adaptive card or a message indicating only PDF files are accepted
    */
   async handleInvoked({ proactiveSendCard, sendCard, send, conversation, activity }: ActivityContext): Promise<void> {
-    console.log(`File Uploading: ${activity.text}`)
-
     // Check if the activity has attachments and if the first attachment is a pdf
     const attachment = activity.attachments && activity.attachments[0]
     if (!attachment || attachment.content.fileType !== ATTACHMENT_FILE_TYPE) {
@@ -54,7 +53,7 @@ export class UploadFileCommandHandler {
       await writeExtractedText(extractedText, conversation.documentId)
       await proactiveSendCard(uploadFileCard('Text Extracted', `Extracted text from ${pages} page(s).`))
     } catch (err) {
-      console.error('Failed to extract text:', err)
+      log.error('Failed to extract text:', err)
       await proactiveSendCard(
         warningCard('Sorry, I could not extract text from the PDF. Please ensure the file is valid.')
       )
@@ -68,9 +67,8 @@ export class UploadFileCommandHandler {
    */
   async handleFileDownload(file: Attachment) {
     const filePath = path.join(Config.FILES_DIR, file.name)
-    console.log(`Downloading file to: ${filePath}`)
     await writeContentToFile(file.content.downloadUrl, filePath)
-    console.log(`File downloaded successfully: ${filePath}`)
+    log.info(`File downloaded successfully: ${filePath}`)
     return filePath
   }
 }

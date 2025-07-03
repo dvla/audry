@@ -1,8 +1,8 @@
 import { Selector } from '@microsoft/teams-ai'
-import * as fs from 'fs'
 
 import { createFileConsentCard, processingCard, warningCard } from '../internal/cards'
 import { ActivityContext } from '../internal/conversationHandlers'
+import { log } from '../internal/logger'
 import { getTranscript } from '../internal/utils/documentUtils'
 import { transcriptToSpeech } from '../tts/textoSpeechGoogle'
 
@@ -34,7 +34,7 @@ export class TranscriptToAudioHandler {
       const transcript = await getTranscript(documentId)
       const { outputFileName, outputFilePath } = await transcriptToSpeech(transcript)
 
-      console.log('Audio generation complete:', outputFilePath)
+      log.info('Audio generation complete: ' + outputFilePath)
       // Create file consent card
       const fileConsentCard = createFileConsentCard(outputFilePath, outputFileName, 'Transcript audio')
 
@@ -44,7 +44,7 @@ export class TranscriptToAudioHandler {
         attachments: [fileConsentCard],
       })
     } catch (error) {
-      console.error('Error in async audio generation:', error)
+      log.error('Error in async audio generation:', error)
       await proactiveSend({
         type: 'message',
         attachments: [warningCard('Failed to generate audio from transcript')],

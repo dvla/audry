@@ -1,8 +1,9 @@
-import { GenerateContentResponse, GoogleGenAI, SpeakerVoiceConfig } from '@google/genai'
+import { GoogleGenAI, SpeakerVoiceConfig } from '@google/genai'
 import * as path from 'path'
 import * as wav from 'wav'
 
 import { Config } from '../internal/config'
+import { log } from '../internal/logger'
 import { generatePodcastFileName } from '../internal/utils/documentUtils'
 
 const TTS_MODEL = 'gemini-2.5-flash-preview-tts'
@@ -75,11 +76,10 @@ export async function transcriptToSpeech(
 ): Promise<{ outputFileName: string; outputFilePath: string }> {
   const transcriptChunks = splitTranscript(transcript)
 
-  console.log('Generating audio with prompt')
   const startTime = Date.now()
   const audioData = await Promise.all(transcriptChunks.map((chunk) => processChunks(chunk)))
   const totalSeconds = ((Date.now() - startTime) / 1000).toFixed(2)
-  console.log(`Total audio generation time: ${totalSeconds} seconds`)
+  log.info(`Total audio generation time: ${totalSeconds} seconds`)
 
   const audioBuffers = Buffer.concat(audioData.map((data) => Buffer.from(data, 'base64')))
   const outputFileName = generatePodcastFileName() + '.wav'
@@ -106,7 +106,7 @@ export const splitTranscript = (transcript: string): string[] => {
     }
   }
 
-  console.log(`Transcript split into ${chunks.length} chunks.`)
+  log.info(`Transcript split into ${chunks.length} chunks. Creating audio...`)
   return chunks
 }
 
@@ -127,8 +127,8 @@ export const processChunks = async (chunk: string) => {
   })
 
   const chunkSeconds = ((Date.now() - chunkStartTime) / 1000).toFixed(2)
-  console.log(`Chunk processed in ${chunkSeconds} seconds`)
-  console.log(`- totalTokenCount: ${response.usageMetadata?.totalTokenCount}`)
+  log.debug(`Chunk processed in ${chunkSeconds} seconds`)
+  log.debug(`- totalTokenCount: ${response.usageMetadata?.totalTokenCount}`)
 
   const data = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data
   if (!data) throw new Error('No audio data received from the API')

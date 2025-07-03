@@ -2,6 +2,7 @@ import { Selector } from '@microsoft/teams-ai'
 import { Activity, TurnContext } from 'botbuilder'
 
 import { ApplicationTurnState } from '../internal/conversationHandlers'
+import { log } from '../internal/logger'
 
 /**
  * The `GenericCommandHandler` responds
@@ -14,7 +15,7 @@ export class GenericCommandHandler {
     context: TurnContext,
     state: ApplicationTurnState
   ): Promise<string | Partial<Activity> | void> {
-    console.log(`App received message: ${context.activity.text}`)
+    log.debug(`App received message: ${context.activity.text}`)
 
     const response =
       'Hi there! to create a Podcast follow the  steps: \n\n' +

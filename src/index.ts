@@ -9,6 +9,7 @@ import { ATTACHMENT_CONTENT_TYPE, FILE_TIGGER_PATTERN, UploadFileCommandHandler 
 import { warningCard } from './internal/cards'
 import { ApplicationTurnState, MessageHandler } from './internal/conversationHandlers'
 import { adapter } from './internal/initialize'
+import { log } from './internal/logger'
 import { app } from './teamsBot'
 
 const MATCH_ALL = /.*/g
@@ -23,7 +24,7 @@ expressApp.get('/', function (req, res) {
 })
 
 const server = expressApp.listen(process.env.port || process.env.PORT || 3978, () => {
-  console.log(`\nBot Started, ${expressApp.name} listening to`, server.address())
+  log.info(`\nBot Started, ${expressApp.name} listening to ${JSON.stringify(server.address())}...`)
 })
 
 // Listen for uploaded files
@@ -46,7 +47,7 @@ app.adaptiveCards.actionExecute(MATCH_ALL, async (context: TurnContext, state) =
     case transcriptToAudioHandler.triggerVerb:
       return await transcriptToAudioHandler.handleActionInvoked(MessageHandler(context, state))
     default:
-      console.warn(`Unhandled action: ${context.activity.value?.verb}`)
+      log.warn(`Unhandled action: ${context.activity.value?.verb}`)
       return warningCard(`Unhandled action: ${context.activity.value?.action?.verb}`)
   }
 })
@@ -57,7 +58,6 @@ const FILE_CONSENT_INVOKE_NAME = 'fileConsent/invoke'
 app.message(
   async (context: TurnContext) => {
     if (ActivityTypes.Invoke == context.activity?.type && context.activity?.name == FILE_CONSENT_INVOKE_NAME) {
-      console.log(`File consent invoke received: ${JSON.stringify(context.activity.value)}`)
       return true
     }
     return false
@@ -86,7 +86,7 @@ const handleAttachments = (context: TurnContext) => {
     const attachment = context.activity.attachments[0]
     if (attachment.contentType === ATTACHMENT_CONTENT_TYPE) {
       // Handle file download info attachment
-      console.log(`File Download Info: ${attachment.content.downloadUrl}`)
+      log.debug(`File Download Info: ${attachment.content.downloadUrl}`)
       context.activity.text = FILE_TIGGER_PATTERN
     }
   }

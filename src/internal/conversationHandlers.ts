@@ -72,11 +72,6 @@ export const MessageHandler = (context: TurnContext, state: ApplicationTurnState
   const conversation = state.conversation
   const botIdentity = context.turnState.get(adapter.BotIdentityKey)
   const conversationReference = TurnContext.getConversationReference(context.activity)
-  console.log('App ActivityHandler invoked', {
-    activityType: context.activity.type,
-    activityName: context.activity.name,
-    activityValue: context.activity.value,
-  })
 
   return {
     send: (activity) => context.sendActivity(activity),
