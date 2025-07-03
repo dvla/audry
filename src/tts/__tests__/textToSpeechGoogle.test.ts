@@ -2,7 +2,7 @@ import path from 'path'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { Config } from '../../internal/config'
-import { config, processChunks, saveWaveFile, splitTranscript, transcriptToSpeech } from '../textoSpeechGoogle'
+import { generateConfig, processChunks, saveWaveFile, splitTranscript, transcriptToSpeech } from '../textoSpeechGoogle'
 
 const SMALL_TEST_TRANSCRIPT = `Speaker 1: Alright, Ellie, buckle up, because today we're diving deep into the digital heart of… the DVLA!
 
@@ -120,22 +120,45 @@ describe('transcriptToSpeech', () => {
 })
 
 describe('splitTranscript', () => {
+  let originalMaxLines: string
+  let originalLinesPerChunk: string
+
+  beforeEach(() => {
+    originalMaxLines = Config.MAX_NUMBER_OF_LINES
+    originalLinesPerChunk = Config.LINES_PER_CHUNK
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    Config.MAX_NUMBER_OF_LINES = originalMaxLines
+    Config.LINES_PER_CHUNK = originalLinesPerChunk
+  })
+
   test('split transcript into multiple parts', async () => {
     const chunks = splitTranscript(SMALL_TEST_TRANSCRIPT)
     expect(chunks).toBeDefined()
   })
 
-  it('splits transcript into chunks of max lines, skipping empty lines', () => {
+  it('splits transcript into chunks, skipping empty lines', () => {
     // Setup
-    process.env.MAX_NUMBER_OF_LINES = '2'
+    Config.LINES_PER_CHUNK = '2'
 
     const transcript = 'Line 1\nLine 2\n\nLine 3\nLine 4\nLine 5\n\n\nLine 6'
     const transcriptLines = 6
     const result = splitTranscript(transcript)
     expect(result.length).toBe(
-      Math.floor(transcriptLines / +Config.MAX_NUMBER_OF_LINES) +
-        (transcriptLines % +Config.MAX_NUMBER_OF_LINES > 0 ? 1 : 0)
+      Math.floor(transcriptLines / +Config.LINES_PER_CHUNK) + (transcriptLines % +Config.LINES_PER_CHUNK > 0 ? 1 : 0)
     )
+  })
+
+  it('splits transcript into chunks more than the MAX_NUMBER_OF_LINES, skipping empty lines', async () => {
+    // Setup
+    Config.MAX_NUMBER_OF_LINES = '2'
+    Config.LINES_PER_CHUNK = '1'
+
+    const transcript = 'Line 1\nLine 2\n\nLine 3\nLine 4\nLine 5\n\n\nLine 6'
+    const result = splitTranscript(transcript)
+    expect(result.length).toBe(+Config.MAX_NUMBER_OF_LINES)
   })
 
   it('returns empty array for empty transcript', () => {
@@ -176,7 +199,7 @@ describe('processChunks', () => {
     expect(fakeGenerateContent).toHaveBeenCalledWith({
       model: TTS_MODEL,
       contents: [{ parts: [{ text: `${STYLE}:\n\nHello world` }] }],
-      config: config,
+      config: generateConfig,
     })
   })
 

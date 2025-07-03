@@ -8,7 +8,9 @@ export const DEFAULT_EMPTY = ''
 export const DEFAULT_FILES_DIR = os.tmpdir()
 export const DEFAULT_MAX_PAGES = '80'
 export const DEFAULT_GEMINI_MODEL = 'gemini-2.0-flash-001'
+export const DEFAULT_GEMINI_TTS_MODEL = 'gemini-2.5-flash-preview-tts'
 export const DEFAULT_MAX_NUMBER_OF_LINES = '28'
+export const DEFAULT_LINES_PER_CHUNK = '4'
 
 /**
  * Checks if a variable is set and not equal to the placeholder.
@@ -39,8 +41,12 @@ export const Config = {
   GEMINI_API_KEY: checkOptionalVariable(process.env.GEMINI_API_KEY, DEFAULT_EMPTY),
   //Gemini Model
   GEMINI_MODEL: checkOptionalVariable(process.env.GEMINI_MODEL, DEFAULT_GEMINI_MODEL),
+  //Gemini TTS Model
+  GEMINI_TTS_MODEL: checkOptionalVariable(process.env.GEMINI_TTS_MODEL, DEFAULT_GEMINI_TTS_MODEL),
   // Max number of lines for transcript chunks
   MAX_NUMBER_OF_LINES: checkOptionalVariable(process.env.MAX_NUMBER_OF_LINES, DEFAULT_MAX_NUMBER_OF_LINES),
+  // Number of lines per chunk for transcript processing
+  LINES_PER_CHUNK: checkOptionalVariable(process.env.LINES_PER_CHUNK, DEFAULT_LINES_PER_CHUNK),
 
   COSMOSDB_ENDPOINT: checkOptionalVariable(process.env.COSMOSDB_ENDPOINT, DEFAULT_EMPTY),
   COSMOSDB_DATABASE: checkOptionalVariable(process.env.COSMOSDB_DATABASE, DEFAULT_EMPTY),

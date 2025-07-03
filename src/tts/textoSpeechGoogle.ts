@@ -6,7 +6,6 @@ import { Config } from '../internal/config'
 import { log } from '../internal/logger'
 import { generatePodcastFileName } from '../internal/utils/documentUtils'
 
-const TTS_MODEL = 'gemini-2.5-flash-preview-tts'
 const STYLE =
   'Use a genuine and refined British accent for Speaker 1. Use a genuine and refined British accent for Speaker 2.'
 let cloudClient: GoogleGenAI | null = null
@@ -29,7 +28,7 @@ interface GenerateContentConfig {
 /**
  * Configuration for generating speech with multiple speaker voices
  */
-export const config: GenerateContentConfig = {
+export const generateConfig: GenerateContentConfig = {
   responseModalities: ['AUDIO'],
   speechConfig: {
     multiSpeakerVoiceConfig: {
@@ -94,13 +93,20 @@ export async function transcriptToSpeech(
  * @returns The transcript split into chunks of a maximum number of lines
  */
 export const splitTranscript = (transcript: string): string[] => {
-  const sentences = transcript.split('\n').filter((line) => line.trim() !== '')
+  let sentences = transcript.split('\n').filter((line) => line.trim() !== '')
+  const maxLines = Config.MAX_NUMBER_OF_LINES
+  // Check if the number of sentences exceeds the maximum allowed lines
+  if (sentences.length > +Config.MAX_NUMBER_OF_LINES) {
+    log.warn(`Transcript (${sentences.length}) exceeds maximum number of lines (${Config.MAX_NUMBER_OF_LINES}).`)
+    sentences = sentences.slice(0, +Config.MAX_NUMBER_OF_LINES)
+  }
+
   const chunks: string[] = []
   let currentChunk = ''
 
   for (let i = 0; i < sentences.length; i++) {
     currentChunk += (currentChunk ? '\n' : '') + sentences[i]
-    if ((i + 1) % +Config.MAX_NUMBER_OF_LINES === 0 || i === sentences.length - 1) {
+    if ((i + 1) % +Config.LINES_PER_CHUNK === 0 || i === sentences.length - 1) {
       chunks.push(currentChunk)
       currentChunk = ''
     }
@@ -121,9 +127,9 @@ export const processChunks = async (chunk: string) => {
   const chunkStartTime = Date.now()
 
   const response = await ai.models.generateContent({
-    model: TTS_MODEL,
+    model: Config.GEMINI_TTS_MODEL,
     contents: [{ parts: [{ text: prompt }] }],
-    config,
+    config: generateConfig,
   })
 
   const chunkSeconds = ((Date.now() - chunkStartTime) / 1000).toFixed(2)
