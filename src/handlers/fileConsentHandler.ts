@@ -1,0 +1,201 @@
+import { ActivityContext } from '../internal/conversationHandlers'
+import { createFileInfoAttachment, errorCard } from '../internal/cards'
+import fs from 'fs/promises'
+
+const FILE_UPLOAD_ACTION = 'fileUpload'
+
+export class FileConsentHandler {
+  /**
+   * Main handler for file consent invoke activities
+   * @param context - The turn context
+   * @param state - The application turn state
+   */
+  async handleFileConsentInvoke({ send, sendCard, activity }: ActivityContext): Promise<void> {
+    try {
+      const fileConsentValue = activity?.value
+      const action = fileConsentValue?.action // "accept" or "decline"
+      const type = fileConsentValue?.type // "fileUpload"
+
+      console.log(`File consent - action: ${action}, type: ${type}`)
+
+      if (type === FILE_UPLOAD_ACTION && action === 'accept') {
+        // Handle file consent accept
+        await this.handleFileConsentAccept(activity, send, sendCard)
+      } else {
+        // Handle file consent decline
+        console.warn('File consent declined')
+        await this.handleFileConsentDecline(activity)
+      }
+    } catch (error) {
+      console.error('Error handling file consent invoke:', error)
+      await sendCard(errorCard('Error processing file consent request.'))
+    }
+  }
+  /**
+   * Handles file consent accept activity with proper SharePoint upload session handling
+   * @param context - The activity context
+   */
+  async handleFileConsentAccept(activity, send, sendCard): Promise<void> {
+    console.log('[FileConsentAccept] Handler invoked', {
+      activityType: activity.type,
+      activityName: activity.name,
+      activityValue: activity.value,
+    })
+
+    try {
+      console.log('[FileConsentAccept] Received file consent accept activity.')
+
+      const consentContext = activity.value
+      const uploadUrl = consentContext.uploadInfo?.uploadUrl
+      const uniqueId = consentContext.uploadInfo?.uniqueId
+      const fileName = consentContext.uploadInfo?.name
+      const contentUrl = consentContext.uploadInfo?.contentUrl
+
+      if (!uploadUrl) {
+        console.error('[FileConsentAccept] Upload URL not provided in consent response.')
+        throw new Error('Upload URL not provided in consent response')
+      }
+
+      // Upload file to Microsoft Teams using proper SharePoint upload session
+      console.log('[FileConsentAccept] Uploading file to Teams...')
+
+      try {
+        // Get the transcript file path for the current conversation
+        const audioFile = consentContext.context.fileId
+        let audio: Buffer
+        let fileSize: number // file size in bytes
+        if (audioFile) {
+          audio = await fs.readFile(audioFile)
+          const stats = await fs.stat(audioFile)
+          fileSize = stats.size // file size in bytes
+        }
+
+        const uploadResponse = await this.uploadFileToTeams(uploadUrl, audio, fileSize)
+
+        if (uploadResponse.success) {
+          console.log(`[FileConsentAccept] Upload successful`)
+
+          // Create file info attachment using the contentUrl from the consent response
+          console.log('[FileConsentAccept] Creating file info attachment...')
+          const fileInfoAttachment = createFileInfoAttachment(
+            fileName,
+            contentUrl, // Use contentUrl instead of uploadUrl
+            uniqueId
+          )
+
+          // Send file info to complete the upload process
+          console.log('[FileConsentAccept] Sending file info attachment to Teams...')
+          await send({
+            type: 'message',
+            attachments: [fileInfoAttachment],
+          })
+        } else {
+          throw new Error(`Upload failed: ${uploadResponse.error}`)
+        }
+      } catch (uploadError) {
+        console.error(`[FileConsentAccept] Upload failed:`, uploadError)
+        throw new Error(`Upload failed: ${uploadError.message}`)
+      }
+    } catch (error) {
+      console.error('[FileConsentAccept] Error handling file consent accept:', error)
+      await sendCard(errorCard('Failed to upload audio file to Teams. Please try again.'))
+    }
+  }
+
+  /**
+   * Upload file to Teams using proper SharePoint upload session handling
+   * @param uploadUrl - The upload session URL
+   * @param fileBuffer - The file data as buffer
+   * @param fileName - The file name
+   * @returns Promise with upload result
+   */
+  private async uploadFileToTeams(
+    uploadUrl: string,
+    fileBuffer: Buffer,
+    fileSize: number
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      const chunkSize = 327680 // 320KB chunks (recommended by Microsoft)
+
+      if (fileSize <= chunkSize) {
+        // Single chunk upload
+        console.log('[FileUpload] Uploading single chunk...')
+
+        const response = await this.uploadFile(uploadUrl, fileBuffer, fileSize, `bytes 0-${fileSize - 1}/${fileSize}`)
+
+        if (response.status === 200 || response.status === 201 || response.status === 202) {
+          return { success: true }
+        } else {
+          return { success: false, error: `HTTP ${response.status}: ${response.statusText}` }
+        }
+      } else {
+        // Multi-chunk upload
+        console.log('[FileUpload] Uploading multiple chunks...')
+        let uploadedBytes = 0
+
+        while (uploadedBytes < fileSize) {
+          const remainingBytes = fileSize - uploadedBytes
+          const currentChunkSize = Math.min(chunkSize, remainingBytes)
+          const chunk = fileBuffer.slice(uploadedBytes, uploadedBytes + currentChunkSize)
+
+          const rangeStart = uploadedBytes
+          const rangeEnd = uploadedBytes + currentChunkSize - 1
+
+          console.log(`[FileUpload] Uploading chunk: bytes ${rangeStart}-${rangeEnd}/${fileSize}`)
+
+          const response = await this.uploadFile(
+            uploadUrl,
+            chunk,
+            currentChunkSize,
+            `bytes ${rangeStart}-${rangeEnd}/${fileSize}`
+          )
+
+          if (response.status !== 200 && response.status !== 201 && response.status !== 202) {
+            return { success: false, error: `HTTP ${response.status}: ${response.statusText}` }
+          }
+
+          uploadedBytes += currentChunkSize
+        }
+
+        return { success: true }
+      }
+    } catch (error) {
+      console.error('[FileUpload] Upload error:', error)
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        return { success: false, error: 'Network error during upload' }
+      } else {
+        return { success: false, error: error.message || 'Unknown upload error' }
+      }
+    }
+  }
+
+  /**
+   * Handles file consent decline activity
+   * @param context - The activity context
+   */
+  async handleFileConsentDecline(sendCard): Promise<void> {
+    await sendCard(errorCard('File upload was declined. The audio file will not be shared.'))
+
+    console.log('User declined file upload consent')
+  }
+
+  /**
+   * Uploads a file to a specified URL in chunks.
+   * @param uploadUrl - The URL to upload the file to.
+   * @param buffer - The file buffer to upload.
+   * @param size - The size of the file.
+   * @param bytes - The byte range to upload.
+   * @returns The response from the upload request.
+   */
+  async uploadFile(uploadUrl: string, buffer: Buffer, size: number, bytes: string) {
+    return await fetch(uploadUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/octet-stream',
+        'Content-Range': bytes,
+        'Content-Length': size.toString(),
+      },
+      body: buffer,
+    })
+  }
+}

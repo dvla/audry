@@ -21,6 +21,7 @@ describe('TextToTranscriptHandler', () => {
     activityContext = {
       send: vi.fn().mockResolvedValue({}),
       sendCard: vi.fn().mockResolvedValue({}),
+      proactiveSend: vi.fn().mockResolvedValue({}),
       proactiveSendCard: vi.fn().mockResolvedValue({}),
       conversation: {
         documentId: 'doc123',
@@ -45,7 +46,7 @@ describe('TextToTranscriptHandler', () => {
 
   it('should return a processing card immediately on handleActionInvoked', async () => {
     await handler.handleActionInvoked(activityContext)
-    expect(cards.processingCard).toHaveBeenCalledWith('Generating transcript... This may take a few minutes.')
+    expect(cards.processingCard).toHaveBeenCalledWith('Generating transcript...')
   })
 
   it('should generate transcript and send success card', async () => {

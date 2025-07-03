@@ -20,7 +20,7 @@ export class TextToTranscriptHandler {
   async handleActionInvoked(context: ActivityContext) {
     setImmediate(async () => this.generateTranscript(context))
 
-    return processingCard('Generating transcript... This may take a few minutes.')
+    return processingCard('Generating transcript...')
   }
 
   /**

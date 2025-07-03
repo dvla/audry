@@ -45,5 +45,8 @@
   "configurableTabs": [],
   "staticTabs": [],
   "permissions": ["identity"],
-  "validDomains": []
+  "validDomains": [],
+  "webApplicationInfo": {
+    "id": "${{BOT_ID}}"
+  }
 }

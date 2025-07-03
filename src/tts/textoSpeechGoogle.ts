@@ -2,6 +2,7 @@ import { GenerateContentResponse, GoogleGenAI, SpeakerVoiceConfig } from '@googl
 import * as wav from 'wav'
 import * as path from 'path'
 import { Config } from '../internal/config'
+import { generatePodcastFileName } from '../internal/utils/documentUtils'
 
 const TTS_MODEL = 'gemini-2.5-flash-preview-tts'
 const STYLE =
@@ -68,7 +69,9 @@ export const getGoogleClient = (): GoogleGenAI => {
  * @param accent - The accent to use for the speech synthesis (default is 'British').
  * @returns A promise that resolves to the path of the saved audio file.
  */
-export async function transcriptToSpeech(transcript: string, documentId: string): Promise<string> {
+export async function transcriptToSpeech(
+  transcript: string
+): Promise<{ outputFileName: string; outputFilePath: string }> {
   const transcriptChunks = splitTranscript(transcript)
 
   console.log('Generating audio with prompt')
@@ -78,9 +81,10 @@ export async function transcriptToSpeech(transcript: string, documentId: string)
   console.log(`Total audio generation time: ${totalSeconds} seconds`)
 
   const audioBuffers = Buffer.concat(audioData.map((data) => Buffer.from(data, 'base64')))
-  const outputFilePath = path.join(Config.FILES_DIR, `${documentId}_audio.wav`)
+  const outputFileName = generatePodcastFileName() + '.wav'
+  const outputFilePath = path.join(Config.FILES_DIR, outputFileName)
   await saveWaveFile(outputFilePath, audioBuffers)
-  return outputFilePath
+  return { outputFileName, outputFilePath }
 }
 
 /**

@@ -24,7 +24,6 @@ describe('config test', () => {
     delete process.env.BOT_ID
     delete process.env.BOT_TYPE
     delete process.env.BOT_TENANT_ID
-    delete process.env.BOT_PASSWORD
     delete process.env.ELEVENLABS_API_KEY
     delete process.env.AUDRY_FILES_DIR
     delete process.env.AUDRY_MAX_PAGES
@@ -39,7 +38,6 @@ describe('config test', () => {
     expect(Config.MicrosoftAppId).toBeUndefined()
     expect(Config.MicrosoftAppType).toBeUndefined()
     expect(Config.MicrosoftAppTenantId).toBeUndefined()
-    expect(Config.MicrosoftAppPassword).toBeUndefined()
     expect(Config.ELEVENLABS_API_KEY).toEqual(DEFAULT_EMPTY)
     expect(Config.FILES_DIR).toEqual(DEFAULT_FILES_DIR)
     expect(Config.MAX_PAGES).toEqual(DEFAULT_MAX_PAGES)
@@ -52,7 +50,6 @@ describe('config test', () => {
     process.env.BOT_ID = 'test-bot-id'
     process.env.BOT_TYPE = 'test-bot-type'
     process.env.BOT_TENANT_ID = 'test-bot-tenant-id'
-    process.env.BOT_PASSWORD = 'test-bot-password'
     process.env.ELEVENLABS_API_KEY = 'test-elevenlabs-api-key'
     process.env.AUDRY_FILES_DIR = '/custom/files/dir'
     process.env.AUDRY_MAX_PAGES = '100'
@@ -67,7 +64,6 @@ describe('config test', () => {
     expect(Config.MicrosoftAppId).toEqual('test-bot-id')
     expect(Config.MicrosoftAppType).toEqual('test-bot-type')
     expect(Config.MicrosoftAppTenantId).toEqual('test-bot-tenant-id')
-    expect(Config.MicrosoftAppPassword).toEqual('test-bot-password')
     expect(Config.ELEVENLABS_API_KEY).toEqual('test-elevenlabs-api-key')
     expect(Config.FILES_DIR).toEqual('/custom/files/dir')
     expect(Config.MAX_PAGES).toEqual('100')

@@ -24,6 +24,7 @@ describe('UploadFileCommandHandler', () => {
     activityContext = {
       send: vi.fn().mockResolvedValue({}),
       sendCard: vi.fn().mockResolvedValue({}),
+      proactiveSend: vi.fn().mockResolvedValue({}),
       proactiveSendCard: vi.fn().mockResolvedValue({}),
       ref: undefined,
       conversation: {

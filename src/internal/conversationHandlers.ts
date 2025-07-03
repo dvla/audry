@@ -38,6 +38,12 @@ export interface ActivityContext {
    */
   proactiveSendCard: (card: any) => Promise<void>
   /**
+   * Send a message proactively to the conversation
+   * @param activity activity to send
+   */
+  proactiveSend: (activity: ActivityLike) => Promise<void>
+
+  /**
    * the conversation state
    */
   conversation: ConversationState
@@ -66,6 +72,11 @@ export const MessageHandler = (context: TurnContext, state: ApplicationTurnState
   const conversation = state.conversation
   const botIdentity = context.turnState.get(adapter.BotIdentityKey)
   const conversationReference = TurnContext.getConversationReference(context.activity)
+  console.log('App ActivityHandler invoked', {
+    activityType: context.activity.type,
+    activityName: context.activity.name,
+    activityValue: context.activity.value,
+  })
 
   return {
     send: (activity) => context.sendActivity(activity),
@@ -74,8 +85,13 @@ export const MessageHandler = (context: TurnContext, state: ApplicationTurnState
       adapter.continueConversationAsync(botIdentity, conversationReference, async (proactiveContext) => {
         await proactiveContext.sendActivity(MessageFactory.attachment(CardFactory.adaptiveCard(card)))
       }),
+    proactiveSend: (message) =>
+      adapter.continueConversationAsync(botIdentity, conversationReference, async (proactiveContext) => {
+        await proactiveContext.sendActivity(message)
+      }),
     conversation: conversation,
     activity: context.activity,
+
     ref: conversationReference,
   }
 }

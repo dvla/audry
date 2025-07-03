@@ -21,7 +21,7 @@ variables:
 # Used by Bicep
   # These values are used for all branches other than main (i.e. dev work)
   - name: BOT_ID
-    value: '9d93dbf5-3e71-4b82-a70d-b0ff179da20a' #ETL-Bot-Genny-Dev
+    value: '30ddfda1-9bf3-4dd9-9837-3d06e7617559' # This will be from bicep outputs
   - name: LOCATION
     value: 'uksouth'
   - name: TENANT_ID
@@ -40,7 +40,7 @@ variables:
   # These values will override the above if the branch is main (i.e. for production)
   - ${{ if contains(variables['Build.SourceBranchName'], 'main') }}:
       - name: BOT_ID
-        value: 'bf2365b2-d7fd-4a72-8036-fa9872e85fb2' #ETL-Bot-Genny-Prod
+        value: '9ab7bfc7-fc6c-4637-b87c-17afc2ee7b4b' # This will be from bicep outputs
       - name: ENV_NAME
         value: 'prod'
 

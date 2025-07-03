@@ -100,11 +100,10 @@ describe('transcriptToSpeech', () => {
     })
 
     const transcript = 'Hello Vitest!'
-    const documentId = 'doc123'
-    const outputPath = await transcriptToSpeech(transcript, documentId)
+    const { outputFileName, outputFilePath } = await transcriptToSpeech(transcript)
 
     expect(fakeGenerateContent).toHaveBeenCalledTimes(1)
-    expect(outputPath).toContain(`${documentId}_audio.wav`)
+    expect(outputFileName).toContain(`podcast`)
 
     // wav FileWriter's write called with decoded audio buffer
     expect(writeMock).toHaveBeenCalledWith(Buffer.from(fakeBase64Audio, 'base64'))
@@ -115,7 +114,7 @@ describe('transcriptToSpeech', () => {
       candidates: [],
     })
 
-    await expect(transcriptToSpeech('Test', 'doc404')).rejects.toThrow('No audio data received from the API')
+    await expect(transcriptToSpeech('Test')).rejects.toThrow('No audio data received from the API')
   })
 })
 

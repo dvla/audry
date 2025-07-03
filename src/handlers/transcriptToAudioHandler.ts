@@ -1,8 +1,9 @@
+import * as fs from 'fs'
 import { Selector } from '@microsoft/teams-ai'
 import { ActivityContext } from '../internal/conversationHandlers'
 import { transcriptToSpeech } from '../tts/textoSpeechGoogle'
 import { getTranscript } from '../internal/utils/documentUtils'
-import { warningCard, processingCard, transcriptToAudioCard } from '../internal/cards'
+import { warningCard, processingCard, createFileConsentCard } from '../internal/cards'
 
 const FILE_TRIGGER_PATTERN = 'transcriptToAudio'
 
@@ -14,9 +15,9 @@ export class TranscriptToAudioHandler {
    * @param context - The activity context containing the conversation and activity.
    * @returns An Adaptive Card indicating the processing state.
    */
-  async handleActionInvoked(context: ActivityContext) {
-    setImmediate(() => this.generateAudio(context))
-
+  async handleActionInvoked({ proactiveSend, conversation }: ActivityContext): Promise<void> {
+    // Pass full context including state and turnContext to generateAudio
+    setImmediate(() => this.generateAudio(proactiveSend, conversation))
     return processingCard('Generating audio... This may take a few minutes.')
   }
 
@@ -26,17 +27,27 @@ export class TranscriptToAudioHandler {
    * @returns A promise that resolves when the audio generation is complete.
    * @throws Will throw an error if the transcript generation fails.
    */
-  async generateAudio({ proactiveSendCard, conversation }: ActivityContext): Promise<void> {
+  async generateAudio(proactiveSend, conversation): Promise<void> {
     try {
       const documentId = conversation.documentId
       const transcript = await getTranscript(documentId)
-      const transcriptFilePath = await transcriptToSpeech(transcript, documentId)
-      console.log('Audio generation complete:', transcriptFilePath)
-      conversation.audioFilePath = transcriptFilePath
-      await proactiveSendCard(transcriptToAudioCard('Audio generation completed successfully!', transcriptFilePath))
+      const { outputFileName, outputFilePath } = await transcriptToSpeech(transcript)
+
+      console.log('Audio generation complete:', outputFilePath)
+      // Create file consent card
+      const fileConsentCard = createFileConsentCard(outputFilePath, outputFileName, 'Transcript audio')
+
+      // Send file consent card as a raw attachment (not as an adaptive card)
+      await proactiveSend({
+        type: 'message',
+        attachments: [fileConsentCard],
+      })
     } catch (error) {
       console.error('Error in async audio generation:', error)
-      await proactiveSendCard(warningCard('Failed to generate audio from transcript'))
+      await proactiveSend({
+        type: 'message',
+        attachments: [warningCard('Failed to generate audio from transcript')],
+      })
     }
   }
 }

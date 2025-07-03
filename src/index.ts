@@ -1,4 +1,4 @@
-import { TurnContext } from 'botbuilder'
+import { TurnContext, ActivityTypes } from 'botbuilder'
 import express from 'express'
 import { GenericCommandHandler } from './commands/genericCommandHandler'
 import { adapter } from './internal/initialize'
@@ -6,7 +6,9 @@ import { ApplicationTurnState, MessageHandler } from './internal/conversationHan
 import { app } from './teamsBot'
 import { ATTACHMENT_CONTENT_TYPE, FILE_TIGGER_PATTERN, UploadFileCommandHandler } from './handlers/uploadFileHandler'
 import { TranscriptToAudioHandler } from './handlers/transcriptToAudioHandler'
+import { FileConsentHandler } from './handlers/fileConsentHandler'
 import { TextToTranscriptHandler } from './handlers/textToTranscriptHandler'
+
 import { warningCard } from './internal/cards'
 
 const MATCH_ALL = /.*/g
@@ -35,6 +37,8 @@ app.message(uploadFileCommandHandler.triggerPatterns, async (context: TurnContex
  */
 const textToTranscriptHandler = new TextToTranscriptHandler()
 const transcriptToAudioHandler = new TranscriptToAudioHandler()
+const fileConsentHandler = new FileConsentHandler()
+
 app.adaptiveCards.actionExecute(MATCH_ALL, async (context: TurnContext, state) => {
   switch (context.activity.value?.action?.verb) {
     case textToTranscriptHandler.triggerVerb:
@@ -46,6 +50,22 @@ app.adaptiveCards.actionExecute(MATCH_ALL, async (context: TurnContext, state) =
       return warningCard(`Unhandled action: ${context.activity.value?.action?.verb}`)
   }
 })
+
+// File consent invoke handler
+const FILE_CONSENT_INVOKE_NAME = 'fileConsent/invoke'
+
+app.message(
+  async (context: TurnContext) => {
+    if (ActivityTypes.Invoke == context.activity?.type && context.activity?.name == FILE_CONSENT_INVOKE_NAME) {
+      console.log(`File consent invoke received: ${JSON.stringify(context.activity.value)}`)
+      return true
+    }
+    return false
+  },
+  async (context: TurnContext, state: ApplicationTurnState) => {
+    await fileConsentHandler.handleFileConsentInvoke(MessageHandler(context, state))
+  }
+)
 
 const genericCommandHandler = new GenericCommandHandler()
 app.message(genericCommandHandler.triggerPatterns, async (context: TurnContext, state: ApplicationTurnState) => {
