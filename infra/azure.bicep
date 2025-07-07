@@ -8,6 +8,7 @@ param resourceBaseName string
 @maxLength(42)
 param botDisplayName string
 param environmentName string
+param geminiApiKey string
 param location string
 param tenantId string
 param webAppSKU string
@@ -43,6 +44,7 @@ module webapp './webapp.bicep' = {
     cosmosDbDatabase: cosmosDB.outputs.cosmosDbDatabase
     cosmosDbContainer: cosmosDB.outputs.cosmosDbContainer
     cosmosDbAuthKey: cosmosDB.outputs.cosmosDbAuthKey
+    geminiApiKey: geminiApiKey
   }
 }
 

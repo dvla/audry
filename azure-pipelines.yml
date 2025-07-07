@@ -61,10 +61,6 @@ stages:
         inputs:
           version: "22"
           checkLatest: true
-      #Install 365 Agents Toolkit
-      - script: |
-          npm install -g @microsoft/m365agentstoolkit-cli
-        displayName: "Install 365 Agents Toolkit"
       # Install dependencies
       - script: |
           npm ci
@@ -124,8 +120,17 @@ stages:
     - job: CreateInfrastructure
       displayName: Create infrastructure
       steps:
+      - task: AzureKeyVault@2
+        displayName: 'Download secrets from Azure Key Vault'
+        inputs:
+          azureSubscription: '$(azureSubscriptionSvcConn)'
+          KeyVaultName: 'kv-lab-shared-prod'
+          SecretsFilter: 'audry-gemini-apikey'
+          RunAsPreJob: false
       - task: AzureResourceManagerTemplateDeployment@3
         name: BicepDeploy
+        env:
+          GEMINI_KEY: $(audry-gemini-apikey)
         inputs:
           deploymentScope: 'Subscription'
           location: '$(LOCATION)'

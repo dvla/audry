@@ -3,6 +3,7 @@ param cosmosDbEndpoint string
 param cosmosDbDatabase string
 param cosmosDbContainer string
 param cosmosDbAuthKey string
+param geminiApiKey string
 param identityId string
 param appiInstrumentationKey string
 param appiConnectionString string
@@ -68,6 +69,10 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
           value: appiInstrumentationKey
         }
         {
+          name: 'ApplicationInsightsAgent_EXTENSION_VERSION'
+          value: '~3'
+        }
+        {
           name: 'COSMOSDB_ENDPOINT'
           value: cosmosDbEndpoint
         }
@@ -82,6 +87,10 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
         {
           name: 'COSMOSDB_AUTH_KEY'
           value: cosmosDbAuthKey
+        }
+        {
+          name: 'GEMINI_API_KEY'
+          value: geminiApiKey
         }
       ]
       ftpsState: 'FtpsOnly'
