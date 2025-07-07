@@ -28,7 +28,7 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02-preview' 
 }
 
 // Assign "Monitoring Metrics Publisher" role to the Application Insights resource
-resource acrPullRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+resource metricsPublisherRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
   name: guid(applicationInsights.id, userAssignedIdentityPrincipalId, 'appinsightsPublisher')
   scope: applicationInsights
   properties: {

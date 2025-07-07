@@ -49,6 +49,7 @@ pool:
 
 stages:
   - stage: BuildApp
+    #condition: not(contains(variables['Build.SourceBranchName'], 'infra')) #Do not run this stage for Infrastructure branches
     displayName: Build and Test
     jobs:
     - job: BuildAndTest
@@ -115,17 +116,9 @@ stages:
           replaceExistingArchive: true
       - publish: '$(Pipeline.Workspace)/audry.zip'
         artifact: AudryZipDeployFile
-      - script: |
-          npx atk package --env $(ENV_NAME)
-          ls -lh appPackage/build/appPackage.$(ENV_NAME).zip
-        displayName: 'Package application for Teams'
-      - publish: '$(Build.SourcesDirectory)/appPackage/build/appPackage.$(ENV_NAME).zip'
-        displayName: 'Publish Teams app package'
-        artifact: AudryAppPackage
 
 # Deploy the infrastructure via Bicep
   - stage: Infrastructure
-    #condition: contains(variables['Build.SourceBranchName'], 'infra')
     displayName: Create infrastructure
     jobs:
     - job: CreateInfrastructure
@@ -156,12 +149,11 @@ stages:
 
 
   - stage: ZipDeploy
-    dependsOn: Infrastructure
+    #condition: not(contains(variables['Build.SourceBranchName'], 'infra')) #Do not run this stage for Infrastructure branches
     displayName: Zip deploy
     jobs:
       - job: ZipDeploy
         displayName: Zip deploy
-        timeoutInMinutes: '5' #AzureCLI@2/az webapp deploy gets stuck - the site can be up but it never seems to stop polling for a response, so forcing a timeout here
         steps:
         - checkout: self
         - task: DownloadPipelineArtifact@2
@@ -179,3 +171,46 @@ stages:
             inlineScript: |
               echo 'Deploying web app...'
               az webapp deploy --resource-group "rg-$(RESOURCE_BASE_NAME)-$(ENV_NAME)-uks" --name "app-$(RESOURCE_BASE_NAME)-$(ENV_NAME)-uks" --src-path '$(Pipeline.Workspace)/audry.zip' --track-status false
+          # Get BotID from Bicep outputs
+        - task: DownloadPipelineArtifact@2
+          displayName: 'Download Bicep Outputs'
+          inputs:
+            buildType: 'current'
+            artifactName: 'bicepOutputsJsonFile'
+            targetPath: '$(Pipeline.Workspace)'
+        - script: |
+            BICEP_OUTPUTS1=$(cat $(Pipeline.Workspace)/bicepOutputs.json)
+            BICEP_BOT_ID=$(echo "$BICEP_OUTPUTS1" | jq -r '.bot_id.value')
+            echo "##vso[task.setvariable variable=BOT_ID;]$BICEP_BOT_ID"
+            echo "BOT_ID is set to: $BICEP_BOT_ID"
+          displayName: 'Set BOT_ID from Bicep outputs'
+          # Install Node.js
+        - task: UseNode@1
+          displayName: 'Install Node.js'
+          inputs:
+            version: "22"
+            checkLatest: true
+          #Install 365 Agents Toolkit
+        - script: |
+            npm install -g @microsoft/m365agentstoolkit-cli
+          displayName: "Install 365 Agents Toolkit"
+          # Add BOT_ID to .env file
+        - pwsh: |
+            Write-Host "Updating .env file with BOT_ID: $($env:BOT_ID)"
+            $content = Get-Content -Path $(Build.SourcesDirectory)/env/.env.$($env:ENV_NAME) | ForEach-Object {
+              if ($_ -match 'BOT_ID=') {
+                  $_ -replace "BOT_ID=.*", "BOT_ID=$($env:BOT_ID)"
+              } else {
+                  $_
+              }
+            } 
+            $content| Set-Content -Path $(Build.SourcesDirectory)/env/.env.$($env:ENV_NAME) -Force
+          displayName: 'Update .env file with BOT_ID'
+          #Create Teams app package
+        - script: |
+            npx atk package --env $(ENV_NAME)
+            ls -lh appPackage/build/appPackage.$(ENV_NAME).zip
+          displayName: 'Package application for Teams'
+        - publish: '$(Build.SourcesDirectory)/appPackage/build/appPackage.$(ENV_NAME).zip'
+          displayName: 'Publish Teams app package'
+          artifact: AudryAppPackage

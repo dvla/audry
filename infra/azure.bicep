@@ -42,6 +42,7 @@ module webapp './webapp.bicep' = {
     cosmosDbEndpoint: cosmosDB.outputs.cosmosDbEndpoint
     cosmosDbDatabase: cosmosDB.outputs.cosmosDbDatabase
     cosmosDbContainer: cosmosDB.outputs.cosmosDbContainer
+    cosmosDbAuthKey: cosmosDB.outputs.cosmosDbAuthKey
   }
 }
 
@@ -79,6 +80,6 @@ module appInsights './appin.bicep' = {
 }
 
 // The output will be persisted in .env.{envName}. Visit https://aka.ms/teamsfx-actions/arm-deploy for more details.
-output BOT_AZURE_APP_SERVICE_RESOURCE_ID string = webapp.outputs.webAppId
-output BOT_DOMAIN string = webapp.outputs.defaultHostName
-output BOT_ID string = identity.outputs.clientId
+output bot_azure_app_service_resource_id string = webapp.outputs.webAppId
+output bot_domain string = webapp.outputs.defaultHostName
+output bot_id string = identity.outputs.clientId

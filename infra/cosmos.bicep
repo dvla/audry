@@ -89,3 +89,4 @@ resource sqlRoleAssignment 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignm
 output cosmosDbDatabase string = cosmosDbDatabase.name
 output cosmosDbContainer string = containerName
 output cosmosDbEndpoint string = cosmosDbAccount.properties.documentEndpoint
+output cosmosDbAuthKey string = cosmosDbAccount.listKeys().primaryMasterKey

@@ -2,6 +2,7 @@ param botId string
 param cosmosDbEndpoint string
 param cosmosDbDatabase string
 param cosmosDbContainer string
+param cosmosDbAuthKey string
 param identityId string
 param appiInstrumentationKey string
 param appiConnectionString string
@@ -63,7 +64,7 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
           value: appiConnectionString
         }
         {
-          name: 'APPLICATIONINSIGHTS_INSTRUMENTATIONKEY'
+          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
           value: appiInstrumentationKey
         }
         {
@@ -77,6 +78,10 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
         {
           name: 'COSMOSDB_CONTAINER'
           value: cosmosDbContainer
+        }
+        {
+          name: 'COSMOSDB_AUTH_KEY'
+          value: cosmosDbAuthKey
         }
       ]
       ftpsState: 'FtpsOnly'
