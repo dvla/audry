@@ -19,10 +19,11 @@ import { log } from './internal/logger'
  *                    depending on the configuration.
  */
 export const getMemory = (): Storage => {
-  if (Config.COSMOSDB_ENDPOINT && Config.COSMOSDB_DATABASE && Config.COSMOSDB_CONTAINER) {
+  if (Config.COSMOSDB_ENDPOINT && Config.COSMOSDB_DATABASE && Config.COSMOSDB_CONTAINER && Config.COSMOSDB_AUTH_KEY) {
     try {
       const cosmosStorage = new CosmosDbPartitionedStorage({
         cosmosDbEndpoint: Config.COSMOSDB_ENDPOINT,
+        authKey: Config.COSMOSDB_AUTH_KEY,
         databaseId: Config.COSMOSDB_DATABASE,
         containerId: Config.COSMOSDB_CONTAINER,
         compatibilityMode: false,

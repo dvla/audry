@@ -24,8 +24,7 @@ const onTurnErrorHandler = async (context: TurnContext, error: any) => {
   )
 
   // Send a message to the user
-  await context.sendActivity('The bot encountered an error or bug.')
-  await context.sendActivity('To continue to run this bot, please fix the bot source code.')
+  await context.sendActivity('The bot encountered an error or bug. Sorry about that. Please try again later.')
 }
 
 // Set the onTurnError for the singleton CloudAdapter.

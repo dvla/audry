@@ -51,4 +51,5 @@ export const Config = {
   COSMOSDB_ENDPOINT: checkOptionalVariable(process.env.COSMOSDB_ENDPOINT, DEFAULT_EMPTY),
   COSMOSDB_DATABASE: checkOptionalVariable(process.env.COSMOSDB_DATABASE, DEFAULT_EMPTY),
   COSMOSDB_CONTAINER: checkOptionalVariable(process.env.COSMOSDB_CONTAINER, DEFAULT_EMPTY),
+  COSMOSDB_AUTH_KEY: checkOptionalVariable(process.env.COSMOSDB_AUTH_KEY, DEFAULT_EMPTY),
 }
