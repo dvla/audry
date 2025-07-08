@@ -73,6 +73,10 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
           value: '~3'
         }
         {
+          name: 'LOG_LEVEL'
+          value: 'info'
+        }
+        {
           name: 'COSMOSDB_ENDPOINT'
           value: cosmosDbEndpoint
         }

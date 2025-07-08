@@ -1,5 +1,7 @@
 import { createLogger, format, transports } from 'winston'
 
+import { Config } from './config'
+
 /**
  * Interface representing a generic logger with various log levels.
  *
@@ -18,7 +20,11 @@ interface Logger {
 
 const logger = process.env.APPLICATIONINSIGHTS_CONNECTION_STRING
   ? createLogger({
-      transports: [new transports.Console()],
+      transports: [
+        new transports.Console({
+          level: Config.LOG_LEVEL,
+        }),
+      ],
     })
   : createLogger({
       transports: [
@@ -29,6 +35,7 @@ const logger = process.env.APPLICATIONINSIGHTS_CONNECTION_STRING
       ],
     })
 
+logger.warn('Logging level set to ' + logger.transports[0].level)
 /**
  * Returns a logger instance that provides methods for logging messages at various levels
  * (debug, info, warn, error). Each method delegates to the underlying `logger` implementation.

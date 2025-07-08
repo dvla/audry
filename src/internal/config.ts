@@ -6,6 +6,7 @@ export const DEFAULT_EMPTY = ''
 
 // Default values for environment variables
 export const DEFAULT_FILES_DIR = os.tmpdir()
+export const DEFAULT_LOG_LEVEL = 'info'
 export const DEFAULT_MAX_PAGES = '80'
 export const DEFAULT_GEMINI_MODEL = 'gemini-2.0-flash-001'
 export const DEFAULT_GEMINI_TTS_MODEL = 'gemini-2.5-flash-preview-tts'
@@ -31,6 +32,8 @@ export const Config = {
   MicrosoftAppType: process.env.BOT_TYPE,
   MicrosoftAppTenantId: process.env.BOT_TENANT_ID,
   MicrosoftAppPassword: process.env.BOT_PASSWORD,
+
+  LOG_LEVEL: checkOptionalVariable(process.env.LOG_LEVEL, DEFAULT_LOG_LEVEL).toLowerCase(),
   // ElevenLabs API Key
   ELEVENLABS_API_KEY: checkOptionalVariable(process.env.ELEVENLABS_API_KEY, DEFAULT_EMPTY),
   // Audry Temporary Files Directory
