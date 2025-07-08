@@ -10,7 +10,7 @@
     "termsOfUseUrl": "https://dvla.sharepoint.com/sites/TechLab"
   },
   "icons": {
-    "color": "Green-Podcast.png",
+    "color": "podcast-${{APP_NAME_SUFFIX}}.png",
     "outline": "outline.png"
   },
   "name": {
