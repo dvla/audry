@@ -31,20 +31,22 @@ module webapp './webapp.bicep' = {
   name: 'Azure-WebApp'
   scope: rg
   params: {
-    location: location
-    serverfarmName: 'farm-${resourceBaseName}-${environmentName}-uks'
-    webAppName: 'app-${resourceBaseName}-${environmentName}-uks'
-    botId: identity.outputs.clientId
-    tenantId: tenantId
-    webAppSKU: webAppSKU
-    identityId: identity.outputs.identityId
     appiInstrumentationKey: appInsights.outputs.applicationInsightsInstrumentationKey
     appiConnectionString: appInsights.outputs.applicationInsightsConnectionString
+    botId: identity.outputs.clientId
     cosmosDbEndpoint: cosmosDB.outputs.cosmosDbEndpoint
     cosmosDbDatabase: cosmosDB.outputs.cosmosDbDatabase
     cosmosDbContainer: cosmosDB.outputs.cosmosDbContainer
     cosmosDbAuthKey: cosmosDB.outputs.cosmosDbAuthKey
     geminiApiKey: geminiApiKey
+    identityId: identity.outputs.identityId
+    location: location
+    serverfarmName: 'farm-${resourceBaseName}-${environmentName}-uks'
+    storageBlobEndpoint: storage.outputs.blobEndpoint
+    storageBlobContainer: storage.outputs.blobContainerName
+    tenantId: tenantId
+    webAppName: 'app-${resourceBaseName}-${environmentName}-uks'
+    webAppSKU: webAppSKU
   }
 }
 
@@ -81,7 +83,19 @@ module appInsights './appin.bicep' = {
   }
 }
 
+module storage './storage.bicep' = {
+  name: 'Azure-Storage'
+  scope: rg
+  params: {
+    storageAccountName: 'st${resourceBaseName}${environmentName}uks'
+    containerName: 'audry'
+    userAssignedIdentityPrincipalId: identity.outputs.principalId
+  }
+}
+
 // The output will be persisted in .env.{envName}. Visit https://aka.ms/teamsfx-actions/arm-deploy for more details.
 output bot_azure_app_service_resource_id string = webapp.outputs.webAppId
 output bot_domain string = webapp.outputs.defaultHostName
 output bot_id string = identity.outputs.clientId
+output blob_endpoint string = storage.outputs.blobEndpoint
+output blob_container_name string = storage.outputs.blobContainerName

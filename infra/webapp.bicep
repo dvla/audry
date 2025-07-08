@@ -9,6 +9,8 @@ param appiInstrumentationKey string
 param appiConnectionString string
 param location string
 param serverfarmName string
+param storageBlobEndpoint string
+param storageBlobContainer string
 param tenantId string
 param webAppName string
 param webAppSKU string
@@ -96,6 +98,11 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
           name: 'GEMINI_API_KEY'
           value: geminiApiKey
         }
+        {
+          name: 'AUDRY_BLOB_CONTAINER_ENDPOINT'
+          value: '${storageBlobEndpoint}${storageBlobContainer}'
+        }
+
       ]
       ftpsState: 'FtpsOnly'
       linuxFxVersion: 'NODE|22-lts' // Set NodeJS version to 22.x for your site
