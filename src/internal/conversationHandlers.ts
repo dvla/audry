@@ -10,6 +10,7 @@ export interface ConversationState {
   documentId: string // Unique identifier for a document
   documentPath: string // Path to the document
   audioFilePath: string // Path to the generated audio file
+  userId: string // Unique identifier for the user
 }
 
 /**

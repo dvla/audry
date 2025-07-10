@@ -29,6 +29,7 @@ describe('TextToTranscriptHandler', () => {
         count: 0,
         documentPath: '',
         audioFilePath: '',
+        userId: '',
       },
       ref: undefined,
       activity: undefined,

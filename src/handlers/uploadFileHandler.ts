@@ -9,6 +9,7 @@ import { ActivityContext } from '../internal/conversationHandlers'
 import { log } from '../internal/logger'
 import { writeExtractedText } from '../internal/utils/documentUtils'
 import { extractTextFromPdf, writeContentToFile } from '../internal/utils/fileUtils'
+import { getUserId } from '../internal/utils/userUtils'
 
 // Content type for Teams file download info attachments
 export const ATTACHMENT_CONTENT_TYPE = 'application/vnd.microsoft.teams.file.download.info'
@@ -45,6 +46,8 @@ export class UploadFileCommandHandler {
     conversation.documentPath = fileDownloadPath
     // Generate and set a new UUID for documentId in state
     conversation.documentId = uuidv7()
+    // Set the userId in the conversation state
+    conversation.userId = getUserId(activity)
 
     await send({ type: ActivityTypes.Typing })
 

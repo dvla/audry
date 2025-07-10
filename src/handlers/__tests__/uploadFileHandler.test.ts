@@ -33,6 +33,7 @@ describe('UploadFileCommandHandler', () => {
         documentId: '',
         documentPath: '',
         audioFilePath: '',
+        userId: '',
       },
       activity: {
         text: FILE_TIGGER_PATTERN,
