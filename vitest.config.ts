@@ -4,5 +4,6 @@ export default defineConfig({
   test: {
     globals: true,
     exclude: [...configDefaults.exclude, 'lib/', 'src/adaptiveCards/*'],
+    setupFiles: ['./vitest.setup.ts'],
   },
 })
