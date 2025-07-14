@@ -36,6 +36,7 @@ describe('TranscriptToAudioHandler', () => {
       proactiveSendCard: vi.fn(),
       conversation: {
         documentId: 'test-doc-123',
+        userId: 'test-user-456',
         count: 0,
         documentPath: '/path/to/doc.txt',
         audioFilePath: '/path/to/audio.mp3',
