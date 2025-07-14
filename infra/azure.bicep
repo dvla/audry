@@ -38,6 +38,7 @@ module webapp './webapp.bicep' = {
     cosmosDbDatabase: cosmosDB.outputs.cosmosDbDatabase
     cosmosDbContainer: cosmosDB.outputs.cosmosDbContainer
     cosmosDbAuthKey: cosmosDB.outputs.cosmosDbAuthKey
+    docIntEndpoint: docIntelligence.outputs.docIntEndpoint
     geminiApiKey: geminiApiKey
     identityId: identity.outputs.identityId
     location: location
@@ -61,6 +62,18 @@ module azureBotRegistration './bot.bicep' = {
     botAppDomain: webapp.outputs.defaultHostName
     botDisplayName: botDisplayName
     botServiceName: 'bot-${resourceBaseName}-${environmentName}-uks'
+  }
+}
+
+module docIntelligence './docint.bicep' = {
+  name: 'Azure-Doc-Intelligence'
+  scope: rg
+  params: {
+    docIntName: 'docint-${resourceBaseName}-${environmentName}-uks'
+    location: 'uksouth'
+    userAssignedIdentityPrincipalId: identity.outputs.principalId
+    docIntBaseName: '${resourceBaseName}-${environmentName}'
+    skuName: 'S0'
   }
 }
 
@@ -99,3 +112,4 @@ output bot_domain string = webapp.outputs.defaultHostName
 output bot_id string = identity.outputs.clientId
 output blob_endpoint string = storage.outputs.blobEndpoint
 output blob_container_name string = storage.outputs.blobContainerName
+output doc_int_endpoint string = docIntelligence.outputs.docIntEndpoint

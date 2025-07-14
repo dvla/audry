@@ -3,6 +3,7 @@ param cosmosDbEndpoint string
 param cosmosDbDatabase string
 param cosmosDbContainer string
 param cosmosDbAuthKey string
+param docIntEndpoint string
 param geminiApiKey string
 param identityId string
 param appiInstrumentationKey string
@@ -93,6 +94,10 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
         {
           name: 'COSMOSDB_AUTH_KEY'
           value: cosmosDbAuthKey
+        }
+        {
+          name: 'DOCINT_ENDPOINT'
+          value: docIntEndpoint
         }
         {
           name: 'GEMINI_API_KEY'
