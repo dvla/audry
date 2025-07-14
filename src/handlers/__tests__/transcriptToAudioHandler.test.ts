@@ -4,6 +4,7 @@ import * as cards from '../../internal/cards'
 import type { ActivityContext } from '../../internal/conversationHandlers.js'
 import { log } from '../../internal/logger.js'
 import { getTranscript } from '../../internal/utils/documentUtils.js'
+import { DEFAULT_CONFIG } from '../../tts/episodeConfig'
 import { transcriptToSpeech } from '../../tts/textoSpeechGoogle.js'
 import { TranscriptToAudioHandler } from '../transcriptToAudioHandler'
 
@@ -40,6 +41,7 @@ describe('TranscriptToAudioHandler', () => {
         count: 0,
         documentPath: '/path/to/doc.txt',
         audioFilePath: '/path/to/audio.mp3',
+        config: DEFAULT_CONFIG,
       },
       ref: undefined,
       activity: undefined,

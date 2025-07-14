@@ -35,7 +35,10 @@ const logger = process.env.APPLICATIONINSIGHTS_CONNECTION_STRING
       ],
     })
 
-logger.warn('Logging level set to ' + logger.transports[0].level)
+logger.transports.forEach((transport, idx) => {
+  logger.warn(`Transport[${idx}] level: ${transport.level ?? 'undefined'}`)
+})
+
 /**
  * Returns a logger instance that provides methods for logging messages at various levels
  * (debug, info, warn, error). Each method delegates to the underlying `logger` implementation.

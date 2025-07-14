@@ -1,6 +1,8 @@
 import { TurnState } from '@microsoft/teams-ai'
 import { Activity, CardFactory, ConversationReference, MessageFactory, ResourceResponse, TurnContext } from 'botbuilder'
 
+import { EpisodeConfig } from '../tts/episodeConfig'
+
 /**
  * ConversationState holds the state of the conversation,
  * including document paths and other metadata.
@@ -11,6 +13,7 @@ export interface ConversationState {
   documentPath: string // Path to the document
   audioFilePath: string // Path to the generated audio file
   userId: string // Unique identifier for the user
+  config: EpisodeConfig
 }
 
 /**

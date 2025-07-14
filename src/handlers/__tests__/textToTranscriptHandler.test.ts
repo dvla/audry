@@ -3,6 +3,7 @@ import { Mock, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as cards from '../../internal/cards'
 import * as documentUtils from '../../internal/utils/documentUtils'
+import { DEFAULT_CONFIG } from '../../tts/episodeConfig'
 import { textToTranscript } from '../../tts/textToTranscript'
 import { TextToTranscriptHandler } from '../textToTranscriptHandler'
 
@@ -30,6 +31,7 @@ describe('TextToTranscriptHandler', () => {
         documentPath: '',
         audioFilePath: '',
         userId: '',
+        config: DEFAULT_CONFIG,
       },
       ref: undefined,
       activity: undefined,
@@ -54,7 +56,10 @@ describe('TextToTranscriptHandler', () => {
   it('should generate transcript and send success card', async () => {
     await handler.generateTranscript(activityContext)
     expect(documentUtils.getExtractedText).toHaveBeenCalledWith('doc123')
-    expect(textToTranscript).toHaveBeenCalledWith(EXTRACTED_TEXT)
+    expect(textToTranscript).toHaveBeenCalledWith(
+      expect.stringContaining('You are the a world-class podcast writer'),
+      EXTRACTED_TEXT
+    )
     expect(documentUtils.writeTranscript).toHaveBeenCalledWith(TRANSCRIPT, 'doc123')
     const cardArgs = (activityContext.proactiveSendCard as Mock).mock.calls[0][0]
     expect(cardArgs).toMatchSnapshot()

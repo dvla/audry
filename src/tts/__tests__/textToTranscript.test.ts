@@ -25,6 +25,7 @@ describe('textToTranscript', () => {
     vi.spyOn(clientModule, 'getGoogleClient').mockReturnValue(mockClient as any)
 
     const result = await textToTranscript(
+      '',
       'Information Technology Services  Digital and Technology Strategic Plan  2021 24'
     )
 

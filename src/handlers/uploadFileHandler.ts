@@ -1,5 +1,5 @@
 import { Selector } from '@microsoft/teams-ai'
-import { ActivityTypes, Attachment } from 'botbuilder'
+import { Activity, ActivityTypes, Attachment } from 'botbuilder'
 import path from 'path'
 import { v7 as uuidv7 } from 'uuid'
 
@@ -10,6 +10,7 @@ import { log } from '../internal/logger'
 import { writeExtractedText } from '../internal/utils/documentUtils'
 import { extractTextFromPdf, writeContentToFile } from '../internal/utils/fileUtils'
 import { getUserId } from '../internal/utils/userUtils'
+import { DEFAULT_CONFIG } from '../tts/episodeConfig'
 
 // Content type for Teams file download info attachments
 export const ATTACHMENT_CONTENT_TYPE = 'application/vnd.microsoft.teams.file.download.info'
@@ -24,6 +25,16 @@ const ATTACHMENT_FILE_TYPE = 'pdf'
  */
 export class UploadFileCommandHandler {
   triggerPatterns: string | RegExp | Selector | (string | RegExp | Selector)[] = FILE_TIGGER_PATTERN
+
+  /**
+   * Sets up a new conversation
+   */
+  newConversation(activity: Activity, conversation: any, fileDownloadPath: string) {
+    conversation.documentPath = fileDownloadPath
+    conversation.documentId = uuidv7()
+    conversation.userId = getUserId(activity)
+    conversation.config = DEFAULT_CONFIG
+  }
 
   /**
    * Handles the command when a user uploads a file.
@@ -43,12 +54,7 @@ export class UploadFileCommandHandler {
 
     // Download the file and save it to the temp folder
     const fileDownloadPath = await this.handleFileDownload(attachment)
-    conversation.documentPath = fileDownloadPath
-    // Generate and set a new UUID for documentId in state
-    conversation.documentId = uuidv7()
-    // Set the userId in the conversation state
-    conversation.userId = getUserId(activity)
-
+    this.newConversation(activity, conversation, fileDownloadPath)
     await send({ type: ActivityTypes.Typing })
 
     try {

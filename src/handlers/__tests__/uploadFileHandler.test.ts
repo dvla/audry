@@ -4,6 +4,7 @@ import { Mock, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import * as cards from '../../internal/cards'
 import { ActivityContext } from '../../internal/conversationHandlers'
 import * as fileutils from '../../internal/utils/fileUtils'
+import { DEFAULT_CONFIG } from '../../tts/episodeConfig'
 import { ATTACHMENT_CONTENT_TYPE, FILE_TIGGER_PATTERN, UploadFileCommandHandler } from '../uploadFileHandler'
 
 vi.mock('stream/promises', () => ({
@@ -34,6 +35,7 @@ describe('UploadFileCommandHandler', () => {
         documentPath: '',
         audioFilePath: '',
         userId: '',
+        config: DEFAULT_CONFIG,
       },
       activity: {
         text: FILE_TIGGER_PATTERN,
