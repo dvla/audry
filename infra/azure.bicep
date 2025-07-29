@@ -39,15 +39,18 @@ module webapp './webapp.bicep' = {
     cosmosDbContainer: cosmosDB.outputs.cosmosDbContainer
     cosmosDbAuthKey: cosmosDB.outputs.cosmosDbAuthKey
     docIntEndpoint: docIntelligence.outputs.docIntEndpoint
+    environmentName: environmentName
     geminiApiKey: geminiApiKey
     identityId: identity.outputs.identityId
     location: location
     serverfarmName: 'farm-${resourceBaseName}-${environmentName}-uks'
-    storageBlobEndpoint: storage.outputs.blobEndpoint
+    storageAccountName: storage.outputs.storageAccountName
     storageBlobContainer: storage.outputs.blobContainerName
     tenantId: tenantId
+    userAssignedIdentityPrincipalId: identity.outputs.principalId
     webAppName: 'app-${resourceBaseName}-${environmentName}-uks'
     webAppSKU: webAppSKU
+    webAppConfigName: 'appconfig-${resourceBaseName}-${environmentName}-uks'
   }
 }
 
