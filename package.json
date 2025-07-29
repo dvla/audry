@@ -27,6 +27,7 @@
         "test": "vitest run --coverage"
     },
     "dependencies": {
+        "@azure/ai-form-recognizer": "^5.1.0",
         "@elevenlabs/elevenlabs-js": "^2.7.0",
         "@google/genai": "^1.11.0",
         "@microsoft/teams-ai": "^1.7.4",
@@ -35,7 +36,6 @@
         "botbuilder": "^4.23.2",
         "botbuilder-azure": "^4.23.2",
         "express": "^5.1.0",
-        "pdfjs-dist": "^5.3.31",
         "uuid": "^11.1.0",
         "wav": "^1.0.2",
         "winston": "^3.17.0",

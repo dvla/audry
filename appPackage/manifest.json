@@ -18,8 +18,8 @@
     "full": "Audry Podcast Generator"
   },
   "description": {
-    "short": "Upload a PDF to turn content into audio.${{APP_NAME_SUFFIX}}",
-    "full": "Easily convert your PDFs into immersive podcast style audio in just a few simple steps. Upload your document and we'll seamlessly transform it into high quality spoken word."
+    "short": "Upload a file to turn content into audio.${{APP_NAME_SUFFIX}}",
+    "full": "Easily convert your files into immersive podcast style audio in just a few simple steps. Upload your document and we'll seamlessly transform it into high quality spoken word."
   },
   "accentColor": "#FFFFFF",
   "bots": [

@@ -1,59 +1,184 @@
-import fs from 'fs/promises'
-import path from 'path'
-import { v7 as uuidv7 } from 'uuid'
-import { afterAll, describe, expect, it } from 'vitest'
+import * as fs from 'fs/promises'
+import { Readable } from 'stream'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { Config } from '../../config'
-import { extractTextFromPdf, writeContentToFile } from '../fileUtils'
+import { extractTextFromFile, writeContentToFile } from '../fileUtils'
 
-const sourcePdf = path.resolve(__dirname, './test.pdf')
-const downloadedPdfPath = `${Config.FILES_DIR}/${uuidv7()}.pdf`
-const testUrl = 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
+vi.mock('fs/promises', () => ({
+  default: {
+    readFile: vi.fn(),
+  },
+  readFile: vi.fn(),
+}))
 
-describe('extractTextFromPdf (real file)', () => {
-  it('extracts text from up to maxPages', async () => {
-    const { extractedText, pages } = await extractTextFromPdf(sourcePdf, 2)
+vi.mock('fs')
+vi.mock('stream/promises')
 
-    expect(pages).toBeLessThan(3)
-    expect(extractedText.length).toBeGreaterThan(10)
+// Mock Azure Identity
+vi.mock('@azure/identity', () => ({
+  DefaultAzureCredential: vi.fn(),
+}))
+
+// Mock config
+vi.mock('../config', () => ({
+  Config: {
+    DOCINT_ENDPOINT: 'https://mock-endpoint.cognitiveservices.azure.com/',
+  },
+}))
+
+vi.mock('@azure/ai-form-recognizer', () => {
+  return {
+    DocumentAnalysisClient: vi.fn().mockImplementation(() => {
+      return {
+        beginAnalyzeDocument: vi.fn().mockResolvedValue({
+          pollUntilDone: vi.fn().mockResolvedValue({
+            content: 'Line 1 Line 2',
+            pages: [
+              {
+                lines: [{ content: 'Line 1' }, { content: 'Line 2' }],
+              },
+            ],
+          }),
+        }),
+      }
+    }),
+    AzureKeyCredential: vi.fn(),
+  }
+})
+
+// Stub logger to prevent actual logging
+vi.mock('../logger', () => ({
+  log: {
+    warn: vi.fn(),
+    error: vi.fn(),
+  },
+}))
+
+global.fetch = vi.fn()
+
+describe('extractTextFromFile', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
   })
 
-  it('extracts all available pages if maxPages is high', async () => {
-    const { extractedText, pages } = await extractTextFromPdf(sourcePdf, 100)
+  it('extracts text from a file with line data', async () => {
+    const mockBuffer = Buffer.from('fake-pdf')
+    const mockReadFile = vi.mocked(fs.readFile)
+    mockReadFile.mockResolvedValue(mockBuffer)
 
-    expect(pages).toBeGreaterThan(0)
-    expect(extractedText).toMatch(/.+/)
-  })
+    const result = await extractTextFromFile('fakepath.pdf')
 
-  it('throws error if file does not exist', async () => {
-    await expect(extractTextFromPdf(path.resolve(__dirname, './assets/missing.pdf'), 1)).rejects.toThrow(/ENOENT/)
+    expect(result).toBe('Line 1 Line 2')
   })
 })
 
-describe('writeContentToFile (real download)', () => {
-  it('downloads a file and saves it to disk', async () => {
-    await writeContentToFile(testUrl, downloadedPdfPath)
-
-    const fileBuffer = await fs.readFile(downloadedPdfPath)
-    expect(fileBuffer.length).toBeGreaterThan(0)
+describe('writeContentToFile', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
   })
 
-  it('can extract text from the downloaded PDF', async () => {
-    const { extractedText, pages } = await extractTextFromPdf(downloadedPdfPath, 1)
+  it('writes content from URL to file using stream', async () => {
+    const mockStream = new Readable()
+    mockStream._read = () => {}
+    mockStream.push('test data')
+    mockStream.push(null)
 
-    expect(pages).toBeGreaterThan(0)
-    expect(extractedText).toMatch(/dummy/i)
+    // Mock fetch response
+    ;(fetch as any).mockResolvedValue({
+      ok: true,
+      body: mockStream,
+      status: 200,
+      statusText: 'OK',
+    })
+
+    // Mock createWriteStream
+    const mockWriteStream = {
+      write: vi.fn(),
+      end: vi.fn(),
+      on: vi.fn(),
+      once: vi.fn(),
+      emit: vi.fn(),
+      close: vi.fn(),
+    }
+
+    const { createWriteStream } = await import('fs')
+    vi.mocked(createWriteStream).mockReturnValue(mockWriteStream as any)
+
+    // Mock pipeline to resolve immediately
+    const { pipeline } = await import('stream/promises')
+    vi.mocked(pipeline).mockResolvedValue(undefined)
+
+    await expect(writeContentToFile('http://example.com/file.pdf', 'output.pdf')).resolves.toBeUndefined()
+
+    // Verify pipeline was called with correct arguments
+    expect(pipeline).toHaveBeenCalledWith(mockStream, mockWriteStream)
   })
 
-  it('throws on invalid URL', async () => {
-    await expect(writeContentToFile('https://invalid.url/this-will-fail.pdf', downloadedPdfPath)).rejects.toThrow(
+  it('throws error on bad fetch', async () => {
+    ;(fetch as any).mockResolvedValue({
+      ok: false,
+      body: null,
+      status: 404,
+      statusText: 'Not Found',
+    })
+
+    await expect(writeContentToFile('http://bad.url', 'output.pdf')).rejects.toThrow('Failed to download file')
+  })
+
+  it('throws error when pipeline fails', async () => {
+    const mockStream = new Readable()
+    mockStream._read = () => {}
+    mockStream.push('test data')
+    mockStream.push(null)
+    ;(fetch as any).mockResolvedValue({
+      ok: true,
+      body: mockStream,
+      status: 200,
+      statusText: 'OK',
+    })
+
+    const mockWriteStream = {
+      write: vi.fn(),
+      end: vi.fn(),
+      on: vi.fn(),
+      once: vi.fn(),
+      emit: vi.fn(),
+      close: vi.fn(),
+    }
+
+    const { createWriteStream } = await import('fs')
+    vi.mocked(createWriteStream).mockReturnValue(mockWriteStream as any)
+
+    // Mock pipeline to reject
+    const { pipeline } = await import('stream/promises')
+    vi.mocked(pipeline).mockRejectedValue(new Error('Pipeline failed'))
+
+    await expect(writeContentToFile('http://example.com/file.pdf', 'output.pdf')).rejects.toThrow(
       'Failed to download file'
     )
   })
-})
 
-afterAll(async () => {
-  try {
-    await fs.unlink(downloadedPdfPath)
-  } catch {}
+  it('throws error when fetch response is not ok', async () => {
+    ;(fetch as any).mockResolvedValue({
+      ok: false,
+      body: null,
+      status: 500,
+      statusText: 'Internal Server Error',
+    })
+
+    await expect(writeContentToFile('http://bad.url', 'output.pdf')).rejects.toThrow('Failed to download file')
+  })
+
+  it('throws error when fetch response has no body', async () => {
+    ;(fetch as any).mockResolvedValue({
+      ok: true,
+      body: null,
+      status: 200,
+      statusText: 'OK',
+    })
+
+    await expect(writeContentToFile('http://example.com/no-body.pdf', 'output.pdf')).rejects.toThrow(
+      'Failed to download file'
+    )
+  })
 })

@@ -1,69 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`UploadFileCommandHandler > should handle valid PDF file upload 1`] = `
-{
-  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-  "body": [
-    {
-      "bleed": true,
-      "items": [
-        {
-          "columns": [
-            {
-              "items": [
-                {
-                  "size": "Large",
-                  "text": "✅",
-                  "type": "TextBlock",
-                },
-              ],
-              "type": "Column",
-              "width": "auto",
-            },
-            {
-              "items": [
-                {
-                  "color": "Default",
-                  "size": "Medium",
-                  "text": "Text Extracted",
-                  "type": "TextBlock",
-                  "weight": "Bolder",
-                  "wrap": true,
-                },
-                {
-                  "text": "Extracted text from 3 page(s).",
-                  "type": "TextBlock",
-                  "wrap": true,
-                },
-              ],
-              "type": "Column",
-              "width": "stretch",
-            },
-          ],
-          "type": "ColumnSet",
-        },
-      ],
-      "style": "default",
-      "type": "Container",
-    },
-    {
-      "actions": [
-        {
-          "style": "positive",
-          "title": "Text to Transcript",
-          "type": "Action.Execute",
-          "verb": "textToTranscript",
-        },
-      ],
-      "type": "ActionSet",
-    },
-  ],
-  "type": "AdaptiveCard",
-  "version": "1.6",
-}
-`;
-
-exports[`UploadFileCommandHandler > should handle when there are no attachments 1`] = `
+exports[`UploadFileCommandHandler (general file support) > should handle valid file upload 1`] = `
 [MockFunction spy] {
   "calls": [
     [
@@ -79,7 +16,7 @@ exports[`UploadFileCommandHandler > should handle when there are no attachments 
                     "items": [
                       {
                         "size": "Large",
-                        "text": "⚠️",
+                        "text": "✅",
                         "type": "TextBlock",
                       },
                     ],
@@ -91,9 +28,14 @@ exports[`UploadFileCommandHandler > should handle when there are no attachments 
                       {
                         "color": "Default",
                         "size": "Medium",
-                        "text": "Sorry! I can only handle PDF files. Please upload a valid PDF file.",
+                        "text": "File Processed",
                         "type": "TextBlock",
                         "weight": "Bolder",
+                        "wrap": true,
+                      },
+                      {
+                        "text": "Successfully extracted text from file: file.pdf",
+                        "type": "TextBlock",
                         "wrap": true,
                       },
                     ],
@@ -104,126 +46,19 @@ exports[`UploadFileCommandHandler > should handle when there are no attachments 
                 "type": "ColumnSet",
               },
             ],
-            "style": "warning",
+            "style": "default",
             "type": "Container",
           },
-        ],
-        "type": "AdaptiveCard",
-        "version": "1.6",
-      },
-    ],
-  ],
-  "results": [
-    {
-      "type": "return",
-      "value": Promise {},
-    },
-  ],
-}
-`;
-
-exports[`UploadFileCommandHandler > should reject non-PDF files 1`] = `
-[MockFunction spy] {
-  "calls": [
-    [
-      {
-        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-        "body": [
           {
-            "bleed": true,
-            "items": [
+            "actions": [
               {
-                "columns": [
-                  {
-                    "items": [
-                      {
-                        "size": "Large",
-                        "text": "⚠️",
-                        "type": "TextBlock",
-                      },
-                    ],
-                    "type": "Column",
-                    "width": "auto",
-                  },
-                  {
-                    "items": [
-                      {
-                        "color": "Default",
-                        "size": "Medium",
-                        "text": "Sorry! I can only handle PDF files. Please upload a valid PDF file.",
-                        "type": "TextBlock",
-                        "weight": "Bolder",
-                        "wrap": true,
-                      },
-                    ],
-                    "type": "Column",
-                    "width": "stretch",
-                  },
-                ],
-                "type": "ColumnSet",
+                "style": "positive",
+                "title": "Text to Transcript",
+                "type": "Action.Execute",
+                "verb": "textToTranscript",
               },
             ],
-            "style": "warning",
-            "type": "Container",
-          },
-        ],
-        "type": "AdaptiveCard",
-        "version": "1.6",
-      },
-    ],
-  ],
-  "results": [
-    {
-      "type": "return",
-      "value": Promise {},
-    },
-  ],
-}
-`;
-
-exports[`UploadFileCommandHandler > should send a warning card if the text extraction fails 1`] = `
-[MockFunction spy] {
-  "calls": [
-    [
-      {
-        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-        "body": [
-          {
-            "bleed": true,
-            "items": [
-              {
-                "columns": [
-                  {
-                    "items": [
-                      {
-                        "size": "Large",
-                        "text": "⚠️",
-                        "type": "TextBlock",
-                      },
-                    ],
-                    "type": "Column",
-                    "width": "auto",
-                  },
-                  {
-                    "items": [
-                      {
-                        "color": "Default",
-                        "size": "Medium",
-                        "text": "Sorry, I could not extract text from the PDF. Please ensure the file is valid.",
-                        "type": "TextBlock",
-                        "weight": "Bolder",
-                        "wrap": true,
-                      },
-                    ],
-                    "type": "Column",
-                    "width": "stretch",
-                  },
-                ],
-                "type": "ColumnSet",
-              },
-            ],
-            "style": "warning",
-            "type": "Container",
+            "type": "ActionSet",
           },
         ],
         "type": "AdaptiveCard",

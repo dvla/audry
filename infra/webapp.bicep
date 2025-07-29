@@ -56,6 +56,10 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
           value: botId
         }
         {
+          name: 'AZURE_CLIENT_ID'
+          value: botId
+        }
+        {
           name: 'BOT_TENANT_ID'
           value: tenantId
         }

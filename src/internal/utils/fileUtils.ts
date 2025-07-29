@@ -1,48 +1,67 @@
+import { DocumentAnalysisClient } from '@azure/ai-form-recognizer'
+import { DefaultAzureCredential, TokenCredential } from '@azure/identity'
 import { createWriteStream } from 'fs'
 import fs from 'fs/promises'
-import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs'
 import { pipeline } from 'stream/promises'
 
+import { Config } from '../config'
 import { log } from '../logger'
 
-/**
- * Extracts text from a PDF file at the given path, up to maxPages.
- * @param filePath Path to the PDF file
- * @param maxPages Maximum number of pages to extract
- * @returns Extracted text as a string
- */
-export async function extractTextFromPdf(
-  filePath: string,
-  maxPages: number
-): Promise<{ extractedText: string; pages: number }> {
-  const pdfBuffer = await fs.readFile(filePath)
-  const pdfData = new Uint8Array(pdfBuffer)
-  const pdf = await getDocument({ data: pdfData }).promise
-  const extractUpTo = Math.min(pdf.numPages, maxPages)
-  let extractedText = ''
+// Azure Form Recognizer configuration
+const endpoint = Config.DOCINT_ENDPOINT
+let azureCredential = null
+let azureClient = null
 
-  for (let i = 1; i <= extractUpTo; i++) {
-    const page = await pdf.getPage(i)
-    const content = await page.getTextContent()
-    const pageText = content.items.map((item: any) => item.str).join(' ')
-    extractedText += pageText + '\n\n'
+export const getAzureCredentials = (): TokenCredential => {
+  if (!azureCredential) {
+    azureCredential = new DefaultAzureCredential()
   }
+  return azureCredential
+}
 
-  return {
-    extractedText,
-    pages: extractUpTo,
+const getAzureDocumentClient = () => {
+  if (!azureClient) {
+    azureClient = new DocumentAnalysisClient(endpoint, getAzureCredentials())
+  }
+  return azureClient
+}
+
+/**
+ * Extracts text from a document (Word, Excel, PDF, Image, etc.) using Azure Form Recognizer.
+ * Uses 'prebuilt-read' model, with fallback to result.content if line data is missing.
+ *
+ * @param filePath Path to the local document file
+ * @returns Extracted text and number of pages processed
+ */
+export async function extractTextFromFile(filePath: string): Promise<string> {
+  try {
+    const client = getAzureDocumentClient()
+    const fileBuffer = await fs.readFile(filePath)
+    const poller = await client.beginAnalyzeDocument('prebuilt-read', fileBuffer)
+    const result = await poller.pollUntilDone()
+
+    if (!result) {
+      throw new Error('Document analysis failed')
+    }
+    return result.content
+  } catch (error) {
+    log.error('Error extracting text from document using Azure Form Recognizer.', error)
+    throw new Error('Failed to extract text from document')
   }
 }
 
 /**
- * Downloads the file from the given URL and saves it to the specified path using fetch and stream.pipeline.
- * @param {string} contentUrl - The URL of the file to download.
- * @param {string} filePath - The path where the file will be saved.
- * @returns {Promise<void>}
+ * Downloads a file from a URL and saves it to the given local file path using streaming.
+ *
+ * @param contentUrl The URL of the file to download
+ * @param filePath The path to save the downloaded file
  */
-export async function writeContentToFile(contentUrl, filePath) {
+export async function writeContentToFile(contentUrl: string, filePath: string): Promise<void> {
   try {
     const res = await fetch(contentUrl)
+    if (!res.ok || !res.body) {
+      throw new Error(`Download failed: ${res.status} ${res.statusText}`)
+    }
     const fileStream = createWriteStream(filePath)
     await pipeline(res.body, fileStream)
   } catch (error) {

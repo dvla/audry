@@ -7,7 +7,6 @@ export const DEFAULT_EMPTY = ''
 // Default values for environment variables
 export const DEFAULT_FILES_DIR = os.tmpdir()
 export const DEFAULT_LOG_LEVEL = 'info'
-export const DEFAULT_MAX_PAGES = '80'
 export const DEFAULT_GEMINI_MODEL = 'gemini-2.0-flash-001'
 export const DEFAULT_GEMINI_TTS_MODEL = 'gemini-2.5-flash-preview-tts'
 export const DEFAULT_MAX_NUMBER_OF_LINES = '28'
@@ -18,7 +17,7 @@ export const DEFAULT_LINES_PER_CHUNK = '4'
  * If it is not set or equal to the placeholder, returns the default value.
  * @param variable environment variable to check
  * @param defaultValue default value to return if the variable is not set or is equal to the placeholder
- * @returns environment variable value or default value
+ * @returns environment variable value or default values
  */
 const checkOptionalVariable = (variable: string, defaultValue: string) => {
   if (variable && variable.trim() !== '' && variable.trim() !== ENV_PLACEHOLDER) {
@@ -38,8 +37,6 @@ export const Config = {
   ELEVENLABS_API_KEY: checkOptionalVariable(process.env.ELEVENLABS_API_KEY, DEFAULT_EMPTY),
   // Audry Temporary Files Directory
   FILES_DIR: checkOptionalVariable(process.env.AUDRY_FILES_DIR, DEFAULT_FILES_DIR),
-  // Audry PDF max pages to process
-  MAX_PAGES: checkOptionalVariable(process.env.AUDRY_MAX_PAGES, DEFAULT_MAX_PAGES),
   //Gemini API Key
   GEMINI_API_KEY: checkOptionalVariable(process.env.GEMINI_API_KEY, DEFAULT_EMPTY),
   //Gemini Model
@@ -55,4 +52,5 @@ export const Config = {
   COSMOSDB_DATABASE: checkOptionalVariable(process.env.COSMOSDB_DATABASE, DEFAULT_EMPTY),
   COSMOSDB_CONTAINER: checkOptionalVariable(process.env.COSMOSDB_CONTAINER, DEFAULT_EMPTY),
   COSMOSDB_AUTH_KEY: checkOptionalVariable(process.env.COSMOSDB_AUTH_KEY, DEFAULT_EMPTY),
+  DOCINT_ENDPOINT: checkOptionalVariable(process.env.DOCINT_ENDPOINT, DEFAULT_EMPTY),
 }

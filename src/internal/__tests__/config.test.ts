@@ -7,7 +7,6 @@ import {
   DEFAULT_GEMINI_TTS_MODEL,
   DEFAULT_LINES_PER_CHUNK,
   DEFAULT_MAX_NUMBER_OF_LINES,
-  DEFAULT_MAX_PAGES,
   ENV_PLACEHOLDER,
 } from '../../internal/config'
 
@@ -44,7 +43,6 @@ describe('config test', () => {
     // Assert
     expect(Config.ELEVENLABS_API_KEY).toEqual(DEFAULT_EMPTY)
     expect(Config.FILES_DIR).toEqual(DEFAULT_FILES_DIR)
-    expect(Config.MAX_PAGES).toEqual(DEFAULT_MAX_PAGES)
     expect(Config.GEMINI_API_KEY).toEqual(DEFAULT_EMPTY)
     expect(Config.GEMINI_MODEL).toEqual(DEFAULT_GEMINI_MODEL)
     expect(Config.GEMINI_TTS_MODEL).toEqual(DEFAULT_GEMINI_TTS_MODEL)
@@ -59,7 +57,6 @@ describe('config test', () => {
     // Setup
     process.env.ELEVENLABS_API_KEY = 'test-elevenlabs-api-key'
     process.env.AUDRY_FILES_DIR = '/custom/files/dir'
-    process.env.AUDRY_MAX_PAGES = '100'
     process.env.GEMINI_API_KEY = 'test-gemini-api-key'
     process.env.GEMINI_MODEL = 'gemini-2.0-flash-001'
     process.env.GEMINI_TTS_MODEL = 'gemini-2.5-flash-preview-tts'
@@ -76,7 +73,6 @@ describe('config test', () => {
     // Assert
     expect(Config.ELEVENLABS_API_KEY).toEqual('test-elevenlabs-api-key')
     expect(Config.FILES_DIR).toEqual('/custom/files/dir')
-    expect(Config.MAX_PAGES).toEqual('100')
     expect(Config.GEMINI_API_KEY).toEqual('test-gemini-api-key')
     expect(Config.GEMINI_MODEL).toEqual('gemini-2.0-flash-001')
     expect(Config.GEMINI_TTS_MODEL).toEqual('gemini-2.5-flash-preview-tts')
@@ -91,7 +87,6 @@ describe('config test', () => {
     // Setup
     process.env.ELEVENLABS_API_KEY = ENV_PLACEHOLDER
     process.env.AUDRY_FILES_DIR = ENV_PLACEHOLDER
-    process.env.AUDRY_MAX_PAGES = ENV_PLACEHOLDER
     process.env.GEMINI_API_KEY = ENV_PLACEHOLDER
     process.env.GEMINI_MODEL = ENV_PLACEHOLDER
     process.env.GEMINI_TTS_MODEL = ENV_PLACEHOLDER
@@ -108,7 +103,6 @@ describe('config test', () => {
     // Assert
     expect(Config.ELEVENLABS_API_KEY).toEqual(DEFAULT_EMPTY)
     expect(Config.FILES_DIR).toEqual(DEFAULT_FILES_DIR)
-    expect(Config.MAX_PAGES).toEqual(DEFAULT_MAX_PAGES)
     expect(Config.GEMINI_API_KEY).toEqual(DEFAULT_EMPTY)
     expect(Config.GEMINI_MODEL).toEqual(DEFAULT_GEMINI_MODEL)
     expect(Config.GEMINI_TTS_MODEL).toEqual(DEFAULT_GEMINI_TTS_MODEL)
@@ -123,7 +117,6 @@ describe('config test', () => {
     // Setup
     process.env.ELEVENLABS_API_KEY = ''
     process.env.AUDRY_FILES_DIR = ''
-    process.env.AUDRY_MAX_PAGES = ''
     process.env.GEMINI_API_KEY = ''
     process.env.GEMINI_MODEL = ''
     process.env.GEMINI_TTS_MODEL = ''
@@ -140,7 +133,6 @@ describe('config test', () => {
     // Assert
     expect(Config.ELEVENLABS_API_KEY).toEqual(DEFAULT_EMPTY)
     expect(Config.FILES_DIR).toEqual(DEFAULT_FILES_DIR)
-    expect(Config.MAX_PAGES).toEqual(DEFAULT_MAX_PAGES)
     expect(Config.GEMINI_API_KEY).toEqual(DEFAULT_EMPTY)
     expect(Config.GEMINI_MODEL).toEqual(DEFAULT_GEMINI_MODEL)
     expect(Config.GEMINI_TTS_MODEL).toEqual(DEFAULT_GEMINI_TTS_MODEL)
