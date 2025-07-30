@@ -1,8 +1,15 @@
-import * as fs from 'fs/promises'
+import * as fs from 'fs'
 import { Readable } from 'stream'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { extractTextFromFile, writeContentToFile } from '../fileUtils'
+
+const aiDocIntelligenceMock = vi.hoisted(() => ({
+  default: vi.fn(),
+  getLongRunningPoller: vi.fn(),
+  isUnexpected: vi.fn(),
+}))
+vi.mock('@azure-rest/ai-document-intelligence', () => aiDocIntelligenceMock)
 
 vi.mock('fs/promises', () => ({
   default: {
@@ -26,49 +33,78 @@ vi.mock('../config', () => ({
   },
 }))
 
-vi.mock('@azure/ai-form-recognizer', () => {
-  return {
-    DocumentAnalysisClient: vi.fn().mockImplementation(() => {
-      return {
-        beginAnalyzeDocument: vi.fn().mockResolvedValue({
-          pollUntilDone: vi.fn().mockResolvedValue({
-            content: 'Line 1 Line 2',
-            pages: [
-              {
-                lines: [{ content: 'Line 1' }, { content: 'Line 2' }],
-              },
-            ],
-          }),
-        }),
-      }
-    }),
-    AzureKeyCredential: vi.fn(),
-  }
-})
-
-// Stub logger to prevent actual logging
-vi.mock('../logger', () => ({
-  log: {
-    warn: vi.fn(),
-    error: vi.fn(),
+const goodResponse = {
+  status: '202',
+  headers: {
+    'operation-location': 'https://mock-endpoint.cognitiveservices.azure.com/operations/123',
   },
-}))
+}
+const badResponse = {
+  status: '401',
+  body: {
+    error: 'Not Authorised',
+  },
+}
+const goodResult = {
+  content: 'Line 1 Line 2',
+  pages: [
+    {
+      pageNumber: 1,
+      lines: [{ content: 'Line 1' }, { content: 'Line 2' }],
+      words: [{ content: 'Line' }, { content: '1' }, { content: 'Line' }, { content: '2' }],
+    },
+  ],
+  tables: [],
+}
 
 global.fetch = vi.fn()
 
 describe('extractTextFromFile', () => {
   beforeEach(() => {
+    vi.resetAllMocks()
     vi.clearAllMocks()
   })
 
   it('extracts text from a file with line data', async () => {
-    const mockBuffer = Buffer.from('fake-pdf')
-    const mockReadFile = vi.mocked(fs.readFile)
-    mockReadFile.mockResolvedValue(mockBuffer)
-
+    aiDocIntelligenceMock.default.mockReturnValue({
+      path: vi.fn(() => ({
+        post: vi.fn().mockResolvedValue(goodResponse),
+      })),
+    })
+    aiDocIntelligenceMock.getLongRunningPoller.mockReturnValue({
+      pollUntilDone: vi.fn().mockResolvedValue({
+        body: {
+          analyzeResult: goodResult,
+        },
+      }),
+    })
+    aiDocIntelligenceMock.isUnexpected.mockReturnValue(false)
+    const mockReadFile = vi.mocked(fs.readFileSync).mockReturnValue(Buffer.from('fake-pdf'))
     const result = await extractTextFromFile('fakepath.pdf')
-
     expect(result).toBe('Line 1 Line 2')
+  })
+
+  it('does not extract text from a file', async () => {
+    const result = await extractTextFromFile('')
+    expect(result).toBe('No content extracted from the document.')
+  })
+
+  it('handles bad response', async () => {
+    aiDocIntelligenceMock.default.mockReturnValue({
+      path: vi.fn(() => ({
+        post: vi.fn().mockResolvedValue(badResponse),
+      })),
+    })
+    aiDocIntelligenceMock.getLongRunningPoller.mockReturnValue({
+      pollUntilDone: vi.fn().mockResolvedValue({
+        body: {
+          analyzeResult: goodResult,
+        },
+      }),
+    })
+    aiDocIntelligenceMock.isUnexpected.mockReturnValue(true)
+    const mockReadFile = vi.mocked(fs.readFileSync).mockReturnValue(Buffer.from('fake-pdf'))
+    await expect(extractTextFromFile('fakepath.pdf')).rejects.toThrow('Failed to extract text from document')
   })
 })
 

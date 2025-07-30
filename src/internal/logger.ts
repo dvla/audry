@@ -16,6 +16,7 @@ interface Logger {
   info: (message: string) => void
   warn: (message: string) => void
   error: (message: string, error?: Error) => void
+  isDebugEnabled: () => boolean
 }
 
 const logger = process.env.APPLICATIONINSIGHTS_CONNECTION_STRING
@@ -50,6 +51,7 @@ const getLogger = (): Logger => ({
   info: (message) => logger.info(message),
   warn: (message) => logger.warn(message),
   error: (message, error) => logger.error(message, error),
+  isDebugEnabled: () => logger.isDebugEnabled(),
 })
 
 /**
