@@ -1,19 +1,45 @@
 import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js'
+import { VoiceSettings } from '@elevenlabs/elevenlabs-js/api/types/VoiceSettings'
 import { promises as fs } from 'fs'
 import * as path from 'path'
-import { v7 as uuidv7 } from 'uuid'
 
 import { Config } from '../internal/config'
 import { log } from '../internal/logger'
+import { generatePodcastFileName } from '../internal/utils/documentUtils'
+import { EpisodeVoices } from './episodeConfig'
 
 const MODEL_ID = 'eleven_multilingual_v2'
 const OUTPUT_FORMAT = 'mp3_44100_128'
-const MATTHEW_VOICE_ID = 'wUkGqD7qevNIshEdEC5s'
-const MATTHEW_VOICE_SETTINGS = { speed: 1.04, stability: 0.4, similarityBoost: 1.0, useSpeakerBoost: true }
-const ELLIE_VOICE_ID = 'lcMyyd2HUfFzxdCaC4Ta'
-const ELLIE_VOICE_SETTINGS = { stability: 0.5, similarityBoost: 1.0, useSpeakerBoost: false }
 
 let cloudClient: ElevenLabsClient | null = null
+
+const DEFAULT_VOICES = [EpisodeVoices.MATTHEW, EpisodeVoices.ELLIE]
+// Predefined voice configurations for different episode voices
+const VOICE_CONFIGS = new Map<EpisodeVoices, { voiceId: string; voiceSettings: VoiceSettings }>([
+  [
+    EpisodeVoices.MATTHEW,
+    {
+      voiceId: 'wUkGqD7qevNIshEdEC5s',
+      voiceSettings: {
+        speed: 1.04,
+        stability: 0.4,
+        similarityBoost: 1.0,
+        useSpeakerBoost: true,
+      },
+    },
+  ],
+  [
+    EpisodeVoices.ELLIE,
+    {
+      voiceId: 'lcMyyd2HUfFzxdCaC4Ta',
+      voiceSettings: {
+        stability: 0.5,
+        similarityBoost: 1.0,
+        useSpeakerBoost: false,
+      },
+    },
+  ],
+])
 
 /**
  * Returns an instance of the ElevenLabsClient.
@@ -40,7 +66,7 @@ const getClient = (): ElevenLabsClient => {
  * @property {string} text - The content spoken by the speaker in this turn.
  */
 export interface Turn {
-  speaker: string
+  speaker: number
   text: string
 }
 
@@ -98,26 +124,102 @@ const textToSpeechStream = async (
  * @returns Promise resolving to the file path of the generated MP3 audio file
  * @throws Error if no audio buffers could be generated from the provided turns
  */
-export const textToSpeech = async (turns: Turn[], ping?: () => void): Promise<string> => {
-  const fileId = uuidv7()
-  const mp3Path = path.join(Config.FILES_DIR, `eleven_${fileId}.mp3`)
+export const textToSpeech = async (
+  turns: Turn[],
+  ping?: () => void
+): Promise<{ outputFileName: string; outputFilePath: string }> => {
+  const outputFileName = generatePodcastFileName() + '.mp3'
+  const outputFilePath = path.join(Config.FILES_DIR, outputFileName)
+  const startTime = Date.now()
   let buffers: Buffer[] = []
 
   // Loop through each turn and generate audio
   for (const turn of turns) {
     let buffer: Buffer | null = null
-    const isMatthew = turn.speaker === '1'
-    const voiceId = isMatthew ? MATTHEW_VOICE_ID : ELLIE_VOICE_ID
-    const voiceSettings = isMatthew ? MATTHEW_VOICE_SETTINGS : ELLIE_VOICE_SETTINGS
-    buffer = await textToSpeechStream(turn.text, voiceId, voiceSettings, ping)
+    const voiceConfig = VOICE_CONFIGS.get(DEFAULT_VOICES[turn.speaker - 1]) || VOICE_CONFIGS.get(EpisodeVoices.MATTHEW)
+    buffer = await textToSpeechStream(turn.text, voiceConfig.voiceId, voiceConfig.voiceSettings, ping)
     if (buffer && buffer.length > 0) buffers.push(buffer)
   }
 
   if (buffers.length === 0) {
     throw new Error('No audio buffers generated from the turns')
   }
-  await writeFile(buffers, mp3Path)
-  return mp3Path
+  await writeFile(buffers, outputFilePath)
+  return { outputFileName, outputFilePath }
+}
+
+/**
+ * Converts a transcript string using the Eleven Labs API.
+ *
+ * This function parses the provided transcript into speaker turns, then processes each turn
+ * using a Eleven Labs.
+ *
+ * @param transcript - The transcript text to be converted into speech.
+ * @returns A promise that resolves to an object containing the output file name and file path.
+ */
+export async function transcriptToSpeech(
+  transcript: string
+): Promise<{ outputFileName: string; outputFilePath: string }> {
+  const turns = parseTranscriptToSpeakerTurns(transcript)
+  const startTime = Date.now()
+  let i = 0
+  if (turns && turns.length > 0) {
+    log.debug(`Parsed ${turns.length} speaker turns from transcript`)
+    const { outputFileName, outputFilePath } = await textToSpeech(turns, () => {
+      if (i % 10 === 0) {
+        log.debug(`Processed ${i} chunks...`)
+      }
+      i++
+    })
+    const totalSeconds = ((Date.now() - startTime) / 1000).toFixed(2)
+    log.info(`Total audio generation time: ${totalSeconds} seconds`)
+    return { outputFileName, outputFilePath }
+  }
+}
+
+/**
+ * Parses a transcript string into an array of speaker turns.
+ *
+ * The transcript should have lines formatted as "SPEAKER <number>: <text>", where each speaker's
+ * utterance may span multiple lines. Lines not matching the speaker pattern are considered
+ * continuations of the previous speaker's text.
+ *
+ * @param transcript - The transcript string to parse.
+ * @returns An array of `Turn` objects, each containing a `speaker` identifier and the corresponding `text`.
+ */
+export const parseTranscriptToSpeakerTurns = (transcript: string): Turn[] => {
+  const speakerTurns: Turn[] = []
+  let currentSpeaker: string | null = null
+  let currentText: string[] = []
+  const speakerPattern = /^SPEAKER (\d+): (.*)/i
+
+  for (const rawLine of transcript.split('\n')) {
+    const line = rawLine.trim()
+    if (!line) continue
+    const match = line.match(speakerPattern)
+    if (match) {
+      // Save previous turn if exists
+      if (currentSpeaker !== null) {
+        speakerTurns.push({
+          speaker: parseInt(currentSpeaker),
+          text: currentText.join(' ').trim(),
+        })
+      }
+      currentSpeaker = match[1]
+      currentText = [match[2]]
+    } else if (currentSpeaker !== null) {
+      // Continuation of previous speaker
+      currentText.push(line)
+    }
+  }
+  // Add last turn
+  if (currentSpeaker !== null && currentText.length > 0) {
+    speakerTurns.push({
+      speaker: parseInt(currentSpeaker),
+      text: currentText.join(' ').trim(),
+    })
+  }
+  return speakerTurns
 }
 
 /**

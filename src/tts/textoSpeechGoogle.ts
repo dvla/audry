@@ -1,10 +1,11 @@
-import { GoogleGenAI, SpeakerVoiceConfig } from '@google/genai'
+import { GenerateContentConfig, GoogleGenAI, SpeakerVoiceConfig, VoiceConfig } from '@google/genai'
 import * as path from 'path'
 import * as wav from 'wav'
 
 import { Config } from '../internal/config'
 import { log } from '../internal/logger'
 import { generatePodcastFileName } from '../internal/utils/documentUtils'
+import { EpisodeVoices } from './episodeConfig'
 
 const STYLE =
   'Use a genuine and refined British accent for Speaker 1. Use a genuine and refined British accent for Speaker 2.'
@@ -16,38 +17,38 @@ interface SaveWaveFileOptions {
   sampleWidth?: number
 }
 
-interface GenerateContentConfig {
-  responseModalities: string[]
-  speechConfig: {
-    multiSpeakerVoiceConfig: {
-      speakerVoiceConfigs: SpeakerVoiceConfig[]
-    }
-  }
+// Predefined voice configurations for different episode voices
+const VOICE_CONFIGS = new Map<EpisodeVoices, VoiceConfig>([
+  [EpisodeVoices.MATTHEW, { prebuiltVoiceConfig: { voiceName: 'Fenrir' } }],
+  [EpisodeVoices.ELLIE, { prebuiltVoiceConfig: { voiceName: 'Achernar' } }],
+])
+
+/**
+ * Generates speaker voice configurations from an array of episode voices.
+ *
+ * @param voices - Array of episode voice types to be converted to speaker configurations
+ * @returns Array of speaker voice configurations with sequential speaker names and corresponding voice settings
+ */
+const generateVoiceConfig = (voices: EpisodeVoices[]): SpeakerVoiceConfig[] => {
+  let i = 1
+  return voices.map((voice) => ({
+    speaker: `Speaker ${i++}`,
+    voiceConfig: VOICE_CONFIGS.get(voice) || VOICE_CONFIGS.get(EpisodeVoices.MATTHEW), // Default to Matthew if not found
+  }))
 }
 
 /**
  * Configuration for generating speech with multiple speaker voices
  */
-export const generateConfig: GenerateContentConfig = {
-  responseModalities: ['AUDIO'],
-  speechConfig: {
-    multiSpeakerVoiceConfig: {
-      speakerVoiceConfigs: [
-        {
-          speaker: 'Speaker 1',
-          voiceConfig: {
-            prebuiltVoiceConfig: { voiceName: 'Fenrir' },
-          },
-        },
-        {
-          speaker: 'Speaker 2',
-          voiceConfig: {
-            prebuiltVoiceConfig: { voiceName: 'Achernar' },
-          },
-        },
-      ],
+export const generateConfig = (voices: EpisodeVoices[]): GenerateContentConfig => {
+  return {
+    responseModalities: ['AUDIO'],
+    speechConfig: {
+      multiSpeakerVoiceConfig: {
+        speakerVoiceConfigs: generateVoiceConfig(voices),
+      },
     },
-  },
+  }
 }
 
 /**
@@ -76,7 +77,8 @@ export async function transcriptToSpeech(
   const transcriptChunks = splitTranscript(transcript)
 
   const startTime = Date.now()
-  const audioData = await Promise.all(transcriptChunks.map((chunk) => processChunks(chunk)))
+  const generateConfiguration = generateConfig([EpisodeVoices.MATTHEW, EpisodeVoices.ELLIE])
+  const audioData = await Promise.all(transcriptChunks.map((chunk) => processChunks(chunk, generateConfiguration)))
   const totalSeconds = ((Date.now() - startTime) / 1000).toFixed(2)
   log.info(`Total audio generation time: ${totalSeconds} seconds`)
 
@@ -119,9 +121,10 @@ export const splitTranscript = (transcript: string): string[] => {
 /**
  * Processes a single chunk of text to generate speech using Google's Gemini TTS API.
  * @param chunk The text chunk to process.
+ * @param generateConfiguration The configuration for generating content.
  * @returns A promise that resolves to the base64 encoded audio data.
  */
-export const processChunks = async (chunk: string) => {
+export const processChunks = async (chunk: string, generateConfiguration: GenerateContentConfig) => {
   const ai = getGoogleClient()
   const prompt = `${STYLE}:\n\n${chunk}`
   const chunkStartTime = Date.now()
@@ -129,7 +132,7 @@ export const processChunks = async (chunk: string) => {
   const response = await ai.models.generateContent({
     model: Config.GEMINI_TTS_MODEL,
     contents: [{ parts: [{ text: prompt }] }],
-    config: generateConfig,
+    config: generateConfiguration,
   })
 
   const chunkSeconds = ((Date.now() - chunkStartTime) / 1000).toFixed(2)

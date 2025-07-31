@@ -26,6 +26,7 @@ const logger = process.env.APPLICATIONINSIGHTS_CONNECTION_STRING
           level: Config.LOG_LEVEL,
         }),
       ],
+      exitOnError: false,
     })
   : createLogger({
       transports: [
@@ -34,11 +35,20 @@ const logger = process.env.APPLICATIONINSIGHTS_CONNECTION_STRING
           level: 'debug',
         }),
       ],
+      exitOnError: false,
     })
 
 logger.transports.forEach((transport, idx) => {
-  logger.warn(`Transport[${idx}] level: ${transport.level ?? 'undefined'}`)
+  logger.warn(
+    `Transport[${idx}] cname: ${transport.constructor.name ?? 'undefined'} level: ${transport.level ?? 'undefined'}`
+  )
 })
+
+let secondLogger = logger.transports[1]
+if (secondLogger) {
+  logger.warn(`Second transport changing level from: ${secondLogger.level ?? 'undefined'} to ${Config.LOG_LEVEL}`)
+  secondLogger.level = Config.LOG_LEVEL
+}
 
 /**
  * Returns a logger instance that provides methods for logging messages at various levels

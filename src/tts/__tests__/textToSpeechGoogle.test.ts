@@ -2,6 +2,7 @@ import path from 'path'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { Config } from '../../internal/config'
+import { EpisodeVoices } from '../episodeConfig'
 import { generateConfig, processChunks, saveWaveFile, splitTranscript, transcriptToSpeech } from '../textoSpeechGoogle'
 
 const SMALL_TEST_TRANSCRIPT = `Speaker 1: Alright, Ellie, buckle up, because today we're diving deep into the digital heart of… the DVLA!
@@ -58,6 +59,7 @@ Config.GEMINI_API_KEY = 'fake-api-key'
 
 // Some reusable base64 audio data
 const fakeBase64Audio = Buffer.from('test audio').toString('base64')
+const voiceConfiguration = generateConfig([EpisodeVoices.MATTHEW, EpisodeVoices.ELLIE])
 
 describe('saveWaveFile', () => {
   beforeEach(() => {
@@ -194,12 +196,12 @@ describe('processChunks', () => {
       ],
       usageMetadata: { totalTokenCount: 42 },
     })
-    const result = await processChunks('Hello world')
+    const result = await processChunks('Hello world', voiceConfiguration)
     expect(result).toBe('base64audio')
     expect(fakeGenerateContent).toHaveBeenCalledWith({
       model: TTS_MODEL,
       contents: [{ parts: [{ text: `${STYLE}:\n\nHello world` }] }],
-      config: generateConfig,
+      config: voiceConfiguration,
     })
   })
 
@@ -214,6 +216,8 @@ describe('processChunks', () => {
       ],
       usageMetadata: { totalTokenCount: 42 },
     })
-    await expect(processChunks('Hello world')).rejects.toThrow('No audio data received from the API')
+    await expect(processChunks('Hello world', voiceConfiguration)).rejects.toThrow(
+      'No audio data received from the API'
+    )
   })
 })
