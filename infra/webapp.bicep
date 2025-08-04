@@ -27,6 +27,48 @@ var featureFlags = [
   }
   // Add more feature flags as needed
 ]
+var vFeatureFlags = [
+  {
+    id: 'ttsmodel'
+    description: 'Controls the TTS model used by the bot'
+    enabled: true
+    variants: [
+      {
+        name: 'general'
+        configuration_value: {
+          provider: 'google'
+          model: 'gemini-2.5-flash-preview-tts'
+        }
+      }
+      {
+        name: 'advanced'
+        configuration_value: {
+          provider: 'google'
+          model: 'gemini-2.5-pro-preview-tts'
+        }
+      }
+      {
+        name: 'premium'
+        configuration_value: {
+          provider: 'elevenlabs'
+          model: 'eleven_multilingual_v2'
+        }
+      } 
+    ]
+    allocation: {
+      percentile: [
+        {
+          variant: 'general'
+          from: 0
+          to: 100
+        }
+      ]
+      default_when_enabled: 'general'
+      default_when_disabled: 'general'
+    }
+  }
+  // Add more variant feature flags as needed
+]
 
 // Compute resources for your Web App
 resource appServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
@@ -168,7 +210,7 @@ resource webAppConfig 'Microsoft.AppConfiguration/configurationStores@2025-02-01
   }
 }
 
-resource uiEnabledFeatureflag 'Microsoft.AppConfiguration/configurationStores/keyValues@2024-05-01' = [for featureFlag in featureFlags: {
+resource Featureflag 'Microsoft.AppConfiguration/configurationStores/keyValues@2024-05-01' = [for featureFlag in featureFlags: {
   parent: webAppConfig
   name: '.appconfig.featureflag~2F${featureFlag.id}'
   properties: {
@@ -177,6 +219,26 @@ resource uiEnabledFeatureflag 'Microsoft.AppConfiguration/configurationStores/ke
         id: featureFlag.id
         description: featureFlag.description
         enabled: featureFlag.enabled
+      }
+  )
+    contentType: 'application/vnd.microsoft.appconfig.ff+json;charset=utf-8'
+  }
+  dependsOn: [
+    appConfigDeployRoleAssignment
+  ]
+}]
+
+resource VariantFeatureflag 'Microsoft.AppConfiguration/configurationStores/keyValues@2024-05-01' = [for vFeatureFlag in vFeatureFlags: {
+  parent: webAppConfig
+  name: '.appconfig.featureflag~2F${vFeatureFlag.id}'
+  properties: {
+    value: string(
+      {
+        id: vFeatureFlag.id
+        description: vFeatureFlag.description
+        enabled: vFeatureFlag.enabled
+        variants: vFeatureFlag.variants
+        allocation: vFeatureFlag.allocation
       }
   )
     contentType: 'application/vnd.microsoft.appconfig.ff+json;charset=utf-8'
