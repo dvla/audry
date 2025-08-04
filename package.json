@@ -28,8 +28,10 @@
     },
     "dependencies": {
         "@azure-rest/ai-document-intelligence": "^1.1.0",
+        "@azure/app-configuration-provider": "^2.1.0",
         "@elevenlabs/elevenlabs-js": "^2.7.0",
         "@google/genai": "^1.11.0",
+        "@microsoft/feature-management": "^2.1.0",
         "@microsoft/teams-ai": "^1.7.4",
         "adaptive-expressions": "^4.23.2",
         "adaptivecards-templating": "^2.3.1",

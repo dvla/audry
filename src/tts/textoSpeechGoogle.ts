@@ -2,6 +2,7 @@ import { GenerateContentConfig, GoogleGenAI, SpeakerVoiceConfig, VoiceConfig } f
 import * as path from 'path'
 import * as wav from 'wav'
 
+import { TTSModelConfig } from '../features/featureTTS'
 import { Config } from '../internal/config'
 import { log } from '../internal/logger'
 import { generatePodcastFileName } from '../internal/utils/documentUtils'
@@ -66,19 +67,22 @@ export const getGoogleClient = (): GoogleGenAI => {
 
 /**
  * Converts a transcript to speech using Google's Gemini TTS API.
- * @param transcript - The text transcript to convert to speech.
- * @param documentId - The unique identifier for the document.
- * @param accent - The accent to use for the speech synthesis (default is 'British').
+ * @param modelConfig - The TTS model configuration to use.
+ * @param transcript - The transcript text to convert to speech.
  * @returns A promise that resolves to the path of the saved audio file.
  */
 export async function transcriptToSpeech(
+  modelConfig: TTSModelConfig,
   transcript: string
 ): Promise<{ outputFileName: string; outputFilePath: string }> {
   const transcriptChunks = splitTranscript(transcript)
 
+  log.info(`Start audio generation with model: ${modelConfig.model} and provider: ${modelConfig.provider}`)
   const startTime = Date.now()
   const generateConfiguration = generateConfig([EpisodeVoices.MATTHEW, EpisodeVoices.ELLIE])
-  const audioData = await Promise.all(transcriptChunks.map((chunk) => processChunks(chunk, generateConfiguration)))
+  const audioData = await Promise.all(
+    transcriptChunks.map((chunk) => processChunks(chunk, generateConfiguration, modelConfig))
+  )
   const totalSeconds = ((Date.now() - startTime) / 1000).toFixed(2)
   log.info(`Total audio generation time: ${totalSeconds} seconds`)
 
@@ -122,15 +126,20 @@ export const splitTranscript = (transcript: string): string[] => {
  * Processes a single chunk of text to generate speech using Google's Gemini TTS API.
  * @param chunk The text chunk to process.
  * @param generateConfiguration The configuration for generating content.
+ * @param modelConfig The TTS model configuration to use.
  * @returns A promise that resolves to the base64 encoded audio data.
  */
-export const processChunks = async (chunk: string, generateConfiguration: GenerateContentConfig) => {
+export const processChunks = async (
+  chunk: string,
+  generateConfiguration: GenerateContentConfig,
+  modelConfig: TTSModelConfig
+) => {
   const ai = getGoogleClient()
   const prompt = `${STYLE}:\n\n${chunk}`
   const chunkStartTime = Date.now()
 
   const response = await ai.models.generateContent({
-    model: Config.GEMINI_TTS_MODEL,
+    model: modelConfig.model,
     contents: [{ parts: [{ text: prompt }] }],
     config: generateConfiguration,
   })

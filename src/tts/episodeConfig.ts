@@ -36,6 +36,8 @@ export enum EpisodeStyle {
 export enum EpisodeVoices {
   MATTHEW = 'Matthew',
   ELLIE = 'Ellie',
+  DANIEL = 'Daniel',
+  JAMIE = 'Jamie',
 }
 
 /**

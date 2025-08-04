@@ -29,7 +29,6 @@ describe('config test', () => {
     delete process.env.AUDRY_MAX_PAGES
     delete process.env.GEMINI_API_KEY
     delete process.env.GEMINI_MODEL
-    delete process.env.GEMINI_TTS_MODEL
     delete process.env.COSMOSDB_ENDPOINT
     delete process.env.COSMOSDB_DATABASE
     delete process.env.COSMOSDB_CONTAINER
@@ -45,7 +44,6 @@ describe('config test', () => {
     expect(Config.FILES_DIR).toEqual(DEFAULT_FILES_DIR)
     expect(Config.GEMINI_API_KEY).toEqual(DEFAULT_EMPTY)
     expect(Config.GEMINI_MODEL).toEqual(DEFAULT_GEMINI_MODEL)
-    expect(Config.GEMINI_TTS_MODEL).toEqual(DEFAULT_GEMINI_TTS_MODEL)
     expect(Config.COSMOSDB_ENDPOINT).toEqual(DEFAULT_EMPTY)
     expect(Config.COSMOSDB_DATABASE).toEqual(DEFAULT_EMPTY)
     expect(Config.COSMOSDB_CONTAINER).toEqual(DEFAULT_EMPTY)
@@ -59,7 +57,6 @@ describe('config test', () => {
     process.env.AUDRY_FILES_DIR = '/custom/files/dir'
     process.env.GEMINI_API_KEY = 'test-gemini-api-key'
     process.env.GEMINI_MODEL = 'gemini-2.0-flash-001'
-    process.env.GEMINI_TTS_MODEL = 'gemini-2.5-flash-preview-tts'
     process.env.COSMOSDB_ENDPOINT = 'https://test-cosmosdb.documents.azure.com:443/'
     process.env.COSMOSDB_DATABASE = 'test-database'
     process.env.COSMOSDB_CONTAINER = 'test-container'
@@ -75,7 +72,6 @@ describe('config test', () => {
     expect(Config.FILES_DIR).toEqual('/custom/files/dir')
     expect(Config.GEMINI_API_KEY).toEqual('test-gemini-api-key')
     expect(Config.GEMINI_MODEL).toEqual('gemini-2.0-flash-001')
-    expect(Config.GEMINI_TTS_MODEL).toEqual('gemini-2.5-flash-preview-tts')
     expect(Config.COSMOSDB_ENDPOINT).toEqual('https://test-cosmosdb.documents.azure.com:443/')
     expect(Config.COSMOSDB_DATABASE).toEqual('test-database')
     expect(Config.COSMOSDB_CONTAINER).toEqual('test-container')
@@ -89,7 +85,6 @@ describe('config test', () => {
     process.env.AUDRY_FILES_DIR = ENV_PLACEHOLDER
     process.env.GEMINI_API_KEY = ENV_PLACEHOLDER
     process.env.GEMINI_MODEL = ENV_PLACEHOLDER
-    process.env.GEMINI_TTS_MODEL = ENV_PLACEHOLDER
     process.env.COSMOSDB_ENDPOINT = ENV_PLACEHOLDER
     process.env.COSMOSDB_DATABASE = ENV_PLACEHOLDER
     process.env.COSMOSDB_CONTAINER = ENV_PLACEHOLDER
@@ -105,7 +100,6 @@ describe('config test', () => {
     expect(Config.FILES_DIR).toEqual(DEFAULT_FILES_DIR)
     expect(Config.GEMINI_API_KEY).toEqual(DEFAULT_EMPTY)
     expect(Config.GEMINI_MODEL).toEqual(DEFAULT_GEMINI_MODEL)
-    expect(Config.GEMINI_TTS_MODEL).toEqual(DEFAULT_GEMINI_TTS_MODEL)
     expect(Config.COSMOSDB_ENDPOINT).toEqual(DEFAULT_EMPTY)
     expect(Config.COSMOSDB_DATABASE).toEqual(DEFAULT_EMPTY)
     expect(Config.COSMOSDB_CONTAINER).toEqual(DEFAULT_EMPTY)
@@ -119,7 +113,6 @@ describe('config test', () => {
     process.env.AUDRY_FILES_DIR = ''
     process.env.GEMINI_API_KEY = ''
     process.env.GEMINI_MODEL = ''
-    process.env.GEMINI_TTS_MODEL = ''
     process.env.COSMOSDB_ENDPOINT = ''
     process.env.COSMOSDB_DATABASE = ''
     process.env.COSMOSDB_CONTAINER = ''
@@ -135,7 +128,6 @@ describe('config test', () => {
     expect(Config.FILES_DIR).toEqual(DEFAULT_FILES_DIR)
     expect(Config.GEMINI_API_KEY).toEqual(DEFAULT_EMPTY)
     expect(Config.GEMINI_MODEL).toEqual(DEFAULT_GEMINI_MODEL)
-    expect(Config.GEMINI_TTS_MODEL).toEqual(DEFAULT_GEMINI_TTS_MODEL)
     expect(Config.COSMOSDB_ENDPOINT).toEqual(DEFAULT_EMPTY)
     expect(Config.COSMOSDB_DATABASE).toEqual(DEFAULT_EMPTY)
     expect(Config.COSMOSDB_CONTAINER).toEqual(DEFAULT_EMPTY)

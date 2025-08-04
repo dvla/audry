@@ -3,17 +3,17 @@ import { VoiceSettings } from '@elevenlabs/elevenlabs-js/api/types/VoiceSettings
 import { promises as fs } from 'fs'
 import * as path from 'path'
 
+import { TTSModelConfig } from '../features/featureTTS'
 import { Config } from '../internal/config'
 import { log } from '../internal/logger'
 import { generatePodcastFileName } from '../internal/utils/documentUtils'
 import { EpisodeVoices } from './episodeConfig'
 
-const MODEL_ID = 'eleven_multilingual_v2'
 const OUTPUT_FORMAT = 'mp3_44100_128'
 
 let cloudClient: ElevenLabsClient | null = null
 
-const DEFAULT_VOICES = [EpisodeVoices.MATTHEW, EpisodeVoices.ELLIE]
+export const DEFAULT_VOICES = [EpisodeVoices.MATTHEW, EpisodeVoices.ELLIE]
 // Predefined voice configurations for different episode voices
 const VOICE_CONFIGS = new Map<EpisodeVoices, { voiceId: string; voiceSettings: VoiceSettings }>([
   [
@@ -36,6 +36,27 @@ const VOICE_CONFIGS = new Map<EpisodeVoices, { voiceId: string; voiceSettings: V
         stability: 0.5,
         similarityBoost: 1.0,
         useSpeakerBoost: false,
+      },
+    },
+  ],
+  [
+    EpisodeVoices.DANIEL,
+    {
+      voiceId: 'onwK4e9ZLuTAKqWW03F9',
+      voiceSettings: {
+        speed: 1.04,
+        similarityBoost: 1.0,
+        useSpeakerBoost: true,
+      },
+    },
+  ],
+  [
+    EpisodeVoices.JAMIE,
+    {
+      voiceId: 'BgdB8LkxV25DmnTgabLx',
+      voiceSettings: {
+        similarityBoost: 1.0,
+        useSpeakerBoost: true,
       },
     },
   ],
@@ -74,6 +95,7 @@ export interface Turn {
  * Converts text to speech using ElevenLabs API and returns the audio as a Buffer.
  *
  * @param text - The text to convert to speech
+ * @param modelId - The identifier of the TTS model to use
  * @param voiceId - The identifier of the voice to use for speech synthesis
  * @param voiceSettings - Voice configuration settings (speed, stability, etc.)
  * @param ping - Optional callback function called on each chunk of audioStream
@@ -82,6 +104,7 @@ export interface Turn {
  */
 const textToSpeechStream = async (
   text: string,
+  modelId: string,
   voiceId: string,
   voiceSettings: any,
   ping?: () => void
@@ -92,7 +115,7 @@ const textToSpeechStream = async (
       voiceId,
       {
         text,
-        modelId: MODEL_ID,
+        modelId,
         outputFormat: OUTPUT_FORMAT,
         voiceSettings,
         optimizeStreamingLatency: 0,
@@ -120,24 +143,26 @@ const textToSpeechStream = async (
  * voice characteristics based on the speaker.
  *
  * @param turns - Array of conversation turns containing speaker identification and text content
+ * @param modelId - The identifier of the TTS model to use
  * @param ping - Optional callback function called on each chunk of audioStream for each turn
  * @returns Promise resolving to the file path of the generated MP3 audio file
  * @throws Error if no audio buffers could be generated from the provided turns
  */
 export const textToSpeech = async (
   turns: Turn[],
+  modelId: string,
+  voices: EpisodeVoices[],
   ping?: () => void
 ): Promise<{ outputFileName: string; outputFilePath: string }> => {
   const outputFileName = generatePodcastFileName() + '.mp3'
   const outputFilePath = path.join(Config.FILES_DIR, outputFileName)
-  const startTime = Date.now()
   let buffers: Buffer[] = []
 
   // Loop through each turn and generate audio
   for (const turn of turns) {
     let buffer: Buffer | null = null
-    const voiceConfig = VOICE_CONFIGS.get(DEFAULT_VOICES[turn.speaker - 1]) || VOICE_CONFIGS.get(EpisodeVoices.MATTHEW)
-    buffer = await textToSpeechStream(turn.text, voiceConfig.voiceId, voiceConfig.voiceSettings, ping)
+    const voiceConfig = VOICE_CONFIGS.get(voices[turn.speaker - 1]) || VOICE_CONFIGS.get(EpisodeVoices.MATTHEW)
+    buffer = await textToSpeechStream(turn.text, modelId, voiceConfig.voiceId, voiceConfig.voiceSettings, ping)
     if (buffer && buffer.length > 0) buffers.push(buffer)
   }
 
@@ -154,19 +179,23 @@ export const textToSpeech = async (
  * This function parses the provided transcript into speaker turns, then processes each turn
  * using a Eleven Labs.
  *
- * @param transcript - The transcript text to be converted into speech.
- * @returns A promise that resolves to an object containing the output file name and file path.
+ * @param modelConfig - The TTS model configuration to use.
+ * @param transcript - The transcript text to convert to speech.
+ * @returns A promise that resolves to the path of the saved audio file.
  */
 export async function transcriptToSpeech(
-  transcript: string
+  modelConfig: TTSModelConfig,
+  transcript: string,
+  voices: EpisodeVoices[] = DEFAULT_VOICES
 ): Promise<{ outputFileName: string; outputFilePath: string }> {
   const turns = parseTranscriptToSpeakerTurns(transcript)
+  log.info(`Start audio Elevenlabs with model: ${modelConfig.model} and provider: ${modelConfig.provider}`)
   const startTime = Date.now()
   let i = 0
   if (turns && turns.length > 0) {
     log.debug(`Parsed ${turns.length} speaker turns from transcript`)
-    const { outputFileName, outputFilePath } = await textToSpeech(turns, () => {
-      if (i % 10 === 0) {
+    const { outputFileName, outputFilePath } = await textToSpeech(turns, modelConfig.model, voices, () => {
+      if (i % 20 === 0) {
         log.debug(`Processed ${i} chunks...`)
       }
       i++

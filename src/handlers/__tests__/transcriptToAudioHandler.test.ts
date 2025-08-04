@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { DEFAULT_TTS_MODEL_CONFIG } from '../../features/featureTTS'
 import * as cards from '../../internal/cards'
 import type { ActivityContext } from '../../internal/conversationHandlers.js'
 import { log } from '../../internal/logger.js'
@@ -109,7 +110,7 @@ describe('TranscriptToAudioHandler', () => {
       await handler.generateAudio(mockContext.proactiveSend, mockContext.conversation)
 
       expect(mockGetTranscript).toHaveBeenCalledWith('test-doc-123')
-      expect(mockTranscriptToSpeech).toHaveBeenCalledWith('Test transcript')
+      expect(mockTranscriptToSpeech).toHaveBeenCalledWith(DEFAULT_TTS_MODEL_CONFIG, 'Test transcript')
       expect(mockCreateFileConsentCard).toHaveBeenCalled()
       expect(mockContext.proactiveSend).toHaveBeenCalledWith(expect.objectContaining({ type: 'message' }))
     })

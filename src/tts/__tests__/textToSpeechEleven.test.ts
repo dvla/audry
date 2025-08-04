@@ -1,8 +1,9 @@
 import os from 'os'
+import { DEFAULT_TTS_MODEL_CONFIG } from 'src/features/featureTTS'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { Config } from '../../internal/config'
-import { textToSpeech, writeFile } from '../textToSpeechEleven'
+import { DEFAULT_VOICES, textToSpeech, writeFile } from '../textToSpeechEleven'
 
 const exampleTranscript = `
 Speaker 1: Ellie, welcome back to the show! Today, we're diving deep into something that affects every single one of us who has ever flown on a plane.
@@ -22,7 +23,9 @@ describe('textToSpeechEleven config test', () => {
   })
 
   test('should Fail with missing API KEY', async () => {
-    await expect(textToSpeech([{ speaker: 1, text: 'Test' }])).rejects.toThrow(new Error('ELEVENLABS_API_KEY not set'))
+    await expect(
+      textToSpeech([{ speaker: 1, text: 'Test' }], 'eleven_multilingual_v2', DEFAULT_VOICES)
+    ).rejects.toThrow(new Error('ELEVENLABS_API_KEY not set'))
   })
 
   test('writeFile throws error if buffers empty', async () => {
@@ -44,6 +47,7 @@ describe('textToSpeechEleven tests', () => {
         ELEVENLABS_API_KEY: 'mock-real-key',
         FILES_DIR: os.tmpdir(),
       },
+      DEFAULT_GEMINI_TTS_MODEL: 'gemini-2.5-flash-preview-tts',
     }))
 
     vi.doMock('@elevenlabs/elevenlabs-js', () => ({
@@ -65,6 +69,8 @@ describe('textToSpeechEleven tests', () => {
         { speaker: 1, text: 'Matthew text' },
         { speaker: 2, text: 'Ellie text' },
       ],
+      'eleven_multilingual_v2',
+      DEFAULT_VOICES,
       myPingBack
     )
     expect(myPingBack).toBeCalled()
@@ -79,9 +85,9 @@ describe('textToSpeechEleven tests', () => {
       })),
     }))
     const textToSpeechStreamModule = await import('../textToSpeechEleven.js')
-    await expect(textToSpeechStreamModule.textToSpeech([{ speaker: 1, text: '' }])).rejects.toThrow(
-      'No audio buffers generated from the turns'
-    )
+    await expect(
+      textToSpeechStreamModule.textToSpeech([{ speaker: 1, text: '' }], 'eleven_multilingual_v2', DEFAULT_VOICES)
+    ).rejects.toThrow('No audio buffers generated from the turns')
   })
 
   test('should convert transcript to speech', async () => {
@@ -97,7 +103,7 @@ describe('textToSpeechEleven tests', () => {
       })),
     }))
     const textToSpeechStreamModule = await import('../textToSpeechEleven.js')
-    const result = await textToSpeechStreamModule.transcriptToSpeech(exampleTranscript)
+    const result = await textToSpeechStreamModule.transcriptToSpeech(DEFAULT_TTS_MODEL_CONFIG, exampleTranscript)
     expect(result.outputFileName).toContain('.mp3')
     expect(result.outputFilePath).toContain(os.tmpdir())
   })

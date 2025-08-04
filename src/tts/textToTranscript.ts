@@ -1,8 +1,24 @@
+import { Providers, getTTSModelConfig } from '../features/featureTTS'
 import { Config } from '../internal/config'
 import { log } from '../internal/logger'
-import { getGoogleClient } from './textoSpeechGoogle'
+import { EpisodeConfig } from './episodeConfig'
+import { promptForTranscript } from './promptForTranscript'
+import { transcriptToSpeech as ttsEleven } from './textToSpeechEleven'
+import { getGoogleClient, transcriptToSpeech as ttsGoogle } from './textoSpeechGoogle'
 
 const MIME_TYPE = 'text/plain'
+
+/**
+ * Converts the provided text into a transcript format using the specified episode configuration.
+ *
+ * @param text - The input text to be converted into a transcript.
+ * @param episodeConfig - The configuration object for the episode, used to generate the system prompt.
+ * @returns A promise that resolves to the transcript generated from the input text.
+ */
+export const toTranscript = async (text: string, episodeConfig: EpisodeConfig) => {
+  const systemPrompt = promptForTranscript(episodeConfig)
+  return textToTranscript(systemPrompt, text)
+}
 
 /**
  * Converts extracted text into a podcast-style transcript using Google's Gemini AI.
@@ -28,4 +44,23 @@ export const textToTranscript = async (prompt: string, extractedText: string) =>
   }
 
   return responseText
+}
+
+/**
+ * Provides a function to convert a transcript to audio using the appropriate TTS provider.
+ * @returns A function that takes a transcript and returns the audio file path.
+ */
+export const transcriptToAudioProvider = async (): Promise<any> => {
+  const modelConfig = (await getTTSModelConfig())?.configuration
+  let toAudioProvider
+  switch (modelConfig.provider) {
+    case Providers.ELEVEN_LABS:
+      toAudioProvider = (transcript: string) => ttsEleven(modelConfig, transcript)
+      break
+    case Providers.GOOGLE:
+    // Google is the default provider
+    default:
+      toAudioProvider = (transcript: string) => ttsGoogle(modelConfig, transcript)
+  }
+  return toAudioProvider
 }

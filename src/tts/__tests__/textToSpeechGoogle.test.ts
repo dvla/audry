@@ -1,6 +1,7 @@
 import path from 'path'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
+import { DEFAULT_TTS_MODEL_CONFIG } from '../../features/featureTTS'
 import { Config } from '../../internal/config'
 import { EpisodeVoices } from '../episodeConfig'
 import { generateConfig, processChunks, saveWaveFile, splitTranscript, transcriptToSpeech } from '../textoSpeechGoogle'
@@ -103,7 +104,7 @@ describe('transcriptToSpeech', () => {
     })
 
     const transcript = 'Hello Vitest!'
-    const { outputFileName, outputFilePath } = await transcriptToSpeech(transcript)
+    const { outputFileName, outputFilePath } = await transcriptToSpeech(DEFAULT_TTS_MODEL_CONFIG, transcript)
 
     expect(fakeGenerateContent).toHaveBeenCalledTimes(1)
     expect(outputFileName).toContain(`podcast`)
@@ -117,7 +118,9 @@ describe('transcriptToSpeech', () => {
       candidates: [],
     })
 
-    await expect(transcriptToSpeech('Test')).rejects.toThrow('No audio data received from the API')
+    await expect(transcriptToSpeech(DEFAULT_TTS_MODEL_CONFIG, 'Test')).rejects.toThrow(
+      'No audio data received from the API'
+    )
   })
 })
 
@@ -196,7 +199,7 @@ describe('processChunks', () => {
       ],
       usageMetadata: { totalTokenCount: 42 },
     })
-    const result = await processChunks('Hello world', voiceConfiguration)
+    const result = await processChunks('Hello world', voiceConfiguration, DEFAULT_TTS_MODEL_CONFIG)
     expect(result).toBe('base64audio')
     expect(fakeGenerateContent).toHaveBeenCalledWith({
       model: TTS_MODEL,
@@ -216,7 +219,7 @@ describe('processChunks', () => {
       ],
       usageMetadata: { totalTokenCount: 42 },
     })
-    await expect(processChunks('Hello world', voiceConfiguration)).rejects.toThrow(
+    await expect(processChunks('Hello world', voiceConfiguration, DEFAULT_TTS_MODEL_CONFIG)).rejects.toThrow(
       'No audio data received from the API'
     )
   })

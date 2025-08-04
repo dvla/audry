@@ -4,8 +4,7 @@ import { createFileConsentCard, processingCard, warningCard } from '../internal/
 import { ActivityContext } from '../internal/conversationHandlers'
 import { log } from '../internal/logger'
 import { getTranscript } from '../internal/utils/documentUtils'
-import { transcriptToSpeech as ttsEleven } from '../tts/textToSpeechEleven'
-import { transcriptToSpeech as ttsGoogle } from '../tts/textoSpeechGoogle'
+import { transcriptToAudioProvider } from '../tts/textToTranscript'
 
 const FILE_TRIGGER_PATTERN = 'transcriptToAudio'
 
@@ -35,8 +34,8 @@ export class TranscriptToAudioHandler {
     try {
       const documentId = conversation.documentId
       const transcript = await getTranscript(documentId)
-      // Variants, flash, standard, premium
-      const { outputFileName, outputFilePath } = await (premiumAudio ? ttsEleven : ttsGoogle)(transcript)
+      const transcriptToAudio = await transcriptToAudioProvider()
+      const { outputFileName, outputFilePath } = await transcriptToAudio(transcript)
 
       log.info('Audio generation complete: ' + outputFilePath)
       // Create file consent card
