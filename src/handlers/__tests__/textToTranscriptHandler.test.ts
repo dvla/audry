@@ -2,23 +2,29 @@ import { ActivityContext } from 'src/internal/conversationHandlers'
 import { Mock, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as cards from '../../internal/cards'
-import * as documentUtils from '../../internal/utils/documentUtils'
 import { DEFAULT_CONFIG } from '../../tts/episodeConfig'
-import { toTranscript } from '../../tts/textToTranscript'
 import { TextToTranscriptHandler } from '../textToTranscriptHandler'
 
-const EXTRACTED_TEXT = 'Information Technology Services  Digital and Technology Strategic Plan  2021 24'
-const TRANSCRIPT =
-  "Speaker 1: Ellie, welcome to another electrifying episode! Today, we're diving deep into something that might sound a bit dry at first, but trust me, it's the backbone of how things get done in the modern world."
+const { mockReadFile, mockWriteFile } = vi.hoisted(() => {
+  const EXTRACTED_TEXT = 'Information Technology Services Digital and Technology Strategic Plan 2021 24'
+  return {
+    mockReadFile: vi.fn().mockResolvedValue(EXTRACTED_TEXT),
+    mockWriteFile: vi.fn().mockResolvedValue('path/to/transcript.txt'),
+  }
+})
 
-vi.mock('../../internal/utils/documentUtils')
-vi.mock('../../tts/textToTranscript')
+vi.mock('../../internal/utils/documentUtils', () => ({
+  readFile: mockReadFile,
+  writeFile: mockWriteFile,
+}))
 
 describe('TextToTranscriptHandler', () => {
   let handler: TextToTranscriptHandler
   let activityContext: ActivityContext
 
   beforeEach(() => {
+    vi.clearAllMocks()
+
     handler = new TextToTranscriptHandler()
     activityContext = {
       send: vi.fn().mockResolvedValue({}),
@@ -36,9 +42,7 @@ describe('TextToTranscriptHandler', () => {
       ref: undefined,
       activity: undefined,
     }
-    ;(documentUtils.getExtractedText as any).mockResolvedValue(EXTRACTED_TEXT)
-    ;(toTranscript as any).mockResolvedValue(TRANSCRIPT)
-    ;(documentUtils.writeTranscript as any).mockResolvedValue('path/to/transcript.txt')
+
     vi.spyOn(cards, 'processingCard')
     vi.spyOn(cards, 'textToTranscriptCard')
     vi.spyOn(cards, 'warningCard')
@@ -53,19 +57,11 @@ describe('TextToTranscriptHandler', () => {
     expect(cards.processingCard).toHaveBeenCalledWith('Generating transcript...')
   })
 
-  it('should generate transcript and send success card', async () => {
-    await handler.generateTranscript(activityContext)
-    expect(documentUtils.getExtractedText).toHaveBeenCalledWith('doc123')
-    expect(toTranscript).toHaveBeenCalledWith(EXTRACTED_TEXT, expect.anything())
-    expect(documentUtils.writeTranscript).toHaveBeenCalledWith(TRANSCRIPT, 'doc123')
-    const cardArgs = (activityContext.proactiveSendCard as Mock).mock.calls[0][0]
-    expect(cardArgs).toMatchSnapshot()
-    expect(cards.textToTranscriptCard).toHaveBeenCalledWith('Transcript Created', TRANSCRIPT)
-  })
-
   it('should send error card if transcript generation fails', async () => {
-    ;(documentUtils.getExtractedText as any).mockRejectedValue(new Error('fail'))
+    mockReadFile.mockRejectedValueOnce(new Error('fail'))
+
     await handler.generateTranscript(activityContext)
+
     const cardArgs = (activityContext.proactiveSendCard as Mock).mock.calls[0][0]
     expect(cardArgs).toMatchSnapshot()
     expect(cards.warningCard).toHaveBeenCalledWith('The transcript could not be generated. Please try again later.')

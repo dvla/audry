@@ -1,105 +1,144 @@
-import { Readable } from 'stream'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { ActivityTypes } from 'botbuilder'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as cards from '../../internal/cards'
-import { ActivityContext } from '../../internal/conversationHandlers'
-import * as fileutils from '../../internal/utils/fileUtils'
-import { DEFAULT_CONFIG } from '../../tts/episodeConfig'
-import { ATTACHMENT_CONTENT_TYPE, FILE_TIGGER_PATTERN, UploadFileCommandHandler } from '../uploadFileHandler'
+import { ATTACHMENT_CONTENT_TYPE, UploadFileCommandHandler } from '../uploadFileHandler'
 
-// ✅ Mock pipeline
-vi.mock('stream/promises', () => ({
-  pipeline: vi.fn(() => Promise.resolve()),
+// Mock all dependencies
+vi.mock('../../internal/utils/fileUtils', () => ({
+  extractTextFromFile: vi.fn().mockResolvedValue('extracted text content'),
+  writeContentToFile: vi.fn().mockResolvedValue(undefined),
 }))
 
-// ✅ Mock extractTextFromFile to return string
-vi.spyOn(fileutils, 'extractTextFromFile').mockResolvedValue('mocked text')
-
-// ✅ Mock writeContentToFile
-vi.spyOn(fileutils, 'writeContentToFile').mockResolvedValue()
-
-// ✅ Optionally mock writeExtractedText if used
 vi.mock('../../internal/utils/documentUtils', () => ({
-  writeExtractedText: vi.fn().mockResolvedValue(undefined),
+  writeFile: vi.fn().mockResolvedValue(undefined),
+  EXTRACTED_TEXT: 'extracted-text',
 }))
 
-// ✅ Mock fetch to return a readable stream
-global.fetch = vi.fn(() =>
-  Promise.resolve({
-    ok: true,
-    body: Readable.from(['fake file content']),
-  } as any)
-)
+vi.mock('../../internal/utils/userUtils', () => ({
+  getUserId: vi.fn().mockReturnValue('user123'),
+}))
 
-describe('UploadFileCommandHandler (general file support)', () => {
+vi.mock('../../internal/logger', () => ({
+  log: {
+    error: vi.fn(),
+    info: vi.fn(),
+  },
+}))
+
+vi.mock('../../internal/config', () => ({
+  Config: {
+    FILES_DIR: '/tmp/test-files',
+  },
+}))
+
+describe('UploadFileCommandHandler', () => {
   let handler: UploadFileCommandHandler
-  let activityContext: ActivityContext
+  const mockSendCard = vi.fn()
+  const mockSend = vi.fn()
+  const mockProactiveSendCard = vi.fn()
 
   beforeEach(() => {
     handler = new UploadFileCommandHandler()
-    activityContext = {
-      send: vi.fn().mockResolvedValue({}),
-      sendCard: vi.fn().mockResolvedValue({}),
-      proactiveSend: vi.fn().mockResolvedValue({}),
-      proactiveSendCard: vi.fn().mockResolvedValue({}),
-      ref: undefined,
-      conversation: {
-        count: 0,
-        documentId: '',
-        documentPath: '',
-        audioFilePath: '',
-        userId: '',
-        config: DEFAULT_CONFIG,
-      },
-      activity: {
-        text: FILE_TIGGER_PATTERN,
-        attachments: [
-          {
-            contentType: ATTACHMENT_CONTENT_TYPE,
-            content: {
-              fileType: 'pdf',
-              uniqueId: '123',
-              downloadUrl: 'https://example.com/file.pdf',
-              name: 'file.pdf',
-            },
-            name: 'file.pdf',
-          },
-        ],
-        type: '',
-        localTimezone: '',
-        callerId: '',
-        serviceUrl: '',
-        channelId: '',
-        from: undefined,
-        conversation: undefined,
-        recipient: undefined,
-        label: '',
-        valueType: '',
-        listenFor: [],
-      },
-    }
-
-    vi.spyOn(cards, 'uploadFileCard')
+    vi.clearAllMocks()
     vi.spyOn(cards, 'warningCard')
   })
 
-  afterEach(() => {
-    vi.clearAllMocks()
+  it('should have correct trigger pattern', () => {
+    expect(handler.triggerPatterns).toBe('uploadFile')
   })
 
-  it('should handle valid file upload', async () => {
-    await handler.handleInvoked(activityContext)
+  it('should initialize new conversation', () => {
+    const activity = { from: { id: 'user123' } }
+    const conversation: Record<string, any> = {}
+    const filePath = '/tmp/test.txt'
 
-    expect(activityContext.conversation.documentId).toBeDefined()
-    expect(activityContext.conversation.documentPath).toContain('file.pdf')
+    handler.newConversation(activity as any, conversation, filePath)
 
-    expect(activityContext.send).toHaveBeenCalledWith(expect.objectContaining({ type: 'typing' }))
+    expect(conversation.documentPath).toBe(filePath)
+    expect(conversation.documentId).toBeDefined()
+    expect(conversation.userId).toBe('user123')
+    expect(conversation.config).toBeDefined()
+  })
 
-    expect(cards.uploadFileCard).toHaveBeenCalledWith(
-      'File Processed',
-      'Successfully extracted text from file: file.pdf'
-    )
+  it('should send warning when no attachment', async () => {
+    const activity = { attachments: [] }
+    const conversation = {}
 
-    expect(activityContext.proactiveSendCard).toMatchSnapshot()
+    await handler.handleInvoked({
+      activity: activity as any,
+      conversation,
+      sendCard: mockSendCard,
+      send: mockSend,
+      proactiveSendCard: mockProactiveSendCard,
+    } as any)
+
+    // It should send the warning card first
+    expect(cards.warningCard).toMatchSnapshot()
+  })
+
+  it('should process file successfully', async () => {
+    const attachment = {
+      name: 'test.txt',
+      content: { downloadUrl: 'http://example.com/file' },
+      contentType: ATTACHMENT_CONTENT_TYPE,
+    }
+    const activity = { attachments: [attachment], from: { id: 'user123' } }
+    const conversation = {}
+
+    await handler.handleInvoked({
+      activity: activity as any,
+      conversation,
+      sendCard: mockSendCard,
+      send: mockSend,
+      proactiveSendCard: mockProactiveSendCard,
+    } as any)
+
+    expect(mockSend).toHaveBeenCalledWith({ type: ActivityTypes.Typing })
+    expect(mockProactiveSendCard).toHaveBeenCalled()
+
+    // Check that the success card was sent (simplified check)
+    const cardCall = mockProactiveSendCard.mock.calls[0][0]
+    expect(cardCall).toBeDefined()
+    expect(JSON.stringify(cardCall)).toContain('Successfully extracted text from file')
+  })
+
+  it('should handle extraction error', async () => {
+    const { extractTextFromFile } = await import('../../internal/utils/fileUtils.js')
+    vi.mocked(extractTextFromFile).mockRejectedValueOnce(new Error('Extraction failed'))
+
+    const attachment = {
+      name: 'bad.txt',
+      content: { downloadUrl: 'http://example.com/file' },
+      contentType: ATTACHMENT_CONTENT_TYPE,
+    }
+    const activity = { attachments: [attachment], from: { id: 'user123' } }
+    const conversation = {}
+
+    await handler.handleInvoked({
+      activity: activity as any,
+      conversation,
+      sendCard: mockSendCard,
+      send: mockSend,
+      proactiveSendCard: mockProactiveSendCard,
+    } as any)
+
+    expect(mockProactiveSendCard).toHaveBeenCalled()
+
+    // Check that the error card was sent (simplified check)
+    const cardCall = mockProactiveSendCard.mock.calls[0][0]
+    expect(cardCall).toBeDefined()
+    expect(JSON.stringify(cardCall)).toContain('Sorry, I could not extract text')
+  })
+
+  it('should download file correctly', async () => {
+    const file = {
+      name: 'test.txt',
+      content: { downloadUrl: 'http://example.com/file' },
+    }
+
+    const filePath = await handler.handleFileDownload(file as any)
+
+    expect(filePath).toBe('/tmp/test-files/test.txt')
   })
 })

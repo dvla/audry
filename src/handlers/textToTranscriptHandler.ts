@@ -3,7 +3,7 @@ import { Selector } from '@microsoft/teams-ai'
 import { processingCard, textToTranscriptCard, warningCard } from '../internal/cards'
 import { ActivityContext } from '../internal/conversationHandlers'
 import { log } from '../internal/logger'
-import { getExtractedText, writeTranscript } from '../internal/utils/documentUtils'
+import { EXTRACTED_TEXT, TRANSCRIPT_TEXT, readFile, writeFile } from '../internal/utils/documentUtils'
 import { DEFAULT_CONFIG } from '../tts/episodeConfig'
 import { toTranscript } from '../tts/textToTranscript'
 
@@ -34,13 +34,14 @@ export class TextToTranscriptHandler {
     try {
       // Get the document ID from the conversation
       const documentId = conversation.documentId
+      const userId = conversation.userId
       const config = conversation.config || DEFAULT_CONFIG
       // Get the extracted text from the document
-      const extractedText = await getExtractedText(documentId)
+      const extractedText = await readFile(userId, documentId, EXTRACTED_TEXT)
       // Generate a transcript from the extracted text
       const transcriptText = await toTranscript(extractedText, config)
       // Write the transcript to a file
-      await writeTranscript(transcriptText, documentId)
+      await writeFile(userId, documentId, TRANSCRIPT_TEXT, transcriptText)
       // Send a proactive card with the transcript
       await proactiveSendCard(textToTranscriptCard('Transcript Created', transcriptText))
     } catch (error) {

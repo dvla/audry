@@ -7,7 +7,7 @@ import { uploadFileCard, warningCard } from '../internal/cards'
 import { Config } from '../internal/config'
 import { ActivityContext } from '../internal/conversationHandlers'
 import { log } from '../internal/logger'
-import { writeExtractedText } from '../internal/utils/documentUtils'
+import { EXTRACTED_TEXT, writeFile } from '../internal/utils/documentUtils'
 import { extractTextFromFile, writeContentToFile } from '../internal/utils/fileUtils'
 import { getUserId } from '../internal/utils/userUtils'
 import { DEFAULT_CONFIG } from '../tts/episodeConfig'
@@ -43,6 +43,7 @@ export class UploadFileCommandHandler {
 
     if (!attachment) {
       await sendCard(warningCard('No file was uploaded. Please upload a valid file.'))
+      return
     }
     // Download the file and save it to the temp folder
     const fileDownloadPath = await this.handleFileDownload(attachment)
@@ -52,7 +53,7 @@ export class UploadFileCommandHandler {
 
     try {
       const extractedText = await extractTextFromFile(fileDownloadPath)
-      await writeExtractedText(extractedText, conversation.documentId)
+      await writeFile(conversation.userId, conversation.documentId, EXTRACTED_TEXT, extractedText)
 
       await proactiveSendCard(
         uploadFileCard('File Processed', `Successfully extracted text from file: ${attachment.name}`)

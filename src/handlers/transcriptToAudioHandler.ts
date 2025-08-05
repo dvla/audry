@@ -1,9 +1,10 @@
 import { Selector } from '@microsoft/teams-ai'
+import fs from 'fs/promises'
 
 import { createFileConsentCard, processingCard, warningCard } from '../internal/cards'
 import { ActivityContext } from '../internal/conversationHandlers'
 import { log } from '../internal/logger'
-import { getTranscript } from '../internal/utils/documentUtils'
+import { TRANSCRIPT_TEXT, readFile, writeFile } from '../internal/utils/documentUtils'
 import { transcriptToAudioProvider } from '../tts/textToTranscript'
 
 const FILE_TRIGGER_PATTERN = 'transcriptToAudio'
@@ -33,7 +34,7 @@ export class TranscriptToAudioHandler {
   async generateAudio(proactiveSend, conversation): Promise<void> {
     try {
       const documentId = conversation.documentId
-      const transcript = await getTranscript(documentId)
+      const transcript = await readFile(conversation.userId, documentId, TRANSCRIPT_TEXT)
       const transcriptToAudio = await transcriptToAudioProvider()
       const { outputFileName, outputFilePath } = await transcriptToAudio(transcript)
 
@@ -46,6 +47,7 @@ export class TranscriptToAudioHandler {
         type: 'message',
         attachments: [fileConsentCard],
       })
+      await writeFile(conversation.userId, conversation.documentId, outputFileName, await fs.readFile(outputFilePath))
     } catch (error) {
       log.error('Error in async audio generation:', error)
       await proactiveSend({

@@ -1,58 +1,54 @@
 import fs from 'fs/promises'
 import path from 'path'
+import { Readable } from 'stream'
 
 import { Config } from '../config'
 import { log } from '../logger'
+import { getBlobStorage } from '../storage/blobStorage'
+
+export const EXTRACTED_TEXT = 'extracted_text.txt'
+export const TRANSCRIPT_TEXT = 'transcript.txt'
+export const blobStorage = getBlobStorage()
 
 /**
  * Writes the extracted text to a file.
  * @param text - The extracted text to write.
  * @param documentId - The unique identifier for the document.
+ * @param userId - Optional user ID for Azure Blob Storage organization.
  * @returns The path to the saved extracted text file.
  */
-export const writeExtractedText = async (text: string, documentId: string): Promise<string> => {
-  const filePath = path.join(Config.FILES_DIR, `extracted_text_${documentId}.txt`)
-  await fs.writeFile(filePath, text, 'utf8')
-  log.debug(`Extracted text saved to: ${filePath}`)
-  return filePath
+export const writeFile = async (
+  userId: string,
+  documentId: string,
+  fileName: string,
+  content: Buffer | Readable | string
+): Promise<string> => {
+  let fileRef
+  if (userId && blobStorage) {
+    fileRef = await blobStorage.uploadFile(userId, documentId, fileName, content)
+  } else {
+    fileRef = path.join(Config.FILES_DIR, `${documentId}_${fileName}`)
+    await fs.writeFile(fileRef, content, 'utf8')
+    log.debug(`Extracted text saved to: ${fileRef}`)
+  }
+
+  return fileRef
 }
 
-/**
- * Retrieves the extracted text from a file.
- * @param documentId - The unique identifier for the document.
- * @returns The extracted text.
- */
-export const getExtractedText = async (documentId: string): Promise<string> => {
-  const filePath = path.join(Config.FILES_DIR, `extracted_text_${documentId}.txt`)
+export const readFile = async (userId: string, documentId: string, fileName: string): Promise<string> => {
+  if (userId && blobStorage) {
+    const buffer = await blobStorage.downloadFile(userId, documentId, fileName)
+    return buffer.toString('utf8')
+  }
+
+  // Fallback to local file system
+  const filePath = path.join(Config.FILES_DIR, `${documentId}_${fileName}`)
   try {
     return await fs.readFile(filePath, 'utf8')
   } catch (error) {
     log.error(`Error reading extracted text file at ${filePath}:`, error)
     throw new Error(`Could not read extracted text file: ${error.message}`)
   }
-}
-
-/**
- * Writes the transcript text to a file and returns the file path.
- * @param text - The transcript text to write.
- * @param documentId - The unique identifier for the document.
- * @returns The path to the saved transcript file.
- */
-export const writeTranscript = async (text: string, documentId: string): Promise<string> => {
-  const transcriptFilePath = path.join(Config.FILES_DIR, `transcript_${documentId}.txt`)
-  await fs.writeFile(transcriptFilePath, text, 'utf8')
-  log.info(`Transcript text saved to: ${transcriptFilePath}`)
-  return transcriptFilePath
-}
-
-/**
- * Retrieves the transcript text from a file.
- * @param documentId - The unique identifier for the document.
- * @returns The transcript text.
- */
-export const getTranscript = async (documentId: string): Promise<string> => {
-  const transcriptFilePath = path.join(Config.FILES_DIR, `transcript_${documentId}.txt`)
-  return await fs.readFile(transcriptFilePath, 'utf8')
 }
 
 /**

@@ -1,34 +1,55 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { DEFAULT_TTS_MODEL_CONFIG } from '../../features/featureTTS'
 import * as cards from '../../internal/cards'
 import type { ActivityContext } from '../../internal/conversationHandlers.js'
 import { log } from '../../internal/logger.js'
-import { getTranscript } from '../../internal/utils/documentUtils.js'
+import { readFile } from '../../internal/utils/documentUtils.js'
 import { DEFAULT_CONFIG } from '../../tts/episodeConfig'
 import { transcriptToSpeech } from '../../tts/textoSpeechGoogle.js'
 import { TranscriptToAudioHandler } from '../transcriptToAudioHandler'
 
-// Mock all dependencies
+// --- Use vi.hoisted to ensure mock functions are available when vi.mock is hoisted ---
+const { mockFsWriteFile, mockFsReadFile } = vi.hoisted(() => ({
+  mockFsWriteFile: vi.fn().mockResolvedValue(undefined),
+  mockFsReadFile: vi.fn().mockResolvedValue('Test transcript content'),
+}))
+
+// --- Mock the internal config module that BlobStorage uses ---
+vi.mock('../../internal/config', () => ({
+  Config: {
+    FILES_DIR: '/tmp/test-files',
+    GEMINI_API_KEY: 'fake-api-key',
+    MAX_NUMBER_OF_LINES: '100',
+    LINES_PER_CHUNK: '10',
+  },
+  DEFAULT_GEMINI_TTS_MODEL: 'gemini-tts-v1', // Add this line
+}))
+
+// --- Mock fs/promises ---
+vi.mock('fs/promises', () => ({
+  default: {
+    writeFile: mockFsWriteFile,
+    readFile: mockFsReadFile,
+  },
+}))
+
+// Mock dependencies
 vi.mock('../../internal/utils/documentUtils.js')
 vi.mock('../../tts/textoSpeechGoogle.js')
-
 vi.mock('../../internal/logger.js')
 
 // Typed mocks
-const mockGetTranscript = vi.mocked(getTranscript)
+const mockReadFile = vi.mocked(readFile)
 const mockTranscriptToSpeech = vi.mocked(transcriptToSpeech)
-let mockCreateFileConsentCard
-let mockWarningCard
 const mockLogInfo = vi.mocked(log.info)
 const mockLogError = vi.mocked(log.error)
 
 describe('TranscriptToAudioHandler', () => {
   let handler: TranscriptToAudioHandler
   let mockContext: ActivityContext
-  vi.spyOn(cards, 'uploadFileCard')
-  vi.spyOn(cards, 'warningCard')
-  vi.spyOn(cards, 'processingCard')
+  let mockCreateFileConsentCard: ReturnType<typeof vi.spyOn>
+  let mockWarningCard: ReturnType<typeof vi.spyOn>
+
   beforeEach(() => {
     handler = new TranscriptToAudioHandler()
     mockContext = {
@@ -47,6 +68,13 @@ describe('TranscriptToAudioHandler', () => {
       ref: undefined,
       activity: undefined,
     }
+
+    // Spy on cards functions
+    mockCreateFileConsentCard = vi.spyOn(cards, 'createFileConsentCard')
+    mockWarningCard = vi.spyOn(cards, 'warningCard')
+
+    mockLogInfo.mockImplementation(() => {})
+    mockLogError.mockImplementation(() => {})
   })
 
   afterEach(() => {
@@ -61,32 +89,34 @@ describe('TranscriptToAudioHandler', () => {
 
   describe('handleActionInvoked', () => {
     it('should trigger generateAudio asynchronously', async () => {
-      const generateAudioSpy = vi.spyOn(handler, 'generateAudio').mockImplementation(() => Promise.resolve())
+      const generateAudioSpy = vi.spyOn(handler, 'generateAudio').mockResolvedValue()
 
       await handler.handleActionInvoked(mockContext)
-      await new Promise((resolve) => setImmediate(resolve))
+      // wait a tick for setImmediate
+      await new Promise((r) => setImmediate(r))
 
       expect(generateAudioSpy).toHaveBeenCalledWith(mockContext.proactiveSend, mockContext.conversation)
+
       generateAudioSpy.mockRestore()
     })
 
-    it('should return processing card if implemented', async () => {
-      vi.spyOn(handler, 'generateAudio').mockImplementation(() => Promise.resolve())
+    it('should return processing card', async () => {
+      vi.spyOn(handler, 'generateAudio').mockResolvedValue()
 
       const result = await handler.handleActionInvoked(mockContext)
-
       expect(result).toMatchSnapshot()
     })
   })
 
   describe('generateAudio - Success Flow', () => {
     beforeEach(() => {
-      mockGetTranscript.mockResolvedValue('Test transcript')
+      mockReadFile.mockResolvedValue('Test transcript')
       mockTranscriptToSpeech.mockResolvedValue({
         outputFileName: 'audio.mp3',
         outputFilePath: '/path/to/audio.mp3',
       })
-      mockCreateFileConsentCard = vi.spyOn(cards, 'createFileConsentCard').mockReturnValue({
+
+      mockCreateFileConsentCard.mockReturnValue({
         contentType: 'application/vnd.microsoft.teams.card.file.consent',
         name: 'audio.mp3',
         content: {
@@ -103,14 +133,16 @@ describe('TranscriptToAudioHandler', () => {
           },
         },
       })
-      mockLogInfo.mockImplementation(() => {})
     })
 
     it('should generate and send audio card', async () => {
       await handler.generateAudio(mockContext.proactiveSend, mockContext.conversation)
 
-      expect(mockGetTranscript).toHaveBeenCalledWith('test-doc-123')
-      expect(mockTranscriptToSpeech).toHaveBeenCalledWith(DEFAULT_TTS_MODEL_CONFIG, 'Test transcript')
+      expect(mockReadFile).toHaveBeenCalledWith('test-user-456', 'test-doc-123', expect.any(String))
+      expect(mockTranscriptToSpeech).toHaveBeenCalledWith(
+        { model: 'gemini-tts-v1', provider: 'google' },
+        'Test transcript'
+      )
       expect(mockCreateFileConsentCard).toHaveBeenCalled()
       expect(mockContext.proactiveSend).toHaveBeenCalledWith(expect.objectContaining({ type: 'message' }))
     })
@@ -118,14 +150,11 @@ describe('TranscriptToAudioHandler', () => {
 
   describe('generateAudio - Error Handling', () => {
     beforeEach(() => {
-      mockWarningCard = vi
-        .spyOn(cards, 'warningCard')
-        .mockReturnValue({ type: 'warning', message: 'Failed to generate audio from transcript' })
-      mockLogError.mockImplementation(() => {})
+      mockWarningCard.mockReturnValue({ type: 'warning', message: 'Failed to generate audio from transcript' })
     })
 
     it('should handle transcript fetch error', async () => {
-      mockGetTranscript.mockRejectedValue(new Error('Fetch failed'))
+      mockReadFile.mockRejectedValue(new Error('Fetch failed'))
 
       await handler.generateAudio(mockContext.proactiveSend, mockContext.conversation)
 
@@ -134,7 +163,7 @@ describe('TranscriptToAudioHandler', () => {
     })
 
     it('should handle TTS failure', async () => {
-      mockGetTranscript.mockResolvedValue('abc')
+      mockReadFile.mockResolvedValue('abc')
       mockTranscriptToSpeech.mockRejectedValue(new Error('TTS failed'))
 
       await handler.generateAudio(mockContext.proactiveSend, mockContext.conversation)

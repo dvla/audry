@@ -26,7 +26,7 @@ describe('textToTranscript', () => {
 
     const result = await textToTranscript(
       '',
-      'Information Technology Services  Digital and Technology Strategic Plan  2021 24'
+      'Information Technology Services Digital and Technology Strategic Plan 2021 24'
     )
 
     expect(result).toBe(TRANSCRIPT)
