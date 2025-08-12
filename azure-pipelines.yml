@@ -90,6 +90,10 @@ stages:
           npm run test
         displayName: 'Run Tests'
         condition: always()
+      - task: PublishCodeCoverageResults@2
+        displayName: 'Publish Code Coverage'
+        inputs:
+          summaryFileLocation: '$(Build.SourcesDirectory)/coverage/cobertura-coverage.xml'
       - script: |
           npm prune --omit=dev
         displayName: 'Remove dev dependencies'
