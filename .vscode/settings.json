@@ -25,5 +25,8 @@
         {
             "text": "Keep the subject line under 70 characters if possible."
         }
-    ]
+    ],
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
 }

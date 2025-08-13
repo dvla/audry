@@ -15,6 +15,8 @@ Speaker 1: That's the perfect starting point, Ellie. You're right, most people d
 Speaker 2: Okay, I'm with you. It's like air traffic control on steroids, but with a long-term vision. So, who's in charge of this ambitious project? I mean, designing airspace sounds incredibly complex. It's not just drawing lines on a map, is it? I assume you need experts that do that kind of work everyday right?
 `
 
+const seed = 12345
+
 describe('textToSpeechEleven config test', () => {
   const originalEnv = process.env
 
@@ -25,7 +27,7 @@ describe('textToSpeechEleven config test', () => {
 
   test('should Fail with missing API KEY', async () => {
     await expect(
-      textToSpeech([{ speaker: 1, text: 'Test' }], 'eleven_multilingual_v2', DEFAULT_VOICES)
+      textToSpeech([{ speaker: 1, text: 'Test' }], seed, 'eleven_multilingual_v2', DEFAULT_VOICES)
     ).rejects.toThrow(new Error('ELEVENLABS_API_KEY not set'))
   })
 
@@ -62,7 +64,6 @@ describe('textToSpeechEleven tests', () => {
         },
       })),
     }))
-
     const textToSpeechStreamModule = await import('../textToSpeechEleven.js')
     const myPingBack = vi.fn()
     const result = await textToSpeechStreamModule.textToSpeech(
@@ -70,6 +71,7 @@ describe('textToSpeechEleven tests', () => {
         { speaker: 1, text: 'Matthew text' },
         { speaker: 2, text: 'Ellie text' },
       ],
+      seed,
       'eleven_multilingual_v2',
       DEFAULT_VOICES,
       myPingBack
@@ -87,7 +89,7 @@ describe('textToSpeechEleven tests', () => {
     }))
     const textToSpeechStreamModule = await import('../textToSpeechEleven.js')
     await expect(
-      textToSpeechStreamModule.textToSpeech([{ speaker: 1, text: '' }], 'eleven_multilingual_v2', DEFAULT_VOICES)
+      textToSpeechStreamModule.textToSpeech([{ speaker: 1, text: '' }], seed, 'eleven_multilingual_v2', DEFAULT_VOICES)
     ).rejects.toThrow('No audio buffers generated from the turns')
   })
 

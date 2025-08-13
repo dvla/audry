@@ -1,17 +1,24 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as cards from '../../internal/cards'
-import type { ActivityContext } from '../../internal/conversationHandlers.js'
-import { log } from '../../internal/logger.js'
-import { readFile } from '../../internal/utils/documentUtils.js'
+import type { ActivityContext } from '../../internal/conversationHandlers'
+import { log } from '../../internal/logger'
+import { readFile } from '../../internal/utils/documentUtils'
 import { DEFAULT_CONFIG } from '../../tts/episodeConfig'
-import { transcriptToSpeech } from '../../tts/textoSpeechGoogle.js'
+import { transcriptToSpeech } from '../../tts/textoSpeechGoogle'
 import { TranscriptToAudioHandler } from '../transcriptToAudioHandler'
 
 // --- Use vi.hoisted to ensure mock functions are available when vi.mock is hoisted ---
 const { mockFsWriteFile, mockFsReadFile } = vi.hoisted(() => ({
   mockFsWriteFile: vi.fn().mockResolvedValue(undefined),
   mockFsReadFile: vi.fn().mockResolvedValue('Test transcript content'),
+}))
+
+// Mock the ChatGoogleGenerativeAI
+vi.mock('@langchain/google-genai', () => ({
+  ChatGoogleGenerativeAI: vi.fn().mockImplementation(() => ({
+    withStructuredOutput: vi.fn(),
+  })),
 }))
 
 // --- Mock the internal config module that BlobStorage uses ---
@@ -34,9 +41,10 @@ vi.mock('fs/promises', () => ({
 }))
 
 // Mock dependencies
-vi.mock('../../internal/utils/documentUtils.js')
-vi.mock('../../tts/textoSpeechGoogle.js')
-vi.mock('../../internal/logger.js')
+vi.mock('../../internal/utils/documentUtils')
+vi.mock('../../internal/utils/graphUtils')
+vi.mock('../../tts/textoSpeechGoogle')
+vi.mock('../../internal/logger')
 
 // Typed mocks
 const mockReadFile = vi.mocked(readFile)

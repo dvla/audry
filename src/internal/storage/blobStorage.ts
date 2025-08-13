@@ -5,6 +5,9 @@ import { Config } from '../config'
 import { log } from '../logger'
 import { getAzureCredentials } from '../utils/fileUtils'
 
+export type metadataType = {
+  [propertyName: string]: string
+}
 /**
  * Service for interacting with Azure Blob Storage.
  * Handles uploads, downloads, and management of files in the cloud.
@@ -45,6 +48,7 @@ export class BlobStorage {
    * @param documentId - The unique document ID for organization
    * @param fileName - The name of the file to upload
    * @param content - The file content as Buffer, Readable stream, or string
+   * @param metadata - Optional metadata to associate with the file
    * @returns The URL of the uploaded blob
    * @throws Error if the upload fails
    */
@@ -52,7 +56,8 @@ export class BlobStorage {
     userId: string,
     documentId: string,
     fileName: string,
-    content: Buffer | Readable | string
+    content: Buffer | Readable | string,
+    metadata?: metadataType
   ): Promise<string> {
     try {
       // Note: Container creation is commented out
@@ -64,14 +69,17 @@ export class BlobStorage {
       // Get a block blob client for this specific file
       const blockBlobClient = this.containerClient.getBlockBlobClient(blobPath)
 
+      const options: any = {
+        metadata: metadata || {},
+      }
       // Handle different content types with appropriate upload methods
       if (typeof content === 'string') {
-        await blockBlobClient.upload(content, content.length)
+        await blockBlobClient.upload(content, content.length, options)
       } else if (Buffer.isBuffer(content)) {
-        await blockBlobClient.uploadData(content)
+        await blockBlobClient.uploadData(content, options)
       } else {
         // For Readable streams
-        await blockBlobClient.uploadStream(content)
+        await blockBlobClient.uploadStream(content, options)
       }
 
       log.info(`File uploaded to blob storage: ${blobPath}`)

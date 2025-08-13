@@ -95,6 +95,7 @@ export interface Turn {
  * Converts text to speech using ElevenLabs API and returns the audio as a Buffer.
  *
  * @param text - The text to convert to speech
+ * @param seed - The seed value for the speech synthesis
  * @param modelId - The identifier of the TTS model to use
  * @param voiceId - The identifier of the voice to use for speech synthesis
  * @param voiceSettings - Voice configuration settings (speed, stability, etc.)
@@ -104,6 +105,7 @@ export interface Turn {
  */
 const textToSpeechStream = async (
   text: string,
+  seed: number,
   modelId: string,
   voiceId: string,
   voiceSettings: any,
@@ -116,6 +118,7 @@ const textToSpeechStream = async (
       {
         text,
         modelId,
+        seed,
         outputFormat: OUTPUT_FORMAT,
         voiceSettings,
         optimizeStreamingLatency: 0,
@@ -143,6 +146,7 @@ const textToSpeechStream = async (
  * voice characteristics based on the speaker.
  *
  * @param turns - Array of conversation turns containing speaker identification and text content
+ * @param seed - The seed value for the speech synthesis
  * @param modelId - The identifier of the TTS model to use
  * @param ping - Optional callback function called on each chunk of audioStream for each turn
  * @returns Promise resolving to the file path of the generated MP3 audio file
@@ -150,6 +154,7 @@ const textToSpeechStream = async (
  */
 export const textToSpeech = async (
   turns: Turn[],
+  seed: number,
   modelId: string,
   voices: EpisodeVoices[],
   ping?: () => void
@@ -162,7 +167,7 @@ export const textToSpeech = async (
   for (const turn of turns) {
     let buffer: Buffer | null = null
     const voiceConfig = VOICE_CONFIGS.get(voices[turn.speaker - 1]) || VOICE_CONFIGS.get(EpisodeVoices.MATTHEW)
-    buffer = await textToSpeechStream(turn.text, modelId, voiceConfig.voiceId, voiceConfig.voiceSettings, ping)
+    buffer = await textToSpeechStream(turn.text, seed, modelId, voiceConfig.voiceId, voiceConfig.voiceSettings, ping)
     if (buffer && buffer.length > 0) buffers.push(buffer)
   }
 
@@ -191,10 +196,11 @@ export async function transcriptToSpeech(
   const turns = parseTranscriptToSpeakerTurns(transcript)
   log.info(`Start audio Elevenlabs with model: ${modelConfig.model} and provider: ${modelConfig.provider}`)
   const startTime = Date.now()
+  const seed = parseInt(startTime.toString().slice(-8))
   let i = 0
   if (turns && turns.length > 0) {
     log.debug(`Parsed ${turns.length} speaker turns from transcript`)
-    const { outputFileName, outputFilePath } = await textToSpeech(turns, modelConfig.model, voices, () => {
+    const { outputFileName, outputFilePath } = await textToSpeech(turns, seed, modelConfig.model, voices, () => {
       if (i % 20 === 0) {
         log.debug(`Processed ${i} chunks...`)
       }

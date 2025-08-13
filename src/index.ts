@@ -3,6 +3,7 @@ import express from 'express'
 
 import { GenericCommandHandler } from './commands/genericCommandHandler'
 import { FileConsentHandler } from './handlers/fileConsentHandler'
+import { ReviewHandler } from './handlers/reviewHandler'
 import { TextToTranscriptHandler } from './handlers/textToTranscriptHandler'
 import { TranscriptToAudioHandler } from './handlers/transcriptToAudioHandler'
 import { ATTACHMENT_CONTENT_TYPE, FILE_TIGGER_PATTERN, UploadFileCommandHandler } from './handlers/uploadFileHandler'
@@ -31,6 +32,11 @@ const server = expressApp.listen(process.env.port || process.env.PORT || 3978, (
 const uploadFileCommandHandler = new UploadFileCommandHandler()
 app.message(uploadFileCommandHandler.triggerPatterns, async (context: TurnContext, state: ApplicationTurnState) => {
   await uploadFileCommandHandler.handleInvoked(MessageHandler(context, state))
+})
+
+const reviewHandler = new ReviewHandler()
+app.message(reviewHandler.triggerPatterns, async (context: TurnContext, state: ApplicationTurnState) => {
+  await reviewHandler.handleInvoked(MessageHandler(context, state))
 })
 
 /**

@@ -1,0 +1,9 @@
+{
+  "node_version": "22",
+  "dependencies": ["."],
+  "graphs": {
+    "shownotes_agent": "./src/agents/show-notes/graph.ts:graph",
+    "transcript_review_agent": "./src/agents/transcript-review/graph.ts:graph"
+  },
+  "env": "env/.env.local"
+}

@@ -26,3 +26,5 @@ lib/
 /devTools/
 test/
 /coverage
+# LangGraph API
+.langgraph_api

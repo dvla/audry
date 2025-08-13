@@ -99,7 +99,7 @@ describe('fileUtils', () => {
     test('uploads to Azure when Azure is configured', async () => {
       const result = await writeFile(userId, documentId, fileName, content)
 
-      expect(mockUploadFile).toHaveBeenCalledWith(userId, documentId, fileName, content)
+      expect(mockUploadFile).toHaveBeenCalledWith(userId, documentId, fileName, content, undefined)
       expect(result).toBe('https://fake-storage.blob.core.windows.net/fake-url')
     })
 
@@ -108,7 +108,7 @@ describe('fileUtils', () => {
 
       const result = await writeFile(userId, documentId, fileName, bufferContent)
 
-      expect(mockUploadFile).toHaveBeenCalledWith(userId, documentId, fileName, bufferContent)
+      expect(mockUploadFile).toHaveBeenCalledWith(userId, documentId, fileName, bufferContent, undefined)
       expect(result).toBe('https://fake-storage.blob.core.windows.net/fake-url')
     })
   })
@@ -128,9 +128,7 @@ describe('fileUtils', () => {
     test('throws error when local file read fails', async () => {
       mockFsReadFile.mockRejectedValueOnce(new Error('File not found'))
 
-      await expect(readFile('', documentId, fileName)).rejects.toThrow(
-        'Could not read extracted text file: File not found'
-      )
+      await expect(readFile('', documentId, fileName)).rejects.toThrow('Could not read test.txt: File not found')
     })
   })
 

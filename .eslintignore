@@ -16,7 +16,7 @@ deploy-config
 lib
 node_modules
 target/
-
+test
 functional-tests/vendor
 
 scripts/

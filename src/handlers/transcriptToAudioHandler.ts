@@ -4,7 +4,8 @@ import fs from 'fs/promises'
 import { createFileConsentCard, processingCard, warningCard } from '../internal/cards'
 import { ActivityContext } from '../internal/conversationHandlers'
 import { log } from '../internal/logger'
-import { TRANSCRIPT_TEXT, readFile, writeFile } from '../internal/utils/documentUtils'
+import { SHOW_NOTES, TRANSCRIPT_TEXT, readFile, writeFile } from '../internal/utils/documentUtils'
+import { generateShowNotes } from '../internal/utils/graphUtils'
 import { transcriptToAudioProvider } from '../tts/textToTranscript'
 
 const FILE_TRIGGER_PATTERN = 'transcriptToAudio'
@@ -48,6 +49,10 @@ export class TranscriptToAudioHandler {
         attachments: [fileConsentCard],
       })
       await writeFile(conversation.userId, conversation.documentId, outputFileName, await fs.readFile(outputFilePath))
+      const showNotes = await generateShowNotes(transcript, documentId)
+      if (showNotes) {
+        await writeFile(conversation.userId, conversation.documentId, SHOW_NOTES, JSON.stringify(showNotes, null, 2))
+      }
     } catch (error) {
       log.error('Error in async audio generation:', error)
       await proactiveSend({

@@ -19,7 +19,7 @@ export const DEFAULT_LINES_PER_CHUNK = '4'
  * @param defaultValue default value to return if the variable is not set or is equal to the placeholder
  * @returns environment variable value or default values
  */
-const checkOptionalVariable = (variable: string, defaultValue: string) => {
+const checkOptionalVariable = (variable: string | undefined, defaultValue: string): string => {
   if (variable && variable.trim() !== '' && variable.trim() !== ENV_PLACEHOLDER) {
     return variable
   }

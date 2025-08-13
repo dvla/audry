@@ -89,6 +89,9 @@ vi.mock('../utils/fileUtils', () => ({
   getAzureCredentials: mockGetAzureCredentials,
 }))
 
+export const EMPTY_OPTIONS = {
+  metadata: {},
+}
 describe('BlobStorage', () => {
   let blobStorageInstance: BlobStorage
 
@@ -130,7 +133,7 @@ describe('BlobStorage', () => {
       const result = await blobStorageInstance.uploadFile(userId, documentId, fileName, content)
 
       expect(mockContainerClient.getBlockBlobClient).toHaveBeenCalledWith(`${userId}/${documentId}/${fileName}`)
-      expect(mockBlockBlobClient.upload).toHaveBeenCalledWith(content, content.length)
+      expect(mockBlockBlobClient.upload).toHaveBeenCalledWith(content, content.length, EMPTY_OPTIONS)
       expect(mockLogInfo).toHaveBeenCalledWith(`File uploaded to blob storage: ${userId}/${documentId}/${fileName}`)
       expect(result).toBe('https://fake-storage.blob.core.windows.net/fake-blob-url')
     })
@@ -140,7 +143,7 @@ describe('BlobStorage', () => {
 
       const result = await blobStorageInstance.uploadFile(userId, documentId, fileName, content)
 
-      expect(mockBlockBlobClient.uploadData).toHaveBeenCalledWith(content)
+      expect(mockBlockBlobClient.uploadData).toHaveBeenCalledWith(content, EMPTY_OPTIONS)
       expect(result).toBe('https://fake-storage.blob.core.windows.net/fake-blob-url')
     })
 
@@ -154,7 +157,7 @@ describe('BlobStorage', () => {
 
       const result = await blobStorageInstance.uploadFile(userId, documentId, fileName, content)
 
-      expect(mockBlockBlobClient.uploadStream).toHaveBeenCalledWith(content)
+      expect(mockBlockBlobClient.uploadStream).toHaveBeenCalledWith(content, EMPTY_OPTIONS)
       expect(result).toBe('https://fake-storage.blob.core.windows.net/fake-blob-url')
     })
 
