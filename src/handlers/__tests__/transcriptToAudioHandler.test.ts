@@ -65,6 +65,7 @@ describe('TranscriptToAudioHandler', () => {
       sendCard: vi.fn(),
       proactiveSend: vi.fn(),
       proactiveSendCard: vi.fn(),
+      updateCard: vi.fn(),
       conversation: {
         documentId: 'test-doc-123',
         userId: 'test-user-456',

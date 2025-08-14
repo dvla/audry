@@ -2,6 +2,7 @@ import { ActivityTypes } from 'botbuilder'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as cards from '../../internal/cards'
+import { EpisodeKind, EpisodeVoices } from '../../tts/episodeConfig'
 import { ATTACHMENT_CONTENT_TYPE, UploadFileCommandHandler } from '../uploadFileHandler'
 
 // Mock all dependencies
@@ -34,14 +35,16 @@ vi.mock('../../internal/config', () => ({
 
 describe('UploadFileCommandHandler', () => {
   let handler: UploadFileCommandHandler
-  const mockSendCard = vi.fn()
-  const mockSend = vi.fn()
-  const mockProactiveSendCard = vi.fn()
+  const sendCard = vi.fn()
+  const send = vi.fn()
+  const updateCard = vi.fn()
+  const proactiveSendCard = vi.fn()
 
   beforeEach(() => {
     handler = new UploadFileCommandHandler()
     vi.clearAllMocks()
     vi.spyOn(cards, 'warningCard')
+    vi.spyOn(cards, 'uploadFileCard')
   })
 
   it('should have correct trigger pattern', () => {
@@ -68,9 +71,9 @@ describe('UploadFileCommandHandler', () => {
     await handler.handleInvoked({
       activity: activity as any,
       conversation,
-      sendCard: mockSendCard,
-      send: mockSend,
-      proactiveSendCard: mockProactiveSendCard,
+      sendCard,
+      send,
+      proactiveSendCard,
     } as any)
 
     // It should send the warning card first
@@ -89,16 +92,16 @@ describe('UploadFileCommandHandler', () => {
     await handler.handleInvoked({
       activity: activity as any,
       conversation,
-      sendCard: mockSendCard,
-      send: mockSend,
-      proactiveSendCard: mockProactiveSendCard,
+      sendCard,
+      send,
+      proactiveSendCard,
     } as any)
 
-    expect(mockSend).toHaveBeenCalledWith({ type: ActivityTypes.Typing })
-    expect(mockProactiveSendCard).toHaveBeenCalled()
+    expect(send).toHaveBeenCalledWith({ type: ActivityTypes.Typing })
+    expect(proactiveSendCard).toHaveBeenCalled()
 
     // Check that the success card was sent (simplified check)
-    const cardCall = mockProactiveSendCard.mock.calls[0][0]
+    const cardCall = proactiveSendCard.mock.calls[0][0]
     expect(cardCall).toBeDefined()
     expect(JSON.stringify(cardCall)).toContain('Successfully extracted text from file')
   })
@@ -118,15 +121,15 @@ describe('UploadFileCommandHandler', () => {
     await handler.handleInvoked({
       activity: activity as any,
       conversation,
-      sendCard: mockSendCard,
-      send: mockSend,
-      proactiveSendCard: mockProactiveSendCard,
+      sendCard,
+      send,
+      proactiveSendCard,
     } as any)
 
-    expect(mockProactiveSendCard).toHaveBeenCalled()
+    expect(proactiveSendCard).toHaveBeenCalled()
 
     // Check that the error card was sent (simplified check)
-    const cardCall = mockProactiveSendCard.mock.calls[0][0]
+    const cardCall = proactiveSendCard.mock.calls[0][0]
     expect(cardCall).toBeDefined()
     expect(JSON.stringify(cardCall)).toContain('Sorry, I could not extract text')
   })
@@ -140,5 +143,50 @@ describe('UploadFileCommandHandler', () => {
     const filePath = await handler.handleFileDownload(file as any)
 
     expect(filePath).toBe('/tmp/test-files/test.txt')
+  })
+
+  it('should handle saving config and update the card', async () => {
+    const handler = new UploadFileCommandHandler()
+
+    const conversation: any = {
+      documentPath: '/tmp/test-files/test.txt',
+      userId: 'user123',
+      documentId: 'doc123',
+      config: {},
+    }
+
+    const activity: any = {
+      value: {
+        kind: EpisodeKind.NEWS,
+        voices: EpisodeVoices.MATTHEW,
+      },
+    }
+
+    await handler.handleSaveConfig({ conversation, activity, updateCard } as any)
+
+    expect(conversation.config.kind).toEqual(EpisodeKind.NEWS)
+    expect(conversation.config.voices).toEqual([EpisodeVoices.MATTHEW])
+    expect(cards.uploadFileCard).toMatchSnapshot()
+  })
+
+  it('should handle invalid config (safeParse fails) and send warning instead of updating card', async () => {
+    const handler = new UploadFileCommandHandler()
+
+    const conversation: any = {
+      documentPath: '/tmp/test-files/test.txt',
+      userId: 'user123',
+      documentId: 'doc123',
+      config: {},
+    }
+
+    // 3 voices violates max(2) in schema -> safeParse should fail
+    const activity: any = {
+      value: {
+        voices: 'Matthew,Ellie,Daniel',
+      },
+    }
+
+    await handler.handleSaveConfig({ conversation, activity, updateCard, proactiveSendCard } as any)
+    expect(cards.warningCard).toMatchSnapshot()
   })
 })

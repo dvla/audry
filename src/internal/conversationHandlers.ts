@@ -1,5 +1,13 @@
 import { TurnState } from '@microsoft/teams-ai'
-import { Activity, CardFactory, ConversationReference, MessageFactory, ResourceResponse, TurnContext } from 'botbuilder'
+import {
+  Activity,
+  ActivityTypes,
+  CardFactory,
+  ConversationReference,
+  MessageFactory,
+  ResourceResponse,
+  TurnContext,
+} from 'botbuilder'
 
 import { EpisodeConfig } from '../tts/episodeConfig'
 
@@ -46,7 +54,11 @@ export interface ActivityContext {
    * @param activity activity to send
    */
   proactiveSend: (activity: ActivityLike) => Promise<void>
-
+  /**
+   * Update an existing activity with a new card
+   * @param card adaptive card to update the activity with
+   */
+  updateCard: (card: any) => Promise<void>
   /**
    * the conversation state
    */
@@ -88,9 +100,15 @@ export const MessageHandler = (context: TurnContext, state: ApplicationTurnState
       adapter.continueConversationAsync(botIdentity, conversationReference, async (proactiveContext) => {
         await proactiveContext.sendActivity(message)
       }),
+    updateCard: async (card: any) => {
+      await context.updateActivity({
+        id: context.activity.replyToId,
+        type: ActivityTypes.Message,
+        attachments: [CardFactory.adaptiveCard(card)],
+      })
+    },
     conversation: conversation,
     activity: context.activity,
-
     ref: conversationReference,
   }
 }

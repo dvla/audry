@@ -5,7 +5,6 @@
   "body": [
     {
       "type": "Container",
-      "style": "default",
       "bleed": true,
       "items": [
         {

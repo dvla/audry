@@ -7,7 +7,7 @@ import { ReviewHandler } from './handlers/reviewHandler'
 import { TextToTranscriptHandler } from './handlers/textToTranscriptHandler'
 import { TranscriptToAudioHandler } from './handlers/transcriptToAudioHandler'
 import { ATTACHMENT_CONTENT_TYPE, FILE_TIGGER_PATTERN, UploadFileCommandHandler } from './handlers/uploadFileHandler'
-import { warningCard } from './internal/cards'
+import { SAVE_CONFIG_MESSAGE, warningCard } from './internal/cards'
 import { ApplicationTurnState, MessageHandler } from './internal/conversationHandlers'
 import { adapter } from './internal/initialize'
 import { log } from './internal/logger'
@@ -63,13 +63,30 @@ const FILE_CONSENT_INVOKE_NAME = 'fileConsent/invoke'
 
 app.message(
   async (context: TurnContext) => {
-    if (ActivityTypes.Invoke == context.activity?.type && context.activity?.name == FILE_CONSENT_INVOKE_NAME) {
+    if (ActivityTypes.Invoke == context.activity.type && context.activity.name == FILE_CONSENT_INVOKE_NAME) {
       return true
     }
     return false
   },
   async (context: TurnContext, state: ApplicationTurnState) => {
-    await fileConsentHandler.handleFileConsentInvoke(MessageHandler(context, state))
+    if (context.activity.name === FILE_CONSENT_INVOKE_NAME) {
+      return await fileConsentHandler.handleFileConsentInvoke(MessageHandler(context, state))
+    }
+  }
+)
+
+// Listen for messages with the SAVE_CONFIG_MESSAGE action
+app.message(
+  async (context: TurnContext) => {
+    if (ActivityTypes.Message == context.activity.type && context.activity.value?.action == SAVE_CONFIG_MESSAGE) {
+      return true
+    }
+    return false
+  },
+  async (context: TurnContext, state: ApplicationTurnState) => {
+    if (context.activity.value?.action === SAVE_CONFIG_MESSAGE) {
+      await uploadFileCommandHandler.handleSaveConfig(MessageHandler(context, state))
+    }
   }
 )
 

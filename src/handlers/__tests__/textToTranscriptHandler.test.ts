@@ -31,6 +31,7 @@ describe('TextToTranscriptHandler', () => {
       sendCard: vi.fn().mockResolvedValue({}),
       proactiveSend: vi.fn().mockResolvedValue({}),
       proactiveSendCard: vi.fn().mockResolvedValue({}),
+      updateCard: vi.fn().mockResolvedValue({}),
       conversation: {
         documentId: 'doc123',
         count: 0,

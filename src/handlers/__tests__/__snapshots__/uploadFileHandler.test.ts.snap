@@ -1,85 +1,10 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`UploadFileCommandHandler (general file support) > should handle valid file upload 1`] = `
-[MockFunction spy] {
-  "calls": [
-    [
-      {
-        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-        "body": [
-          {
-            "bleed": true,
-            "items": [
-              {
-                "columns": [
-                  {
-                    "items": [
-                      {
-                        "size": "Large",
-                        "text": "✅",
-                        "type": "TextBlock",
-                      },
-                    ],
-                    "type": "Column",
-                    "width": "auto",
-                  },
-                  {
-                    "items": [
-                      {
-                        "color": "Default",
-                        "size": "Medium",
-                        "text": "File Processed",
-                        "type": "TextBlock",
-                        "weight": "Bolder",
-                        "wrap": true,
-                      },
-                      {
-                        "text": "Successfully extracted text from file: file.pdf",
-                        "type": "TextBlock",
-                        "wrap": true,
-                      },
-                    ],
-                    "type": "Column",
-                    "width": "stretch",
-                  },
-                ],
-                "type": "ColumnSet",
-              },
-            ],
-            "style": "default",
-            "type": "Container",
-          },
-          {
-            "actions": [
-              {
-                "style": "positive",
-                "title": "Text to Transcript",
-                "type": "Action.Execute",
-                "verb": "textToTranscript",
-              },
-            ],
-            "type": "ActionSet",
-          },
-        ],
-        "type": "AdaptiveCard",
-        "version": "1.6",
-      },
-    ],
-  ],
-  "results": [
-    {
-      "type": "return",
-      "value": Promise {},
-    },
-  ],
-}
-`;
-
-exports[`UploadFileCommandHandler > should send warning when no attachment 1`] = `
+exports[`UploadFileCommandHandler > should handle invalid config (safeParse fails) and send warning instead of updating card 1`] = `
 [MockFunction warningCard] {
   "calls": [
     [
-      "No file was uploaded. Please upload a valid file.",
+      "Invalid episode configuration. Please check your input.",
     ],
   ],
   "results": [
@@ -109,7 +34,7 @@ exports[`UploadFileCommandHandler > should send warning when no attachment 1`] =
                       {
                         "color": "Default",
                         "size": "Medium",
-                        "text": "No file was uploaded. Please upload a valid file.",
+                        "text": "Invalid episode configuration. Please check your input.",
                         "type": "TextBlock",
                         "weight": "Bolder",
                         "wrap": true,
@@ -134,7 +59,35 @@ exports[`UploadFileCommandHandler > should send warning when no attachment 1`] =
 }
 `;
 
-exports[`UploadFileCommandHandler > should send warning when no attachment but still try to process (bug in original code) 1`] = `
+exports[`UploadFileCommandHandler > should handle saving config and update the card 1`] = `
+[MockFunction uploadFileCard] {
+  "calls": [
+    [
+      "File Processed",
+      "Successfully extracted text from file: test.txt",
+      {
+        "intro_effect": false,
+        "kind": "News Briefing",
+        "language": "English",
+        "length": "Full",
+        "outro_effect": false,
+        "style": "Conversational",
+        "voices": [
+          "Matthew",
+        ],
+      },
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`UploadFileCommandHandler > should send warning when no attachment 1`] = `
 [MockFunction warningCard] {
   "calls": [
     [

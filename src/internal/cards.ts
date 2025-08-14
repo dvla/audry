@@ -7,6 +7,24 @@ import textToTranscriptCardJson from '../adaptiveCards/textToTranscriptCard.json
 import transcriptToAudioCardJson from '../adaptiveCards/transcriptToAudioCard.json'
 import uploadFileCardJson from '../adaptiveCards/uploadFileCard.json'
 import warningCardJson from '../adaptiveCards/warningCard.json'
+import { Feature, isFeatureEnabled } from '../features/featureFlags'
+import {
+  DEFAULT_CONFIG,
+  EpisodeConfig,
+  EpisodeKind,
+  EpisodeLanguages,
+  EpisodeLength,
+  EpisodeStyle,
+  EpisodeVoices,
+} from '../tts/episodeConfig'
+
+export const SAVE_CONFIG_MESSAGE = 'saveConfig'
+export const CARD_ACTION_SET = 'ActionSet'
+export const SHOW_CARD_ACTION = 'Action.ShowCard'
+
+interface CardItem {
+  type: string
+}
 
 /**
  * Generates an error card with the provided message.
@@ -53,11 +71,21 @@ export const processingCard = (message: string) => {
  * @param body The body text of the card.
  * @returns An Adaptive Card with the title and body text.
  */
-export const uploadFileCard = (title: string, body: string) => {
-  return new ACData.Template(uploadFileCardJson).expand({
+export const uploadFileCard = async (title: string, body: string, config: EpisodeConfig) => {
+  const showConfig = await isFeatureEnabled(Feature.UIConfig)
+  // Create a deep copy so we don't mutate the original
+  const uploadFileCardCopy = structuredClone(uploadFileCardJson)
+  if (showConfig) {
+    const actionSet = uploadFileCardCopy.body.find((item: CardItem) => item.type === CARD_ACTION_SET)
+    if (actionSet) {
+      actionSet.actions = [...actionSet.actions, episodeConfigCard(config)]
+    }
+  }
+
+  return new ACData.Template(uploadFileCardCopy).expand({
     $root: {
-      title: title,
-      body: body,
+      title,
+      body,
     },
   })
 }
@@ -181,5 +209,114 @@ export const audioFileUploadedCard = (fileName: string, message: string = 'Audio
         color: 'Accent',
       },
     ],
+  }
+}
+
+/**
+ * Returns an array of choices for the given configuration name.
+ * @param configName - The configuration name object containing key-value pairs.
+ * @returns Array of choice objects
+ */
+const toChoices = (configName: Record<string, string>) => {
+  return Object.values(configName).map((v) => ({ title: v, value: v }))
+}
+
+/**
+ * Creates an adaptive card for episode configuration using EpisodeSchema.
+ * Uses Input.ChoiceSet for multiple value options and sets default values from DEFAULT_CONFIG.
+ * @param config - The episode configuration object
+ * @returns Adaptive card for episode configuration
+ */
+export const episodeConfigCard = (config: EpisodeConfig) => {
+  return {
+    type: SHOW_CARD_ACTION,
+    title: 'Advanced',
+    verb: 'showConfig',
+    style: 'default',
+    card: {
+      type: 'AdaptiveCard',
+      $schema: 'https://adaptivecards.io/schemas/adaptive-card.json',
+      version: '1.6',
+      body: [
+        {
+          type: 'TextBlock',
+          text: Date.now().toString(),
+          isVisible: false,
+        },
+        {
+          type: 'Container',
+          style: 'accent',
+          bleed: true,
+          showBorder: true,
+          items: [
+            {
+              type: 'TextBlock',
+              text: 'Settings',
+              weight: 'Bolder',
+              size: 'Large',
+              horizontalAlignment: 'Center',
+              spacing: 'Medium',
+            },
+            {
+              type: 'Input.ChoiceSet',
+              id: 'kind',
+              label: 'Episode Kind',
+              isRequired: true,
+              value: config.kind || DEFAULT_CONFIG.kind,
+              style: 'expanded',
+              choices: toChoices(EpisodeKind),
+            },
+            {
+              type: 'Input.ChoiceSet',
+              id: 'language',
+              label: 'Language',
+              isRequired: true,
+              value: config.language || DEFAULT_CONFIG.language,
+              style: 'expanded',
+              choices: toChoices(EpisodeLanguages),
+            },
+            {
+              type: 'Input.ChoiceSet',
+              id: 'length',
+              label: 'Episode Length',
+              isRequired: true,
+              value: config.length || DEFAULT_CONFIG.length,
+              style: 'expanded',
+              choices: toChoices(EpisodeLength),
+            },
+            {
+              type: 'Input.ChoiceSet',
+              id: 'voices',
+              label: 'Voices (Select one or two)',
+              isMultiSelect: true,
+              isRequired: true,
+              value: config.voices.join(',') || DEFAULT_CONFIG.voices.join(','),
+              style: 'expanded',
+              choices: toChoices(EpisodeVoices),
+            },
+            {
+              type: 'Input.ChoiceSet',
+              id: 'style',
+              label: 'Episode Style',
+              isRequired: true,
+              value: config.style || DEFAULT_CONFIG.style,
+              style: 'expanded',
+              choices: toChoices(EpisodeStyle),
+            },
+          ],
+          spacing: 'Medium',
+        },
+      ],
+      actions: [
+        {
+          type: 'Action.Submit',
+          title: 'Save',
+          style: 'positive',
+          data: {
+            action: SAVE_CONFIG_MESSAGE,
+          },
+        },
+      ],
+    },
   }
 }

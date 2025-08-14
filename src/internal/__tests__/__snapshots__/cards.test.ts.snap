@@ -1,0 +1,269 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`uploadFileCard > renders base card without Advanced settings when UIConfig feature is disabled 1`] = `
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "body": [
+    {
+      "bleed": true,
+      "items": [
+        {
+          "columns": [
+            {
+              "items": [
+                {
+                  "size": "Large",
+                  "text": "✅",
+                  "type": "TextBlock",
+                },
+              ],
+              "type": "Column",
+              "width": "auto",
+            },
+            {
+              "items": [
+                {
+                  "color": "Default",
+                  "size": "Medium",
+                  "text": "File Processed",
+                  "type": "TextBlock",
+                  "weight": "Bolder",
+                  "wrap": true,
+                },
+                {
+                  "text": "Body text here",
+                  "type": "TextBlock",
+                  "wrap": true,
+                },
+              ],
+              "type": "Column",
+              "width": "stretch",
+            },
+          ],
+          "type": "ColumnSet",
+        },
+      ],
+      "type": "Container",
+    },
+    {
+      "actions": [
+        {
+          "style": "positive",
+          "title": "Text to Transcript",
+          "type": "Action.Execute",
+          "verb": "textToTranscript",
+        },
+      ],
+      "type": "ActionSet",
+    },
+  ],
+  "type": "AdaptiveCard",
+  "version": "1.6",
+}
+`;
+
+exports[`uploadFileCard > renders card with Advanced settings Action.ShowCard using provided config when UIConfig is enabled 1`] = `
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "body": [
+    {
+      "bleed": true,
+      "items": [
+        {
+          "columns": [
+            {
+              "items": [
+                {
+                  "size": "Large",
+                  "text": "✅",
+                  "type": "TextBlock",
+                },
+              ],
+              "type": "Column",
+              "width": "auto",
+            },
+            {
+              "items": [
+                {
+                  "color": "Default",
+                  "size": "Medium",
+                  "text": "File Processed",
+                  "type": "TextBlock",
+                  "weight": "Bolder",
+                  "wrap": true,
+                },
+                {
+                  "text": "With configuration",
+                  "type": "TextBlock",
+                  "wrap": true,
+                },
+              ],
+              "type": "Column",
+              "width": "stretch",
+            },
+          ],
+          "type": "ColumnSet",
+        },
+      ],
+      "type": "Container",
+    },
+    {
+      "actions": [
+        {
+          "style": "positive",
+          "title": "Text to Transcript",
+          "type": "Action.Execute",
+          "verb": "textToTranscript",
+        },
+        {
+          "card": {
+            "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+            "actions": [
+              {
+                "data": {
+                  "action": "saveConfig",
+                },
+                "style": "positive",
+                "title": "Save",
+                "type": "Action.Submit",
+              },
+            ],
+            "body": [
+              {
+                "isVisible": false,
+                "text": "1700000000000",
+                "type": "TextBlock",
+              },
+              {
+                "bleed": true,
+                "items": [
+                  {
+                    "horizontalAlignment": "Center",
+                    "size": "Large",
+                    "spacing": "Medium",
+                    "text": "Settings",
+                    "type": "TextBlock",
+                    "weight": "Bolder",
+                  },
+                  {
+                    "choices": [
+                      {
+                        "title": "Podcast",
+                        "value": "Podcast",
+                      },
+                      {
+                        "title": "News Briefing",
+                        "value": "News Briefing",
+                      },
+                    ],
+                    "id": "kind",
+                    "isRequired": true,
+                    "label": "Episode Kind",
+                    "style": "expanded",
+                    "type": "Input.ChoiceSet",
+                    "value": "Podcast",
+                  },
+                  {
+                    "choices": [
+                      {
+                        "title": "English",
+                        "value": "English",
+                      },
+                      {
+                        "title": "Welsh",
+                        "value": "Welsh",
+                      },
+                    ],
+                    "id": "language",
+                    "isRequired": true,
+                    "label": "Language",
+                    "style": "expanded",
+                    "type": "Input.ChoiceSet",
+                    "value": "English",
+                  },
+                  {
+                    "choices": [
+                      {
+                        "title": "Brief",
+                        "value": "Brief",
+                      },
+                      {
+                        "title": "Full",
+                        "value": "Full",
+                      },
+                    ],
+                    "id": "length",
+                    "isRequired": true,
+                    "label": "Episode Length",
+                    "style": "expanded",
+                    "type": "Input.ChoiceSet",
+                    "value": "Full",
+                  },
+                  {
+                    "choices": [
+                      {
+                        "title": "Matthew",
+                        "value": "Matthew",
+                      },
+                      {
+                        "title": "Ellie",
+                        "value": "Ellie",
+                      },
+                      {
+                        "title": "Daniel",
+                        "value": "Daniel",
+                      },
+                      {
+                        "title": "Jamie",
+                        "value": "Jamie",
+                      },
+                    ],
+                    "id": "voices",
+                    "isMultiSelect": true,
+                    "isRequired": true,
+                    "label": "Voices (Select one or two)",
+                    "style": "expanded",
+                    "type": "Input.ChoiceSet",
+                    "value": "Matthew,Ellie",
+                  },
+                  {
+                    "choices": [
+                      {
+                        "title": "Solo",
+                        "value": "Solo",
+                      },
+                      {
+                        "title": "Conversational",
+                        "value": "Conversational",
+                      },
+                    ],
+                    "id": "style",
+                    "isRequired": true,
+                    "label": "Episode Style",
+                    "style": "expanded",
+                    "type": "Input.ChoiceSet",
+                    "value": "Conversational",
+                  },
+                ],
+                "showBorder": true,
+                "spacing": "Medium",
+                "style": "accent",
+                "type": "Container",
+              },
+            ],
+            "type": "AdaptiveCard",
+            "version": "1.6",
+          },
+          "style": "default",
+          "title": "Advanced",
+          "type": "Action.ShowCard",
+          "verb": "showConfig",
+        },
+      ],
+      "type": "ActionSet",
+    },
+  ],
+  "type": "AdaptiveCard",
+  "version": "1.6",
+}
+`;

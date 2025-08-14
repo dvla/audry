@@ -5,12 +5,12 @@ import { v7 as uuidv7 } from 'uuid'
 
 import { uploadFileCard, warningCard } from '../internal/cards'
 import { Config } from '../internal/config'
-import { ActivityContext } from '../internal/conversationHandlers'
+import { ActivityContext, ConversationState } from '../internal/conversationHandlers'
 import { log } from '../internal/logger'
 import { EXTRACTED_TEXT, writeFile } from '../internal/utils/documentUtils'
 import { extractTextFromFile, writeContentToFile } from '../internal/utils/fileUtils'
 import { getUserId } from '../internal/utils/userUtils'
-import { DEFAULT_CONFIG } from '../tts/episodeConfig'
+import { DEFAULT_CONFIG, EpisodeSchema } from '../tts/episodeConfig'
 
 // Content type for Teams file download info attachments
 export const ATTACHMENT_CONTENT_TYPE = 'application/vnd.microsoft.teams.file.download.info'
@@ -30,7 +30,7 @@ export class UploadFileCommandHandler {
     conversation.documentPath = fileDownloadPath
     conversation.documentId = uuidv7()
     conversation.userId = getUserId(activity)
-    conversation.config = DEFAULT_CONFIG
+    conversation.config = conversation.config || DEFAULT_CONFIG
   }
   /**
    * Handles the command when a user uploads a file.
@@ -54,10 +54,7 @@ export class UploadFileCommandHandler {
     try {
       const extractedText = await extractTextFromFile(fileDownloadPath)
       await writeFile(conversation.userId, conversation.documentId, EXTRACTED_TEXT, extractedText)
-
-      await proactiveSendCard(
-        uploadFileCard('File Processed', `Successfully extracted text from file: ${attachment.name}`)
-      )
+      await proactiveSendCard(await this.createUploadFileCard(conversation))
     } catch (err) {
       log.error('Failed to extract text:', err)
       await proactiveSendCard(
@@ -75,5 +72,36 @@ export class UploadFileCommandHandler {
     await writeContentToFile(file.content.downloadUrl, filePath)
     log.info(`File downloaded successfully: ${filePath}`)
     return filePath
+  }
+
+  /**
+   * Handles saving the episode configuration.
+   * @param {ActivityContext} context - The activity context.
+   */
+  async handleSaveConfig({ conversation, activity, updateCard, proactiveSendCard }: ActivityContext) {
+    activity.value.voices = activity.value.voices.split(',')
+    const parseResult = EpisodeSchema.safeParse(activity.value)
+    if (!parseResult.success) {
+      log.error(`Invalid episode config: ${JSON.stringify(parseResult.error)}`)
+      await proactiveSendCard(warningCard('Invalid episode configuration. Please check your input.'))
+      return
+    }
+    conversation.config = parseResult.data
+    log.info(`Episode config applied: ${JSON.stringify(activity.value)}`)
+
+    await updateCard(await this.createUploadFileCard(conversation))
+  }
+
+  /**
+   * Generates the upload file card.
+   * @param conversation - The conversation context.
+   * @returns The upload file card.
+   */
+  async createUploadFileCard(conversation: ConversationState) {
+    return await uploadFileCard(
+      'File Processed',
+      `Successfully extracted text from file: ${path.basename(conversation.documentPath)}`,
+      conversation.config
+    )
   }
 }
