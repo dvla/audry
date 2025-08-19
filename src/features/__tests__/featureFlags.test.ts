@@ -125,7 +125,7 @@ describe('featureFlags', () => {
         name: 'google-variant',
         configuration: { provider: 'google', model: 'gemini-1.5-flash' },
       }
-      const parsedConfig = { provider: 'google', model: 'gemini-1.5-flash' }
+      const parsedConfig = { provider: 'google', model: 'gemini-1.5-flash', temperature: 0.2 }
 
       mockLoad.mockResolvedValue(mockAppConfig)
       mockFeatureManager.getVariant.mockResolvedValue(mockVariant)

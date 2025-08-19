@@ -24,6 +24,7 @@ vi.mock('../../internal/logger', () => ({
   log: {
     error: vi.fn(),
     info: vi.fn(),
+    debug: vi.fn(),
   },
 }))
 

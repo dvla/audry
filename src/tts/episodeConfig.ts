@@ -13,6 +13,7 @@ export enum EpisodeLanguages {
  */
 export enum EpisodeKind {
   PODCAST = 'Podcast',
+  PODCAST_SHORT = 'Brief Podcast',
   NEWS = 'News Briefing',
 }
 /**
@@ -38,6 +39,7 @@ export enum EpisodeVoices {
   ELLIE = 'Ellie',
   DANIEL = 'Daniel',
   JAMIE = 'Jamie',
+  CLAIRE = 'Claire',
 }
 
 /**

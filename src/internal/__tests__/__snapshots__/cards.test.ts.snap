@@ -152,6 +152,10 @@ exports[`uploadFileCard > renders card with Advanced settings Action.ShowCard us
                         "value": "Podcast",
                       },
                       {
+                        "title": "Brief Podcast",
+                        "value": "Brief Podcast",
+                      },
+                      {
                         "title": "News Briefing",
                         "value": "News Briefing",
                       },
@@ -216,6 +220,10 @@ exports[`uploadFileCard > renders card with Advanced settings Action.ShowCard us
                       {
                         "title": "Jamie",
                         "value": "Jamie",
+                      },
+                      {
+                        "title": "Claire",
+                        "value": "Claire",
                       },
                     ],
                     "id": "voices",

@@ -104,7 +104,11 @@ describe('TranscriptToAudioHandler', () => {
       // wait a tick for setImmediate
       await new Promise((r) => setImmediate(r))
 
-      expect(generateAudioSpy).toHaveBeenCalledWith(mockContext.proactiveSend, mockContext.conversation)
+      expect(generateAudioSpy).toHaveBeenCalledWith(
+        mockContext.proactiveSend,
+        mockContext.proactiveSendCard,
+        mockContext.conversation
+      )
 
       generateAudioSpy.mockRestore()
     })
@@ -145,12 +149,13 @@ describe('TranscriptToAudioHandler', () => {
     })
 
     it('should generate and send audio card', async () => {
-      await handler.generateAudio(mockContext.proactiveSend, mockContext.conversation)
+      await handler.generateAudio(mockContext.proactiveSend, mockContext.proactiveSend, mockContext.conversation)
 
       expect(mockReadFile).toHaveBeenCalledWith('test-user-456', 'test-doc-123', expect.any(String))
       expect(mockTranscriptToSpeech).toHaveBeenCalledWith(
-        { model: 'gemini-tts-v1', provider: 'google' },
-        'Test transcript'
+        { model: 'gemini-tts-v1', provider: 'google', temperature: 0.2 },
+        'Test transcript',
+        DEFAULT_CONFIG.voices
       )
       expect(mockCreateFileConsentCard).toHaveBeenCalled()
       expect(mockContext.proactiveSend).toHaveBeenCalledWith(expect.objectContaining({ type: 'message' }))
@@ -165,17 +170,19 @@ describe('TranscriptToAudioHandler', () => {
     it('should handle transcript fetch error', async () => {
       mockReadFile.mockRejectedValue(new Error('Fetch failed'))
 
-      await handler.generateAudio(mockContext.proactiveSend, mockContext.conversation)
+      await handler.generateAudio(mockContext.proactiveSend, mockContext.proactiveSendCard, mockContext.conversation)
 
       expect(mockLogError).toHaveBeenCalled()
-      expect(mockContext.proactiveSend).toHaveBeenCalledWith(expect.objectContaining({ type: 'message' }))
+      expect(mockContext.proactiveSendCard).toHaveBeenCalledWith(
+        expect.objectContaining({ message: 'Failed to generate audio from transcript' })
+      )
     })
 
     it('should handle TTS failure', async () => {
       mockReadFile.mockResolvedValue('abc')
       mockTranscriptToSpeech.mockRejectedValue(new Error('TTS failed'))
 
-      await handler.generateAudio(mockContext.proactiveSend, mockContext.conversation)
+      await handler.generateAudio(mockContext.proactiveSend, mockContext.proactiveSendCard, mockContext.conversation)
 
       expect(mockTranscriptToSpeech).toHaveBeenCalled()
       expect(mockWarningCard).toHaveBeenCalled()

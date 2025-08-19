@@ -4,7 +4,14 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { DEFAULT_TTS_MODEL_CONFIG } from '../../features/featureTTS'
 import { Config } from '../../internal/config'
 import { EpisodeVoices } from '../episodeConfig'
-import { generateConfig, processChunks, saveWaveFile, splitTranscript, transcriptToSpeech } from '../textoSpeechGoogle'
+import {
+  STYLE,
+  generateConfig,
+  processChunks,
+  saveWaveFile,
+  splitTranscript,
+  transcriptToSpeech,
+} from '../textoSpeechGoogle'
 
 const SMALL_TEST_TRANSCRIPT = `Speaker 1: Alright, Ellie, buckle up, because today we're diving deep into the digital heart of… the DVLA!
 
@@ -23,8 +30,6 @@ Speaker 1: Well, a few things stand out. Firstly, they're focusing on something 
 Speaker 2: Oh, like a one-stop shop for all things driving-related? I am forever having to remember different passwords for different government services, so that would be amazing! Does that mean… dare I ask… a digital driving license? Like, on my phone?
 `
 const TTS_MODEL = 'gemini-2.5-flash-preview-tts'
-const STYLE =
-  'Use a genuine and refined British accent for Speaker 1. Use a genuine and refined British accent for Speaker 2.'
 
 // --- Mock the @google/genai package ---
 const fakeGenerateContent = vi.fn()
@@ -60,7 +65,7 @@ Config.GEMINI_API_KEY = 'fake-api-key'
 
 // Some reusable base64 audio data
 const fakeBase64Audio = Buffer.from('test audio').toString('base64')
-const voiceConfiguration = generateConfig([EpisodeVoices.MATTHEW, EpisodeVoices.ELLIE])
+const voiceConfiguration = generateConfig([EpisodeVoices.MATTHEW, EpisodeVoices.ELLIE], 123, DEFAULT_TTS_MODEL_CONFIG)
 
 describe('saveWaveFile', () => {
   beforeEach(() => {
@@ -203,7 +208,7 @@ describe('processChunks', () => {
     expect(result).toBe('base64audio')
     expect(fakeGenerateContent).toHaveBeenCalledWith({
       model: TTS_MODEL,
-      contents: [{ parts: [{ text: `${STYLE}:\n\nHello world` }] }],
+      contents: [{ parts: [{ text: `${STYLE}\n\nHello world` }] }],
       config: voiceConfiguration,
     })
   })

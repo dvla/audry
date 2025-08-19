@@ -6,10 +6,10 @@ import { TTSModelConfig } from '../features/featureTTS'
 import { Config } from '../internal/config'
 import { log } from '../internal/logger'
 import { generatePodcastFileName } from '../internal/utils/documentUtils'
-import { EpisodeVoices } from './episodeConfig'
+import { DEFAULT_CONFIG, EpisodeVoices } from './episodeConfig'
 
-const STYLE =
-  'Use a genuine and refined British accent for Speaker 1. Use a genuine and refined British accent for Speaker 2.'
+export const STYLE =
+  'All speakers should have a genuine and inviting British accent.  This is a short episode - make it engaging.'
 let cloudClient: GoogleGenAI | null = null
 
 interface SaveWaveFileOptions {
@@ -22,6 +22,9 @@ interface SaveWaveFileOptions {
 const VOICE_CONFIGS = new Map<EpisodeVoices, VoiceConfig>([
   [EpisodeVoices.MATTHEW, { prebuiltVoiceConfig: { voiceName: 'Fenrir' } }],
   [EpisodeVoices.ELLIE, { prebuiltVoiceConfig: { voiceName: 'Achernar' } }],
+  [EpisodeVoices.JAMIE, { prebuiltVoiceConfig: { voiceName: 'Rasalgethi' } }],
+  [EpisodeVoices.DANIEL, { prebuiltVoiceConfig: { voiceName: 'Charon' } }],
+  [EpisodeVoices.CLAIRE, { prebuiltVoiceConfig: { voiceName: 'Callirrhoe' } }],
 ])
 
 /**
@@ -40,15 +43,26 @@ const generateVoiceConfig = (voices: EpisodeVoices[]): SpeakerVoiceConfig[] => {
 
 /**
  * Configuration for generating speech with multiple speaker voices
+ * @param voices - Array of episode voice types to be converted to speaker configurations
+ * @param seed - A seed value for randomization, used to help with consistent audio generation
+ * @param modelConfig - The TTS model configuration to use
+ * @returns The configuration object for generating speech with multiple speaker voices
  */
-export const generateConfig = (voices: EpisodeVoices[]): GenerateContentConfig => {
+export const generateConfig = (
+  voices: EpisodeVoices[],
+  seed: number,
+  modelConfig: TTSModelConfig
+): GenerateContentConfig => {
   return {
     responseModalities: ['AUDIO'],
     speechConfig: {
+      languageCode: 'en-GB',
       multiSpeakerVoiceConfig: {
         speakerVoiceConfigs: generateVoiceConfig(voices),
       },
     },
+    temperature: modelConfig.temperature,
+    seed,
   }
 }
 
@@ -69,19 +83,24 @@ export const getGoogleClient = (): GoogleGenAI => {
  * Converts a transcript to speech using Google's Gemini TTS API.
  * @param modelConfig - The TTS model configuration to use.
  * @param transcript - The transcript text to convert to speech.
+ * @param voices - The array of voices to use for the speech synthesis.
  * @returns A promise that resolves to the path of the saved audio file.
  */
 export async function transcriptToSpeech(
   modelConfig: TTSModelConfig,
-  transcript: string
+  transcript: string,
+  voices: EpisodeVoices[] = DEFAULT_CONFIG.voices
 ): Promise<{ outputFileName: string; outputFilePath: string }> {
   const transcriptChunks = splitTranscript(transcript)
 
-  log.info(`Start audio generation with model: ${modelConfig.model} and provider: ${modelConfig.provider}`)
+  log.info(
+    `Start audio generation with model: ${modelConfig.model} and provider: ${modelConfig.provider} and temperature: ${modelConfig.temperature}`
+  )
   const startTime = Date.now()
-  const generateConfiguration = generateConfig([EpisodeVoices.MATTHEW, EpisodeVoices.ELLIE])
+  const seed = parseInt(startTime.toString().slice(-8))
+  const generatedConfiguration = generateConfig(voices, seed, modelConfig)
   const audioData = await Promise.all(
-    transcriptChunks.map((chunk) => processChunks(chunk, generateConfiguration, modelConfig))
+    transcriptChunks.map((chunk) => processChunks(chunk, generatedConfiguration, modelConfig))
   )
   const totalSeconds = ((Date.now() - startTime) / 1000).toFixed(2)
   log.info(`Total audio generation time: ${totalSeconds} seconds`)
@@ -96,15 +115,20 @@ export async function transcriptToSpeech(
 /**
  * Splits a transcript into smaller chunks based on line breaks
  * @param transcript The full transcript text
+ * @param maxLines The maximum number of lines allowed in the transcript
+ * @param maxLinesPerChunk The maximum number of lines per chunk
  * @returns The transcript split into chunks of a maximum number of lines
  */
-export const splitTranscript = (transcript: string): string[] => {
+export const splitTranscript = (
+  transcript: string,
+  maxLines = +Config.MAX_NUMBER_OF_LINES,
+  maxLinesPerChunk = +Config.LINES_PER_CHUNK
+): string[] => {
   let sentences = transcript.split('\n').filter((line) => line.trim() !== '')
-  const maxLines = Config.MAX_NUMBER_OF_LINES
   // Check if the number of sentences exceeds the maximum allowed lines
-  if (sentences.length > +Config.MAX_NUMBER_OF_LINES) {
-    log.warn(`Transcript (${sentences.length}) exceeds maximum number of lines (${Config.MAX_NUMBER_OF_LINES}).`)
-    sentences = sentences.slice(0, +Config.MAX_NUMBER_OF_LINES)
+  if (sentences.length > maxLines) {
+    log.warn(`Transcript (${sentences.length}) exceeds maximum number of lines (${maxLines}).`)
+    sentences = sentences.slice(0, maxLines)
   }
 
   const chunks: string[] = []
@@ -112,7 +136,7 @@ export const splitTranscript = (transcript: string): string[] => {
 
   for (let i = 0; i < sentences.length; i++) {
     currentChunk += (currentChunk ? '\n' : '') + sentences[i]
-    if ((i + 1) % +Config.LINES_PER_CHUNK === 0 || i === sentences.length - 1) {
+    if ((i + 1) % maxLinesPerChunk === 0 || i === sentences.length - 1) {
       chunks.push(currentChunk)
       currentChunk = ''
     }
@@ -135,7 +159,7 @@ export const processChunks = async (
   modelConfig: TTSModelConfig
 ) => {
   const ai = getGoogleClient()
-  const prompt = `${STYLE}:\n\n${chunk}`
+  const prompt = `${STYLE}\n\n${chunk}`
   const chunkStartTime = Date.now()
 
   const response = await ai.models.generateContent({

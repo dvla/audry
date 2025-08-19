@@ -17,6 +17,7 @@ const MIME_TYPE = 'text/plain'
  */
 export const toTranscript = async (text: string, episodeConfig: EpisodeConfig) => {
   const systemPrompt = promptForTranscript(episodeConfig)
+  log.debug('Generating transcript with prompt:\n' + systemPrompt)
   return textToTranscript(systemPrompt, text)
 }
 
@@ -50,7 +51,7 @@ export const textToTranscript = async (prompt: string, extractedText: string) =>
  * Provides a function to convert a transcript to audio using the appropriate TTS provider.
  * @returns A function that takes a transcript and returns the audio file path.
  */
-export const transcriptToAudioProvider = async (): Promise<any> => {
+export const transcriptToAudioProvider = async (episodeConfig: EpisodeConfig): Promise<any> => {
   const modelConfig = (await getTTSModelConfig())?.configuration
   let toAudioProvider
   switch (modelConfig.provider) {
@@ -60,7 +61,7 @@ export const transcriptToAudioProvider = async (): Promise<any> => {
     case Providers.GOOGLE:
     // Google is the default provider
     default:
-      toAudioProvider = (transcript: string) => ttsGoogle(modelConfig, transcript)
+      toAudioProvider = (transcript: string) => ttsGoogle(modelConfig, transcript, episodeConfig.voices)
   }
   return toAudioProvider
 }

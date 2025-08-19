@@ -43,4 +43,16 @@ describe('promptForTranscript with different episode kinds', () => {
     expect(prompt).toContain('You are a world-class news writer')
     expect(prompt).toContain('about 1 minute long')
   })
+
+  it('Produces a short podcast', () => {
+    const config = EpisodeSchema.parse({
+      kind: EpisodeKind.PODCAST_SHORT,
+      length: EpisodeLength.BRIEF,
+      voices: [EpisodeVoices.ELLIE],
+    })
+    const prompt = promptForTranscript(config)
+    expect(prompt).toContain('You are a world-class podcast writer')
+    expect(prompt).toContain('GET STRAIGHT INTO THE CONTENT')
+    expect(prompt).toContain('about 1 minute long')
+  })
 })

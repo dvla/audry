@@ -87,7 +87,7 @@ export class UploadFileCommandHandler {
       return
     }
     conversation.config = parseResult.data
-    log.info(`Episode config applied: ${JSON.stringify(activity.value)}`)
+    log.debug(`Episode config applied: ${JSON.stringify(activity.value)}`)
 
     await updateCard(await this.createUploadFileCard(conversation))
   }
