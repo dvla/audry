@@ -38,6 +38,51 @@ resource storageBlobContributor 'Microsoft.Authorization/roleAssignments@2020-04
   }
 }
 
+resource storageMgmtPolicy 'Microsoft.Storage/storageAccounts/managementPolicies@2025-01-01' = {
+  name: 'default'
+  parent: storageAccount
+  properties: {
+    policy: {
+      rules: [
+        {
+          enabled: true
+          name: 'MoveToCoolAfter3Days'
+          type: 'Lifecycle'
+          definition: {
+            actions: {
+              baseBlob: {
+                tierToCool: {
+                  daysAfterModificationGreaterThan: 3
+                }
+              }
+            }
+            filters: {
+              blobTypes: ['blockBlob']
+            }
+          }
+        }
+        {
+          enabled: true
+          name: 'DeleteAfter90Days'
+          type: 'Lifecycle'
+          definition: {
+            actions: {
+              baseBlob: {
+                delete: {
+                  daysAfterLastAccessTimeGreaterThan: 90
+                }
+              }
+            }
+            filters: {
+              blobTypes: ['blockBlob']
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
 output storageAccountName string = storageAccount.name
 output blobContainerName string = containerName
 output blobEndpoint string = storageAccount.properties.primaryEndpoints.blob
