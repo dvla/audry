@@ -38,8 +38,34 @@ resource storageBlobContributor 'Microsoft.Authorization/roleAssignments@2020-04
   }
 }
 
+resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2025-01-01' = {
+  parent: storageAccount
+  name: 'default'
+  properties: {
+    lastAccessTimeTrackingPolicy: {
+      enable: true
+      name: 'AccessTimeTracking'
+      trackingGranularityInDays: 1
+      blobType: [
+        'blockBlob'
+      ]
+    }
+    cors: {
+      corsRules: []
+    }
+    deleteRetentionPolicy: {
+      allowPermanentDelete: false
+      enabled: true
+      days: 3
+    }
+  }
+}
+
 resource storageMgmtPolicy 'Microsoft.Storage/storageAccounts/managementPolicies@2025-01-01' = {
   name: 'default'
+  dependsOn: [
+    blobService
+  ]
   parent: storageAccount
   properties: {
     policy: {
