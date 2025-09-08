@@ -2,7 +2,7 @@ import { AzureAppConfiguration, load } from '@azure/app-configuration-provider'
 import { ConfigurationMapFeatureFlagProvider, FeatureManager } from '@microsoft/feature-management'
 
 import { Config } from '../internal/config'
-import { getAzureCredentials } from '../internal/utils/fileUtils'
+import { getAzureCredentials } from '../internal/utils/authUtils'
 
 // Enum for feature flags
 export enum Feature {

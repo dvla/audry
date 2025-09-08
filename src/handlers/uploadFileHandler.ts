@@ -7,8 +7,7 @@ import { uploadFileCard, warningCard } from '../internal/cards'
 import { Config } from '../internal/config'
 import { ActivityContext, ConversationState } from '../internal/conversationHandlers'
 import { log } from '../internal/logger'
-import { EXTRACTED_TEXT, writeFile } from '../internal/utils/documentUtils'
-import { extractTextFromFile, writeContentToFile } from '../internal/utils/fileUtils'
+import { extractAndWriteText, writeContentToFile } from '../internal/utils/fileUtils'
 import { getUserId } from '../internal/utils/userUtils'
 import { DEFAULT_CONFIG, EpisodeSchema } from '../tts/episodeConfig'
 
@@ -23,6 +22,7 @@ export const FILE_TIGGER_PATTERN = 'uploadFile'
  */
 export class UploadFileCommandHandler {
   triggerPatterns: string | RegExp | Selector | (string | RegExp | Selector)[] = FILE_TIGGER_PATTERN
+
   /**
    * Sets up a new conversation
    */
@@ -32,6 +32,7 @@ export class UploadFileCommandHandler {
     conversation.userId = getUserId(activity)
     conversation.config = conversation.config || DEFAULT_CONFIG
   }
+
   /**
    * Handles the command when a user uploads a file.
    * and responds with an Adaptive Card confirming the upload.
@@ -39,21 +40,20 @@ export class UploadFileCommandHandler {
    * @param state application state
    */
   async handleInvoked({ proactiveSendCard, sendCard, send, conversation, activity }: ActivityContext): Promise<void> {
-    const attachment = activity.attachments?.[0]
+    await send({ type: ActivityTypes.Typing })
 
+    const attachment = activity.attachments?.[0]
     if (!attachment) {
       await sendCard(warningCard('No file was uploaded. Please upload a valid file.'))
       return
     }
+
     // Download the file and save it to the temp folder
     const fileDownloadPath = await this.handleFileDownload(attachment)
     this.newConversation(activity, conversation, fileDownloadPath)
 
-    await send({ type: ActivityTypes.Typing })
-
     try {
-      const extractedText = await extractTextFromFile(fileDownloadPath)
-      await writeFile(conversation.userId, conversation.documentId, EXTRACTED_TEXT, extractedText)
+      await extractAndWriteText(fileDownloadPath, conversation.userId, conversation.documentId)
       await proactiveSendCard(await this.createUploadFileCard(conversation))
     } catch (err) {
       log.error('Failed to extract text:', err)
@@ -62,6 +62,7 @@ export class UploadFileCommandHandler {
       )
     }
   }
+
   /**
    * Handles file download and saves the file.
    * @param {object} file - The file attachment.

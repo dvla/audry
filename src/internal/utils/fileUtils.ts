@@ -1,23 +1,18 @@
 import type { AnalyzeOperationOutput } from '@azure-rest/ai-document-intelligence'
 import DocumentIntelligence, { getLongRunningPoller, isUnexpected } from '@azure-rest/ai-document-intelligence'
-import { DefaultAzureCredential, TokenCredential } from '@azure/identity'
 import { createWriteStream, readFileSync } from 'fs'
+import { readFile } from 'fs/promises'
+import { extname } from 'path'
 import { pipeline } from 'stream/promises'
 
 import { Config } from '../config'
 import { log } from '../logger'
+import { getAzureCredentials } from './authUtils'
+import { EXTRACTED_TEXT, writeFile } from './documentUtils'
 
 // Azure Document Intelligence configuration
 const endpoint = Config.DOCINT_ENDPOINT
-let azureCredential = null
 let azureClient = null
-
-export const getAzureCredentials = (): TokenCredential => {
-  if (!azureCredential) {
-    azureCredential = new DefaultAzureCredential()
-  }
-  return azureCredential
-}
 
 const getAzureDocumentClient = () => {
   if (!azureClient) {
@@ -110,5 +105,32 @@ export async function writeContentToFile(contentUrl: string, filePath: string): 
   } catch (error) {
     log.error('Error downloading the file.', error)
     throw new Error('Failed to download file')
+  }
+}
+
+/**
+ * Extracts text from a file and writes it for .txt or .md files without using Azure.
+ * For all other formats, let the caller use the normal extractTextFromFile + writeFile path.
+ *
+ * @param fileDownloadPath Local path to the file
+ * @param userId User ID to associate extracted text with
+ * @param documentId ID of the document to associate extracted text with
+ */
+export async function extractAndWriteText(fileDownloadPath: string, userId: string, documentId: string): Promise<void> {
+  try {
+    const ext = extname(fileDownloadPath).toLowerCase()
+    let extractedText
+
+    if (ext === '.txt' || ext === '.md') {
+      extractedText = await readFile(fileDownloadPath, 'utf-8')
+      log.info(`Extracted text directly from ${ext} file without using Azure.`)
+    } else {
+      // For non-.txt/.md files, use Azure Document Intelligence
+      extractedText = await extractTextFromFile(fileDownloadPath)
+    }
+    await writeFile(userId, documentId, EXTRACTED_TEXT, extractedText)
+  } catch (error) {
+    log.error('Failed to extract and write text file.', error)
+    throw new Error('Failed to extract and write text')
   }
 }

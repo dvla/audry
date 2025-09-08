@@ -3,7 +3,7 @@ import { Readable } from 'stream'
 
 import { Config } from '../config'
 import { log } from '../logger'
-import { getAzureCredentials } from '../utils/fileUtils'
+import { getAzureCredentials } from '../utils/authUtils'
 
 export type metadataType = {
   [propertyName: string]: string

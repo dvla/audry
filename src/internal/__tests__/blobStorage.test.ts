@@ -84,8 +84,8 @@ vi.mock('../logger', () => ({
   },
 }))
 
-// --- Mock fileUtils ---
-vi.mock('../utils/fileUtils', () => ({
+// --- Mock authUtils ---
+vi.mock('../utils/authUtils', () => ({
   getAzureCredentials: mockGetAzureCredentials,
 }))
 

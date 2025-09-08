@@ -5,15 +5,9 @@ import * as cards from '../../internal/cards'
 import { EpisodeKind, EpisodeVoices } from '../../tts/episodeConfig'
 import { ATTACHMENT_CONTENT_TYPE, UploadFileCommandHandler } from '../uploadFileHandler'
 
-// Mock all dependencies
 vi.mock('../../internal/utils/fileUtils', () => ({
-  extractTextFromFile: vi.fn().mockResolvedValue('extracted text content'),
+  extractAndWriteText: vi.fn().mockResolvedValue(undefined),
   writeContentToFile: vi.fn().mockResolvedValue(undefined),
-}))
-
-vi.mock('../../internal/utils/documentUtils', () => ({
-  writeFile: vi.fn().mockResolvedValue(undefined),
-  EXTRACTED_TEXT: 'extracted-text',
 }))
 
 vi.mock('../../internal/utils/userUtils', () => ({
@@ -77,7 +71,6 @@ describe('UploadFileCommandHandler', () => {
       proactiveSendCard,
     } as any)
 
-    // It should send the warning card first
     expect(cards.warningCard).toMatchSnapshot()
   })
 
@@ -100,16 +93,12 @@ describe('UploadFileCommandHandler', () => {
 
     expect(send).toHaveBeenCalledWith({ type: ActivityTypes.Typing })
     expect(proactiveSendCard).toHaveBeenCalled()
-
-    // Check that the success card was sent (simplified check)
-    const cardCall = proactiveSendCard.mock.calls[0][0]
-    expect(cardCall).toBeDefined()
-    expect(JSON.stringify(cardCall)).toContain('Successfully extracted text from file')
+    expect(cards.uploadFileCard).toMatchSnapshot()
   })
 
   it('should handle extraction error', async () => {
-    const { extractTextFromFile } = await import('../../internal/utils/fileUtils.js')
-    vi.mocked(extractTextFromFile).mockRejectedValueOnce(new Error('Extraction failed'))
+    const { extractAndWriteText } = await import('../../internal/utils/fileUtils.js')
+    vi.mocked(extractAndWriteText).mockRejectedValueOnce(new Error('Extraction failed'))
 
     const attachment = {
       name: 'bad.txt',
@@ -142,7 +131,6 @@ describe('UploadFileCommandHandler', () => {
     }
 
     const filePath = await handler.handleFileDownload(file as any)
-
     expect(filePath).toBe('/tmp/test-files/test.txt')
   })
 

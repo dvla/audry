@@ -87,6 +87,35 @@ exports[`UploadFileCommandHandler > should handle saving config and update the c
 }
 `;
 
+exports[`UploadFileCommandHandler > should process file successfully 1`] = `
+[MockFunction uploadFileCard] {
+  "calls": [
+    [
+      "File Processed",
+      "Successfully extracted text from file: test.txt",
+      {
+        "intro_effect": false,
+        "kind": "Podcast",
+        "language": "English",
+        "length": "Full",
+        "outro_effect": false,
+        "style": "Conversational",
+        "voices": [
+          "Matthew",
+          "Ellie",
+        ],
+      },
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
 exports[`UploadFileCommandHandler > should send warning when no attachment 1`] = `
 [MockFunction warningCard] {
   "calls": [
