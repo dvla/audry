@@ -15,6 +15,9 @@ export const TranscriptReviewState = Annotation.Root({
   crFeedback: Annotation<string>({
     reducer: (x, y) => y,
   }),
+  edaFeedback: Annotation<string>({
+    reducer: (x, y) => y,
+  }),
   finalTranscript: Annotation<string>({
     reducer: (x, y) => y,
   }),

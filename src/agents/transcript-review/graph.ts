@@ -3,11 +3,12 @@ import { END, InMemoryStore, MemorySaver, START, StateGraph } from '@langchain/l
 
 import { log } from '../../internal/logger'
 import { ChatModels, getChatModel } from '../utils/utils'
-import { BG_SYSTEM_PROMPT, CR_SYSTEM_PROMPT, EDITOR_SYSTEM_PROMPT } from './prompts'
+import { BG_SYSTEM_PROMPT, CR_SYSTEM_PROMPT, EDA_SYSTEM_PROMPT, EDITOR_SYSTEM_PROMPT } from './prompts'
 import { TranscriptReviewState, TranscriptReviewStateType } from './state'
 
 const BG_NODE = 'British Expert'
 const CR_NODE = 'Content Reviewer'
+const EDA_NODE = 'Expressive Delivery Advisor'
 const EDITOR_NODE = 'Editor'
 
 /**
@@ -51,6 +52,26 @@ const contentReviewNode = async (state: TranscriptReviewStateType): Promise<Tran
 }
 
 /**
+ * Reviews the given transcript using an Expressive Delivery Advisor agent and updates the state with feedback.
+ *
+ * @param state - The current state containing the original transcript to be reviewed.
+ * @returns A promise that resolves to the updated state with feedback included in the `edaFeedback` property.
+ */
+const expressiveDeliveryNode = async (state: TranscriptReviewStateType): Promise<TranscriptReviewStateType> => {
+  const { originalTranscript } = state
+  const llm = getChatModel(ChatModels.GENERAL)
+  const response = await llm.invoke([
+    { role: 'system', content: EDA_SYSTEM_PROMPT },
+    new HumanMessage('Here is the transcript:\n' + originalTranscript),
+  ])
+  log.debug(`Response from human review agent: ${JSON.stringify(response, null, 2)}`)
+  return {
+    ...state,
+    edaFeedback: response.content?.toString?.() ?? '',
+  }
+}
+
+/**
  * Processes the final transcript by combining feedback from both British grammar and Content Reviewer agents.
  * It invokes an editor agent to rewrite the transcript based on the feedback provided.
  *
@@ -58,14 +79,17 @@ const contentReviewNode = async (state: TranscriptReviewStateType): Promise<Tran
  * @returns A promise that resolves to the updated state with the final transcript included in the `finalTranscript` property.
  */
 const editorNode = async (state: TranscriptReviewStateType): Promise<TranscriptReviewStateType> => {
-  const { originalTranscript, bgFeedback, crFeedback } = state
-  log.info(`Editing transcript with feedback: BG: ${bgFeedback.length} CR: ${crFeedback.length}`)
+  const { originalTranscript, bgFeedback, crFeedback, edaFeedback } = state
+  log.info(
+    `Editing transcript with feedback: BG: ${bgFeedback.length} CR: ${crFeedback.length} EDA: ${edaFeedback.length}`
+  )
   const llm = getChatModel(ChatModels.THINKING)
   const response = await llm.invoke([
     { role: 'system', content: EDITOR_SYSTEM_PROMPT },
     new HumanMessage('Here is the original transcript:\n' + originalTranscript),
     new HumanMessage('Feedback notes from a British Grammar & Localisation Expert:\n' + bgFeedback),
     new HumanMessage('Feedback notes from a Content Reviewer:\n' + crFeedback),
+    new HumanMessage('Feedback notes from an Emotional Performance Advisor:\n' + edaFeedback),
   ])
   log.debug(`Response from editor agent: ${JSON.stringify(response, null, 2)}`)
   return {
@@ -78,11 +102,14 @@ const editorNode = async (state: TranscriptReviewStateType): Promise<TranscriptR
 const workflow = new StateGraph(TranscriptReviewState)
   .addNode(BG_NODE, britishNode)
   .addNode(CR_NODE, contentReviewNode)
+  .addNode(EDA_NODE, expressiveDeliveryNode)
   .addNode(EDITOR_NODE, editorNode)
   .addEdge(START, BG_NODE)
   .addEdge(START, CR_NODE)
+  .addEdge(START, EDA_NODE)
   .addEdge(BG_NODE, EDITOR_NODE)
   .addEdge(CR_NODE, EDITOR_NODE)
+  .addEdge(EDA_NODE, EDITOR_NODE)
   .addEdge(EDITOR_NODE, END)
 
 // Export the compiled graph for use in the application

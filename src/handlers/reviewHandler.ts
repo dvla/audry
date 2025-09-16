@@ -38,8 +38,10 @@ export class ReviewHandler {
         if (review) {
           const british = `British Grammar and Localisation Expert Feedback:\n${review.bgFeedback}`.trim()
           const reviewer = `DVLA Content Reviewer Feedback:\n${review.crFeedback}`.trim()
+          const emotion = `Expressive Delivery Advisor Feedback:\n\n${review.edaFeedback}`.trim()
           await proactiveSend(british)
           await proactiveSend(reviewer)
+          await proactiveSend(emotion)
           await writeFile(conversation.userId, documentId, EDITED_TRANSCRIPT_TEXT, review.finalTranscript)
         } else {
           await proactiveSend('No review for this transcript')

@@ -118,6 +118,8 @@ export async function transcriptToSpeech(
   const audioBuffers = Buffer.concat(audioData.map((data) => Buffer.from(data, 'base64')))
   const outputFileName = generatePodcastFileName() + '.wav'
   const outputFilePath = path.join(Config.FILES_DIR, outputFileName)
+  // Pre-create the empty file
+  fs.writeFileSync(outputFilePath, '')
   log.debug('Saving audio file to ' + outputFilePath)
   await saveWaveFile(outputFilePath, audioBuffers)
   return { outputFileName, outputFilePath }
