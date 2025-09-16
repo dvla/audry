@@ -51,7 +51,7 @@ var vFeatureFlags = [
         name: 'premium'
         configuration_value: {
           provider: 'elevenlabs'
-          model: 'eleven_multilingual_v2'
+          model: 'eleven_v3'
         }
       } 
     ]

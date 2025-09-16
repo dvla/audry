@@ -11,8 +11,6 @@ import { transcriptToAudioProvider } from '../tts/textToTranscript'
 
 const FILE_TRIGGER_PATTERN = 'transcriptToAudio'
 
-// Temporary until we have a feature flag and config
-const premiumAudio = false
 export class TranscriptToAudioHandler {
   triggerVerb: string | RegExp | Selector | (string | RegExp | Selector)[] = FILE_TRIGGER_PATTERN
 

@@ -3,7 +3,7 @@ import { DEFAULT_TTS_MODEL_CONFIG } from 'src/features/featureTTS'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { Config } from '../../internal/config'
-import { DEFAULT_VOICES, textToSpeech, writeFile } from '../textToSpeechEleven'
+import { DEFAULT_VOICES, parseTranscriptToSpeakerDialogue, textToSpeech, writeFile } from '../textToSpeechEleven'
 
 const exampleTranscript = `
 Speaker 1: Ellie, welcome back to the show! Today, we're diving deep into something that affects every single one of us who has ever flown on a plane.
@@ -26,9 +26,8 @@ describe('textToSpeechEleven config test', () => {
   })
 
   test('should Fail with missing API KEY', async () => {
-    await expect(
-      textToSpeech([{ speaker: 1, text: 'Test' }], seed, 'eleven_multilingual_v2', DEFAULT_VOICES)
-    ).rejects.toThrow(new Error('ELEVENLABS_API_KEY not set'))
+    const dialogue = [[{ text: 'Test', voiceId: 'test-voice' }]]
+    await expect(textToSpeech(dialogue, seed, 'eleven_multilingual_v2')).rejects.toThrow('ELEVENLABS_API_KEY not set')
   })
 
   test('writeFile throws error if buffers empty', async () => {
@@ -55,8 +54,8 @@ describe('textToSpeechEleven tests', () => {
 
     vi.doMock('@elevenlabs/elevenlabs-js', () => ({
       ElevenLabsClient: vi.fn().mockImplementation(() => ({
-        textToSpeech: {
-          convert: vi.fn().mockResolvedValue(
+        textToDialogue: {
+          stream: vi.fn().mockResolvedValue(
             (async function* () {
               yield Buffer.from('audio would be returned here')
             })()
@@ -66,38 +65,36 @@ describe('textToSpeechEleven tests', () => {
     }))
     const textToSpeechStreamModule = await import('../textToSpeechEleven.js')
     const myPingBack = vi.fn()
-    const result = await textToSpeechStreamModule.textToSpeech(
-      [
-        { speaker: 1, text: 'Matthew text' },
-        { speaker: 2, text: 'Ellie text' },
-      ],
-      seed,
-      'eleven_multilingual_v2',
-      DEFAULT_VOICES,
-      myPingBack
-    )
+    const dialogue = [
+      [{ text: 'Matthew text', voiceId: 'test-voice' }],
+      [{ text: 'Ellie text', voiceId: 'test-voice2' }],
+    ]
+    const result = await textToSpeechStreamModule.textToSpeech(dialogue, seed, 'eleven_multilingual_v2', myPingBack)
     expect(myPingBack).toBeCalled()
+    expect(result.outputFileName).toContain('.mp3')
+    expect(result.outputFilePath).toContain(os.tmpdir())
   })
 
   test('should throw error if no audio buffers generated', async () => {
     vi.doMock('@elevenlabs/elevenlabs-js', () => ({
       ElevenLabsClient: vi.fn().mockImplementation(() => ({
-        textToSpeech: {
-          convert: vi.fn().mockResolvedValueOnce((async function* () {})()),
+        textToDialogue: {
+          stream: vi.fn().mockResolvedValue((async function* () {})()),
         },
       })),
     }))
     const textToSpeechStreamModule = await import('../textToSpeechEleven.js')
-    await expect(
-      textToSpeechStreamModule.textToSpeech([{ speaker: 1, text: '' }], seed, 'eleven_multilingual_v2', DEFAULT_VOICES)
-    ).rejects.toThrow('No audio buffers generated from the turns')
+    const dialogue = [[{ text: '', voiceId: 'test-voice' }]]
+    await expect(textToSpeechStreamModule.textToSpeech(dialogue, seed, 'eleven_multilingual_v2')).rejects.toThrow(
+      'No audio buffers generated from eleven textToSpeech'
+    )
   })
 
   test('should convert transcript to speech', async () => {
     vi.doMock('@elevenlabs/elevenlabs-js', () => ({
       ElevenLabsClient: vi.fn().mockImplementation(() => ({
-        textToSpeech: {
-          convert: vi.fn().mockResolvedValue(
+        textToDialogue: {
+          stream: vi.fn().mockResolvedValue(
             (async function* () {
               yield Buffer.from('audio would be returned here')
             })()
@@ -106,7 +103,8 @@ describe('textToSpeechEleven tests', () => {
       })),
     }))
     const textToSpeechStreamModule = await import('../textToSpeechEleven.js')
-    const result = await textToSpeechStreamModule.transcriptToSpeech(DEFAULT_TTS_MODEL_CONFIG, exampleTranscript)
+    const dialogue = parseTranscriptToSpeakerDialogue(exampleTranscript, DEFAULT_VOICES)
+    const result = await textToSpeechStreamModule.textToSpeech(dialogue, seed, 'eleven_multilingual_v2')
     expect(result.outputFileName).toContain('.mp3')
     expect(result.outputFilePath).toContain(os.tmpdir())
   })

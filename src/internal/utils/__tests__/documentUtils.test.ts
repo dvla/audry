@@ -130,6 +130,12 @@ describe('fileUtils', () => {
 
       await expect(readFile('', documentId, fileName)).rejects.toThrow('Could not read test.txt: File not found')
     })
+
+    test('returns null when file is missing and errorIfMissing is false', async () => {
+      mockFsReadFile.mockRejectedValueOnce(new Error('File not found'))
+      const result = await readFile('', documentId, fileName, false)
+      expect(result).toBeNull()
+    })
   })
 
   describe('generatePodcastFileName', () => {

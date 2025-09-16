@@ -6,6 +6,7 @@
     ],
     "baseUrl": ".",
     "declaration": true,
+    "skipLibCheck": true,
     "target": "ES2023",
     "module": "nodenext",
     "outDir": "lib",
@@ -35,6 +36,6 @@
   ],
   "exclude": [
     "node_modules",
-    ".vscode/**/*",
+    ".vscode/**/*"
   ]
 }

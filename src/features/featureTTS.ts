@@ -35,7 +35,7 @@ export const DEFAULT_TTS_MODEL_CONFIG: TTSModelConfig = TTSModelSchema.parse({})
 // Use this for ElevenLabs model
 // export const DEFAULT_TTS_MODEL_CONFIG: TTSModelConfig = TTSModelSchema.parse({
 //   provider: Providers.ELEVEN_LABS,
-//   model: 'eleven_multilingual_v2',
+//   model: 'eleven_v3',
 // })
 export interface TTSVariant extends Variant {
   configuration: TTSModelConfig

@@ -56,7 +56,7 @@ export const transcriptToAudioProvider = async (episodeConfig: EpisodeConfig): P
   let toAudioProvider
   switch (modelConfig.provider) {
     case Providers.ELEVEN_LABS:
-      toAudioProvider = (transcript: string) => ttsEleven(modelConfig, transcript)
+      toAudioProvider = (transcript: string) => ttsEleven(modelConfig, transcript, episodeConfig.voices)
       break
     case Providers.GOOGLE:
     // Google is the default provider

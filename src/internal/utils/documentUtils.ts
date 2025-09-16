@@ -48,13 +48,29 @@ export const writeFile = async (
  * @param userId - The ID of the user who owns the file
  * @param documentId - The unique document ID for organization
  * @param fileName - The name of the file to read
+ * @param errorIfMissing - If true, throws an error if the file is missing; otherwise, returns null
  * @returns The content of the file as a string
  * @throws Error if the file reading fails
  */
-export const readFile = async (userId: string, documentId: string, fileName: string): Promise<string> => {
+export const readFile = async (
+  userId: string,
+  documentId: string,
+  fileName: string,
+  errorIfMissing = true
+): Promise<string> => {
   if (userId && blobStorage) {
-    const buffer = await blobStorage.downloadFile(userId, documentId, fileName)
-    return buffer.toString('utf8')
+    try {
+      const buffer = await blobStorage.downloadFile(userId, documentId, fileName)
+      return buffer.toString('utf8')
+    } catch (error) {
+      if (errorIfMissing) {
+        log.error(`Error reading ${fileName} from blob storage:`, error)
+        throw new Error(`Could not read ${fileName}: ${error.message}`)
+      } else {
+        log.debug(`File ${fileName} not found, returning null.`)
+        return null
+      }
+    }
   }
 
   // Fallback to local file system
@@ -62,8 +78,13 @@ export const readFile = async (userId: string, documentId: string, fileName: str
   try {
     return await fs.readFile(filePath, 'utf8')
   } catch (error) {
-    log.error(`Error reading ${filePath}:`, error)
-    throw new Error(`Could not read ${fileName}: ${error.message}`)
+    if (errorIfMissing) {
+      log.error(`Error reading ${filePath}:`, error)
+      throw new Error(`Could not read ${fileName}: ${error.message}`)
+    } else {
+      log.debug(`File ${filePath} not found, returning null.`)
+      return null
+    }
   }
 }
 
