@@ -1,4 +1,5 @@
 import { GenerateContentConfig, GoogleGenAI, SpeakerVoiceConfig, VoiceConfig } from '@google/genai'
+import * as fs from 'node:fs'
 import * as path from 'path'
 import * as wav from 'wav'
 
@@ -8,8 +9,12 @@ import { log } from '../internal/logger'
 import { generatePodcastFileName } from '../internal/utils/documentUtils'
 import { DEFAULT_CONFIG, EpisodeVoices } from './episodeConfig'
 
-export const STYLE =
-  'All speakers should have a genuine and inviting British accent.  This is a short episode - make it engaging.'
+export const STYLE = `This is a short audio episode. 
+ALL SPEAKERS should have a warm, and inviting British accent. 
+The delivery should be conversational and engaging, with a dynamic rhythm that captures the listener's attention. 
+The tone should be informative yet friendly. 
+Here is the text to turn into speech:\n`
+
 let cloudClient: GoogleGenAI | null = null
 
 interface SaveWaveFileOptions {
@@ -62,6 +67,7 @@ export const generateConfig = (
       },
     },
     temperature: modelConfig.temperature,
+    abortSignal: AbortSignal.timeout(8 * 60 * 1000), // 8 minutes
     seed,
   }
 }
@@ -99,15 +105,20 @@ export async function transcriptToSpeech(
   const startTime = Date.now()
   const seed = parseInt(startTime.toString().slice(-8))
   const generatedConfiguration = generateConfig(voices, seed, modelConfig)
-  const audioData = await Promise.all(
+  const audioResponse = await Promise.all(
     transcriptChunks.map((chunk) => processChunks(chunk, generatedConfiguration, modelConfig))
   )
   const totalSeconds = ((Date.now() - startTime) / 1000).toFixed(2)
   log.info(`Total audio generation time: ${totalSeconds} seconds`)
 
+  const audioData = audioResponse.filter((a) => a?.length > 0)
+  if (audioData.length === 0) {
+    throw new Error(`No audio data generated from ${modelConfig.model}`)
+  }
   const audioBuffers = Buffer.concat(audioData.map((data) => Buffer.from(data, 'base64')))
   const outputFileName = generatePodcastFileName() + '.wav'
   const outputFilePath = path.join(Config.FILES_DIR, outputFileName)
+  log.debug('Saving audio file to ' + outputFilePath)
   await saveWaveFile(outputFilePath, audioBuffers)
   return { outputFileName, outputFilePath }
 }
@@ -161,19 +172,27 @@ export const processChunks = async (
   const ai = getGoogleClient()
   const prompt = `${STYLE}\n\n${chunk}`
   const chunkStartTime = Date.now()
+  let data
 
-  const response = await ai.models.generateContent({
-    model: modelConfig.model,
-    contents: [{ parts: [{ text: prompt }] }],
-    config: generateConfiguration,
-  })
+  try {
+    const response = await ai.models.generateContent({
+      model: modelConfig.model,
+      contents: [{ parts: [{ text: prompt }] }],
+      config: generateConfiguration,
+    })
 
-  const chunkSeconds = ((Date.now() - chunkStartTime) / 1000).toFixed(2)
-  log.debug(`Chunk processed in ${chunkSeconds} seconds`)
-  log.debug(`- totalTokenCount: ${response.usageMetadata?.totalTokenCount}`)
+    log.debug(`- totalTokenCount: ${response.usageMetadata?.totalTokenCount}`)
 
-  const data = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data
-  if (!data) throw new Error('No audio data received from the API')
+    data = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data
+    if (!data) {
+      log.warn('No audio data received from the API: ' + JSON.stringify(response.candidates?.[0]))
+    }
+  } catch (error) {
+    log.error('Error generating audio chunk:', error)
+  } finally {
+    const chunkSeconds = ((Date.now() - chunkStartTime) / 1000).toFixed(2)
+    log.debug(`Chunk processed in ${chunkSeconds} seconds`)
+  }
   return data
 }
 
@@ -194,7 +213,7 @@ export async function saveWaveFile(
       sampleRate: rate,
       bitDepth: sampleWidth * 8, // Convert sample width (bytes) to bit depth
     })
-    writer.on('finish', resolve)
+    writer.on('done', resolve)
     writer.on('error', reject)
     writer.write(pcmData) // Write audio data
     writer.end()

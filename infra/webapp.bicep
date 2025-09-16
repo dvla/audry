@@ -23,7 +23,7 @@ var featureFlags = [
   {
     id: 'uiconfig'
     description: 'Controls whether the UI features are enabled or not'
-    enabled: (environmentName == 'dev') ? true : false
+    enabled: true
   }
   // Add more feature flags as needed
 ]

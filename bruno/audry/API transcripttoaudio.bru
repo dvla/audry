@@ -1,0 +1,21 @@
+meta {
+  name: API transcripttoaudio
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{HOST}}/api/transcripttoaudio
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+  "text": "Memorandum of understanding between UK and Republic of Moldova: reciprocal exchange of driving licences. Published 23 July 2025. © Crown copyright 2025."
+  }
+}
+
+settings {
+  encodeUrl: true
+}

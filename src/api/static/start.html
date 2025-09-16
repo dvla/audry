@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Audry API</title>
+    <!-- HTMX -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js"
+      integrity="sha384-ZBXiYtYQ6hJ2Y0ZNoYuI+Nq5MqWBr+chMrS/RkXpNzQCApHEhOt2aY8EJgqwHLkJ"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/gh/Emtyloc/json-enc-custom@v0.1.7/json-enc-custom.js"></script>
+    <!-- Fonts and Styling -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="start.css" />
+  </head>
+
+  <body>
+    <section class="header">
+      <h1>Audry API</h1>
+      <p>Create podcast-style transcripts and audio files using AI.</p>
+    </section>
+    <!-- Get All Prompts -->
+    <section class="border-top">
+      <h2>Input Text</h2>
+      <p>Enter your input text below:</p>
+      <form hx-ext="json-enc-custom">
+        <textarea id="textinput" name="text" rows="10"></textarea>
+        <h2>Settings</h2>
+        <div id="config">
+          <select name="config[kind]" id="kind-select">
+            <option value="Podcast" selected>Podcast</option>
+            <option value="Brief Podcast">Brief Podcast</option>
+            <option value="News Briefing">News Briefing</option>
+          </select>
+          <select name="config[voices]" id="voices-select" multiple required>
+            <option value="Matthew" selected>Matthew</option>
+            <option value="Ellie" selected>Ellie</option>
+            <option value="Daniel">Daniel</option>
+            <option value="Jamie">Jamie</option>
+            <option value="Claire">Claire</option>
+          </select>
+          <select name="config[length]" id="length-select">
+            <option value="Brief">Brief</option>
+            <option value="Full" selected>Full</option>
+          </select>
+        </div>
+        <!-- Error Message -->
+        <div id="error-message" class="error-message" hidden></div>
+        <section class="button-action">
+          <h2>Text to Transcript</h2>
+          <p>Turn the input text into a podcast-style transcript.</p>
+          <button hx-post="/api/texttotranscript" hx-swap="afterend" hx-disabled-elt="this">To Transcript</button>
+        </section>
+        <section class="button-action">
+          <h2>Transcript to Audio</h2>
+          <p>Turn the input text into an audio file.</p>
+          <button
+            hx-post="/api/transcripttoaudio"
+            hx-trigger="click"
+            hx-disabled-elt="this"
+            hx-swap="none"
+            data-download="true"
+          >
+            Text to Speech
+          </button>
+        </section>
+        <section class="button-action">
+          <h2>Text to Audio</h2>
+          <p>Turn the input text into a transcript and then an audio file (Combines the steps above).</p>
+          <button
+            hx-post="/api/texttoaudio"
+            hx-disabled-elt="this"
+            hx-confirm="Convert the input text into a transcript and then create an audio file?"
+            hx-swap="none"
+            data-download="true"
+          >
+            Text To Audio
+          </button>
+        </section>
+      </form>
+    </section>
+    <script>
+      // Configure requests for audio download buttons to expect binary data
+      document.body.addEventListener('htmx:configRequest', function (evt) {
+        const elt = evt.detail.elt
+        if (elt && elt.dataset && elt.dataset.download === 'true') {
+          // Set the request to expect binary data
+          evt.detail.parameters = evt.detail.parameters || {}
+          evt.detail.headers = evt.detail.headers || {}
+          // We'll handle the responseType in the beforeRequest event
+        }
+      })
+
+      // Set responseType after XHR is created but before request is sent
+      document.body.addEventListener('htmx:beforeRequest', function (evt) {
+        const elt = evt.detail.elt
+        if (elt && elt.dataset && elt.dataset.download === 'true') {
+          evt.detail.xhr.responseType = 'arraybuffer'
+        }
+      })
+
+      document.body.addEventListener('htmx:responseError', function (event) {
+        const errorDiv = document.getElementById('error-message')
+        try {
+          const issues = JSON.parse(event.detail.xhr.responseText)?.error?.issues
+          errorDiv.textContent = issues.length > 0 ? JSON.stringify(issues) : 'An error occurred.'
+        } catch (error) {
+          errorDiv.textContent = 'An unknown error occurred.'
+        }
+        errorDiv.hidden = false
+      })
+
+      // For elements with `data-download="true"`,
+      // create a download (or open) once the response arrives.
+      document.body.addEventListener('htmx:afterRequest', function (evt) {
+        const elt = evt.detail.elt
+        if (!(elt && elt.dataset && elt.dataset.download === 'true')) return
+
+        // Prevent HTMX from trying to swap binary content
+        evt.preventDefault()
+
+        const xhr = evt.detail.xhr
+        if (!xhr) return
+
+        const ct = xhr.getResponseHeader('Content-Type') || ''
+        // Only treat as binary when server signals octet-stream or other application/* types
+        if (!ct.includes('application/octet-stream') && !ct.startsWith('application/')) return
+
+        const raw = xhr.response
+        let dataUri = null
+
+        try {
+          if (raw instanceof ArrayBuffer) {
+            // Handle UTF-8 binary data from ArrayBuffer
+            const bytes = new Uint8Array(raw)
+            let binary = ''
+
+            // Process in chunks to avoid call stack issues with large files
+            const chunkSize = 8192
+            for (let i = 0; i < bytes.byteLength; i += chunkSize) {
+              const end = Math.min(i + chunkSize, bytes.byteLength)
+              const chunk = bytes.subarray(i, end)
+              // Convert each byte directly to a character
+              binary += String.fromCharCode.apply(null, Array.from(chunk))
+            }
+
+            console.log('Binary string length:', binary.length, 'Original buffer length:', bytes.byteLength)
+            const base64 = btoa(binary)
+            dataUri = `data:application/octet-stream;base64,${base64}`
+          } else if (typeof raw === 'string') {
+            console.log('Handling string response, length:', raw.length)
+            // If it's a string, it might be UTF-8 encoded binary
+            let binary = ''
+            for (let i = 0; i < raw.length; i++) {
+              // Extract the byte value (0-255) from each character
+              binary += String.fromCharCode(raw.charCodeAt(i) & 0xff)
+            }
+            const base64 = btoa(binary)
+            dataUri = `data:application/octet-stream;base64,${base64}`
+          } else {
+            console.error('Unsupported response type:', typeof raw, raw)
+            return
+          }
+        } catch (e) {
+          console.error('Error creating data URI from response', e)
+          return
+        }
+
+        if (dataUri) {
+          console.log('Data URI created, length:', dataUri.length)
+          triggerDownload(dataUri, xhr)
+        }
+      })
+
+      // Prevent HTMX swap errors for download responses
+      document.body.addEventListener('htmx:beforeSwap', function (evt) {
+        const elt = evt.detail.elt
+        if (elt && elt.dataset && elt.dataset.download === 'true') {
+          // Skip the swap entirely for download responses
+          evt.detail.shouldSwap = false
+        }
+      })
+
+      function triggerDownload(dataUri, xhr) {
+        // Try to parse filename from Content-Disposition header
+        const cd = xhr.getResponseHeader('Content-Disposition') || ''
+        let filename = 'download.bin'
+        const fnMatch = cd.match(/filename\*=UTF-8''([^;]+)|filename="?([^";]+)"?/i)
+        if (fnMatch) {
+          try {
+            filename = decodeURIComponent((fnMatch[1] || fnMatch[2]).trim())
+          } catch (e) {
+            filename = (fnMatch[1] || fnMatch[2]).trim()
+          }
+        }
+
+        // Create download link with data URI
+        const a = document.createElement('a')
+        a.href = dataUri
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+      }
+    </script>
+  </body>
+</html>

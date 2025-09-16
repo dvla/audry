@@ -1,14 +1,35 @@
 # Project Overview
 Audry is a Microsoft Teams bot that converts documents into podcast-style transcripts and audio files using AI. Built with Microsoft Teams AI SDK, it handles file uploads, text extraction, AI-powered transcript generation (via Google Gemini), and text-to-speech conversion (via Google or ElevenLabs).
 
-## Get Started with the Workflow bot
+There are 3 ways to run this project:
 
-> **Prerequisites**
->
-> To run the workflow bot template in your local dev machine, you will need:
->
-> - [Node.js](https://nodejs.org/), supported versions: 22
-> - [Microsoft 365 Agents Toolkit Visual Studio Code Extension](https://aka.ms/teams-toolkit) version 5.0.0 and higher or [Microsoft 365 Agents Toolkit CLI](https://aka.ms/teamsfx-toolkit-cli)
+1. [**Microsoft 365 Agents Playground**](#get-started-with-the-teams-bot): Uses the Microsoft 365 Agents Toolkit extension.
+2. **Local API Server**: Runs the project as a rest API server using Hono.
+3. [**Langgraph API**](#langgraph-ai-agent): Uses Langgraph and Langsmith studio to visualise the graph element of the project.
+
+## Prerequisites
+- [Node.js](https://nodejs.org/), supported versions: 22
+- For Teams integration use [Microsoft 365 Agents Toolkit Visual Studio Code Extension](https://aka.ms/teams-toolkit) version 5.0.0 and higher or [Microsoft 365 Agents Toolkit CLI](https://aka.ms/teamsfx-toolkit-cli)
+
+## Quick Start (API only)
+
+To get started quickly, you can use the following steps:
+
+1. Clone the repository
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the local **API server**:
+   ```bash
+   npm run api
+   ```
+
+4. Open your browser and navigate to `http://localhost:3000`.
+
+## Get Started with the Teams bot
 >
 > **Note**
 >
@@ -18,18 +39,8 @@ Audry is a Microsoft Teams bot that converts documents into podcast-style transc
 1. First, select the Microsoft 365 Agents Toolkit icon on the left in the VS Code toolbar.
 2. Press F5 to start debugging which launches your app in Microsoft 365 Agents Playground using a web browser. Select `Debug in Microsoft 365 Agents Playground`.
 3. The browser will pop up to open Microsoft 365 Agents Playground.
-4. Type or select `helloWorld` in the chat to send it to your bot - this is the default command provided by the template.
-5. In the response from the bot, select the **DoStuff** button.
+4. Type or select `helloWorld` in the chat to send it to your bot.
 
-The bot will respond by updating the existing Adaptive Card to show the workflow is now complete! Continue reading to learn more about what's included in the template and how to customize it.
-
-Here is a screen shot of the application running:
-
-![Responds to command](https://github.com/user-attachments/assets/b816fdc8-bf89-46aa-82e2-536d596e3aa2)
-
-When you click the `DoStuff` button, the above adaptive card will be updated to a new card as shown below:
-
-![Responds to card action](https://github.com/user-attachments/assets/d5864111-7f34-4e77-855c-dc506c3fa3fe)
 
 ## What's included in the template
 
@@ -56,9 +67,12 @@ The following files can be customized and demonstrate an example implementation 
 | `src/cardActions/doStuffActionHandler.ts` | Implements the handler for the `doStuff` button displayed in the Adaptive Card |
 
 ## Langgraph AI Agent
-Audry uses Langgraph to create an AI agent that processes the transcript and generates show notes.
-The agent is defined in `src/agents/show-notes/graph.ts`. It includes steps for summarizing the transcript, extracting key points, and generating a title and short summary.
+Audry uses Langgraph to create AI agents that process the transcript and generates show notes.
+
 To view the graph use `npm run graph` which will generate a visual representation of the agent's workflow.
+
+- Show Notes - Defined in `src/agents/show-notes/graph.ts`. It includes steps for summarizing the transcript, extracting key points, and generating a title and short summary.
+- Transcript Review - Defined in `src/agents/transcript-review/graph.ts`. It includes steps for reviewing the transcript, providing feedback, and re-drafting a new edition.
 
 ## License
 The MIT License (MIT)

@@ -48,7 +48,7 @@ vi.mock('@google/genai', () => {
 const writeMock = vi.fn()
 const endMock = vi.fn()
 const onMock = vi.fn().mockImplementation((event, cb) => {
-  if (event === 'finish') cb()
+  if (event === 'done') cb()
 })
 
 vi.mock('wav', () => ({
@@ -60,7 +60,6 @@ vi.mock('wav', () => ({
 }))
 
 // Setup config paths and API key for tests
-Config.FILES_DIR = path.resolve(__dirname, '../../tests')
 Config.GEMINI_API_KEY = 'fake-api-key'
 
 // Some reusable base64 audio data
@@ -82,7 +81,7 @@ describe('saveWaveFile', () => {
 
     expect(writeMock).toHaveBeenCalledWith(buffer)
     expect(endMock).toHaveBeenCalled()
-    expect(onMock).toHaveBeenCalledWith('finish', expect.any(Function))
+    expect(onMock).toHaveBeenCalledWith('done', expect.any(Function))
   })
 })
 
@@ -124,7 +123,7 @@ describe('transcriptToSpeech', () => {
     })
 
     await expect(transcriptToSpeech(DEFAULT_TTS_MODEL_CONFIG, 'Test')).rejects.toThrow(
-      'No audio data received from the API'
+      'No audio data generated from gemini-2.5-flash-preview-tts'
     )
   })
 })
@@ -213,7 +212,7 @@ describe('processChunks', () => {
     })
   })
 
-  it('throws if no audio data is returned', async () => {
+  it('handles if no audio data is returned', async () => {
     fakeGenerateContent.mockResolvedValue({
       candidates: [
         {
@@ -224,8 +223,6 @@ describe('processChunks', () => {
       ],
       usageMetadata: { totalTokenCount: 42 },
     })
-    await expect(processChunks('Hello world', voiceConfiguration, DEFAULT_TTS_MODEL_CONFIG)).rejects.toThrow(
-      'No audio data received from the API'
-    )
+    expect(await processChunks('Hello world', voiceConfiguration, DEFAULT_TTS_MODEL_CONFIG)).toBeUndefined()
   })
 })

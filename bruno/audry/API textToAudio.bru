@@ -1,0 +1,29 @@
+meta {
+  name: API textToAudio
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{HOST}}/api/texttoaudio
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "config": {
+      "kind": "Brief Podcast",
+      "length": "Brief",
+      "voices": [
+        "Claire",
+        "Matthew"
+      ]
+    },
+    "text": "Memorandum of understanding between UK and Republic of Moldova: reciprocal exchange of driving licences. Published 23 July 2025. © Crown copyright 2025. This publication is licensed under the terms of the Open Government Licence v3.0 except where otherwise stated. To view this licence, visit nationalarchives.gov.uk/doc/open-government-licence/version/3 or write to the Information Policy Team, The National Archives, Kew, London TW9 4DU, or email: psi@nationalarchives.gov.uk. Where we have identified any third party copyright information you will need to obtain permission from the copyright holders concerned. This publication is available at https://www.gov.uk/government/publications/memorandum-of-understanding-between-uk-and-republic-of-moldova-reciprocal-exchange-of-driving-licences/memorandum-of-understanding-between-uk-and-republic-of-moldova-reciprocal-exchange-of-driving-licences. The memorandum of understanding (MoU) on the reciprocal driving licence exchange between the Government of the Republic of Moldova and the government of the United Kingdom of Great Britain and Northern Ireland has been signed from: the Moldovan side by the Ambassador Ruslan Bolbocean, the UK side by Lilian Greenwood, Minister for Future of Roads, Department for Transport (DfT). Over the past few weeks, technical teams from both countries have finalised coordination mechanisms that will enable a smooth exchange process. As a result, starting 1 August 2025, the UK’s Driver and Vehicle Licensing Agency (DVLA) will begin accepting applications for licence exchange from citizens of the Republic of Moldova. In accordance with the provisions of the MoU, the Republic of Moldova has been included in the list of countries for which the United Kingdom will apply a simplified procedure for the exchange of driving licences. Therefore, Moldovan citizens residing in the United Kingdom who meet the conditions set out in UK legislation will be able to apply to exchange their Moldovan driving licence for the UK equivalent without having to pass a theoretical or practical driving test. Only EU member states and 22 other countries outside the EU benefit from a simplified driving licence exchange procedure with the UK. To benefit from this, and in accordance with the relevant UK law, the application for licence exchange must be submitted within 5 years from the date the holder became a resident in the UK. The applicant must not have been resident in the UK for more than 5 years at the time of the application for exchange, a precondition that applies to all designated countries. The Republic of Moldova will also accept the exchange of UK-issued driving licences, including those held by Moldovan citizens who obtained the right to drive while residing in the UK. The signing of this MoU represents a strong message of support from the United Kingdom to the Republic of Moldova and a recognition of the valuable contribution that Moldovan citizens make to British society."
+  }
+}
+
+settings {
+  encodeUrl: true
+}
