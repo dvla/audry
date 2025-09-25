@@ -1,0 +1,29 @@
+meta {
+  name: API transcripttoaudio Voices config
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{HOST}}/api/transcripttoaudio
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "config": {
+      "kind": "Brief Podcast",
+      "length": "Brief",
+      "voices": [
+        "Ellie",
+        "Matthew"
+      ]
+    },
+    "text": "Speaker 1: Okay, Jamie, let's talk about something crucial in data protection: Subject Access Requests, or SARs. Think of it as, [playfully] 'Hey, what do you know about me?' Like when someone asks for their school reports. \n Speaker 2: [Inquisitively] Right, like getting your school reports? So, what exactly triggers a SAR? \n Speaker 1: Well, under data protection law, anyone can request the personal information an organisation holds about them. And get this, Jamie, [excitedly] they don't even have to say 'subject access request'! They could just ask, 'What information do you have about me?' \n Speaker 2: [Surprised] Wow, so it could be disguised within everyday conversation? Like, if someone calls and says, 'I want to know everything you've got on me,' that's a SAR? \n Speaker 1: Exactly! And that's what makes it tricky. Any employee could receive one, verbally or even via social media. It’s like, you're working at a shop, and someone asks for their usual, but also slips in, 'Oh, and what's my points balance again?' That 'points balance' part could be a mini-SAR if you're tracking their purchases. \n Speaker 2: So training staff to spot these is really important? Because if they miss it, there's a legal clock ticking, right? \n Speaker 1: Precisely! [Sternly] Imagine missing a SAR and facing a fine. It's like risking a data breach penalty! It's all about recognising those subtle requests and knowing where to send them."
+  }
+}
+
+settings {
+  encodeUrl: true
+}

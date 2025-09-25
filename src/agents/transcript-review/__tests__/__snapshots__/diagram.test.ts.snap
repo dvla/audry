@@ -1,0 +1,23 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`TranscriptReviewAgent > should create a graph diagram 1`] = `
+"%%{init: {'flowchart': {'curve': 'linear'}}}%%
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	British_Expert(British Expert)
+	Content_Reviewer(Content Reviewer)
+	Expressive_Delivery_Advisor(Expressive Delivery Advisor)
+	Editor(Editor)
+	__end__([<p>__end__</p>]):::last
+	British_Expert --> Editor;
+	Content_Reviewer --> Editor;
+	Editor --> __end__;
+	Expressive_Delivery_Advisor --> Editor;
+	__start__ --> British_Expert;
+	__start__ --> Content_Reviewer;
+	__start__ --> Expressive_Delivery_Advisor;
+	classDef default fill:#f2f0ff,line-height:1.2;
+	classDef first fill-opacity:0;
+	classDef last fill:#bfb6fc;
+"
+`;

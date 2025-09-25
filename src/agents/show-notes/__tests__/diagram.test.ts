@@ -12,13 +12,14 @@ vi.mock('@langchain/google-genai', () => ({
   })),
 }))
 
-const filePath = path.join(Config.FILES_DIR, 'show-notes.png')
+const filePath = path.join(Config.FILES_DIR, 'show-notes-diagram.txt')
 describe('ShowNotesAgent', () => {
   it('should create a graph diagram', async () => {
     expect(graph).toBeDefined()
     const graphData = await graph.getGraphAsync()
-    const image = await graphData.drawMermaidPng()
-    writeFileSync(filePath, new Uint8Array(await image.arrayBuffer()))
+    const mermaid = await graphData.drawMermaid()
+    writeFileSync(filePath, mermaid)
     await expect(stat(filePath)).resolves.not.toThrow()
+    expect(mermaid).toMatchSnapshot()
   })
 })

@@ -23,6 +23,7 @@ lib/
 .notification.playgroundstore.json
 
 # Dev tool directories
+*.iml
 /devTools/
 test/
 /coverage

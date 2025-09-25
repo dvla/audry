@@ -27,7 +27,7 @@ To get started quickly, you can use the following steps:
    npm run api
    ```
 
-4. Open your browser and navigate to `http://localhost:3000`.
+4. Open your browser and navigate to `http://localhost:3000` or `http://localhost:3000/start.html`.
 
 ## Get Started with the Teams bot
 >

@@ -10,7 +10,7 @@ import { generatePodcastFileName } from '../internal/utils/documentUtils'
 import { EpisodeVoices } from './episodeConfig'
 
 const OUTPUT_FORMAT = 'mp3_44100_128'
-const MAX_CHAR_COUNT = 3000 - 15 // Leave some buffer for any extra tokens
+const MAX_CHAR_COUNT = 3000 - 800 // Leave large buffer for any extra tokens
 
 let cloudClient: ElevenLabsClient | null = null
 
@@ -64,7 +64,7 @@ const textToSpeechStream = async (
   log.debug(`Chunk request ${numOfChars} characters...`)
   const startTime = Date.now()
   try {
-    const audioStream = await client.textToDialogue.stream(
+    const audio = await client.textToDialogue.stream(
       {
         inputs: dialogue,
         modelId,
@@ -77,7 +77,7 @@ const textToSpeechStream = async (
       }
     )
     const chunks: Buffer[] = []
-    for await (const chunk of audioStream) {
+    for await (const chunk of audio) {
       if (ping) ping()
       chunks.push(Buffer.from(chunk))
     }
@@ -112,7 +112,13 @@ export const textToSpeech = async (
 ): Promise<{ outputFileName: string; outputFilePath: string }> => {
   const outputFileName = generatePodcastFileName() + '.mp3'
   const outputFilePath = path.join(Config.FILES_DIR, outputFileName)
-
+  if (log.isDebugEnabled()) {
+    for (let i = 0; i < dialogue.length; i++) {
+      let dialogueFilePath = path.join(Config.FILES_DIR, seed + '_' + i + '_dialogue.txt')
+      log.debug(`Writing dialogue ${i} to ${dialogueFilePath}`)
+      await fs.writeFile(dialogueFilePath, JSON.stringify(dialogue[i], null, 2))
+    }
+  }
   const buffers: Buffer[] = await Promise.all(
     dialogue.map((chunk) =>
       textToSpeechStream(
@@ -130,6 +136,14 @@ export const textToSpeech = async (
   const nonEmptyBuffers = buffers.filter((buffer) => buffer.length > 0)
   if (nonEmptyBuffers.length === 0) {
     throw new Error('No audio buffers generated from eleven textToSpeech')
+  }
+  if (log.isDebugEnabled()) {
+    for (let i = 0; i < nonEmptyBuffers.length; i++) {
+      const buffer = nonEmptyBuffers[i]
+      let debugFilePath = path.join(Config.FILES_DIR, seed + '_' + i + '_' + outputFileName)
+      log.debug(`Writing chunk ${i} with ${buffer.length} bytes to ${debugFilePath}`)
+      await fs.writeFile(debugFilePath, buffer)
+    }
   }
   await writeFile(nonEmptyBuffers, outputFilePath)
   return { outputFileName, outputFilePath }

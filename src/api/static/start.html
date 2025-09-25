@@ -35,16 +35,23 @@
             <option value="Brief Podcast">Brief Podcast</option>
             <option value="News Briefing">News Briefing</option>
           </select>
-          <select name="config[voices]" id="voices-select" multiple required>
+          <select name="config[length]" id="length-select">
+            <option value="Brief">Brief</option>
+            <option value="Full" selected>Full</option>
+          </select>
+          <select name="config[voices][0]" id="voices-select0" required>
             <option value="Matthew" selected>Matthew</option>
-            <option value="Ellie" selected>Ellie</option>
+            <option value="Ellie">Ellie</option>
             <option value="Daniel">Daniel</option>
             <option value="Jamie">Jamie</option>
             <option value="Claire">Claire</option>
           </select>
-          <select name="config[length]" id="length-select">
-            <option value="Brief">Brief</option>
-            <option value="Full" selected>Full</option>
+          <select name="config[voices][1]" id="voices-select1" required>
+            <option value="Matthew">Matthew</option>
+            <option value="Ellie" selected>Ellie</option>
+            <option value="Daniel">Daniel</option>
+            <option value="Jamie">Jamie</option>
+            <option value="Claire">Claire</option>
           </select>
         </div>
         <!-- Error Message -->
