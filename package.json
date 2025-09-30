@@ -1,6 +1,6 @@
 {
     "name": "audry",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Microsoft 365 Agents Toolkit Workflow Bot Sample",
     "engines": {
         "node": ">=22"
@@ -47,7 +47,7 @@
         "botbuilder-azure": "^4.23.2",
         "dotenv": "^16.4.7",
         "express": "^5.1.0",
-        "uuid": "^11.1.0",
+        "uuid": "^13.0.0",
         "wav": "^1.0.2",
         "winston": "^3.17.0",
         "zod": "^3.25.76"
