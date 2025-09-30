@@ -5,7 +5,7 @@ param appInsightsName string
 param logAnalyticsWorkspaceName string
 
 // Create or reference an existing Log Analytics Workspace
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-08-01' = {
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2025-02-01' = {
   name: logAnalyticsWorkspaceName
   location: location
   properties: {
@@ -28,7 +28,7 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02-preview' 
 }
 
 // Assign "Monitoring Metrics Publisher" role to the Application Insights resource
-resource metricsPublisherRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+resource metricsPublisherRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(applicationInsights.id, userAssignedIdentityPrincipalId, 'appinsightsPublisher')
   scope: applicationInsights
   properties: {

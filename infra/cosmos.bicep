@@ -5,7 +5,7 @@ param containerName string = 'bot-storage'
 param location string = resourceGroup().location
 
 // Create Cosmos DB account
-resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2024-05-15' = {
+resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2025-04-15' = {
   name: toLower(cosmosDbAccountName)
   location: location
   kind: 'GlobalDocumentDB'
@@ -30,7 +30,7 @@ resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2024-05-15' = {
 }
 
 // Assign the User Assigned Identity Contributor role to the Cosmos DB account
-resource cosmosDbAccountRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+resource cosmosDbAccountRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(cosmosDbAccount.id, userAssignedIdentityPrincipalId, 'cosmosDbContributor')
   scope: cosmosDbAccount
   properties: {
@@ -41,7 +41,7 @@ resource cosmosDbAccountRoleAssignment 'Microsoft.Authorization/roleAssignments@
 }
 
 // Create a database within the Cosmos DB account
-resource cosmosDbDatabase 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2024-05-15' = {
+resource cosmosDbDatabase 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2025-04-15' = {
   name: databaseName
   parent: cosmosDbAccount
   properties: {
@@ -58,7 +58,7 @@ resource cosmosDbDatabase 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@20
     https://learn.microsoft.com/en-us/azure/cosmos-db/how-to-setup-rbac#permission-model
 */
 var cosmosDataContributor = '00000000-0000-0000-0000-000000000002'
-resource sqlRoleAssignment 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments@2021-04-15' = {
+resource sqlRoleAssignment 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments@2025-04-15' = {
   name: guid(cosmosDataContributor, userAssignedIdentityPrincipalId, cosmosDbAccount.id)
   parent: cosmosDbAccount
   properties: {
@@ -72,7 +72,7 @@ resource sqlRoleAssignment 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignm
   }
 }
 // Assign the User Assigned Identity Contributor role to the Cosmos DB account for the current user
-/* resource sqlRoleAssignmentUser 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments@2021-04-15' = if (currentUserId != '') {
+/* resource sqlRoleAssignmentUser 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments@2025-04-15' = if (currentUserId != '') {
   name: guid(cosmosDataContributor, currentUserId, cosmosDbAccount.id)
   parent: cosmosDbAccount
   properties: {

@@ -13,13 +13,13 @@ param webAppName string = resourceBaseName
 param identityName string = resourceBaseName
 param location string = resourceGroup().location
 
-resource identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+resource identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' = {
   location: location
   name: identityName
 }
 
 // Compute resources for your Web App
-resource serverfarm 'Microsoft.Web/serverfarms@2021-02-01' = {
+resource serverfarm 'Microsoft.Web/serverfarms@2024-11-01' = {
   kind: 'app'
   location: location
   name: serverfarmsName
@@ -29,7 +29,7 @@ resource serverfarm 'Microsoft.Web/serverfarms@2021-02-01' = {
 }
 
 // Web App that hosts your bot
-resource webApp 'Microsoft.Web/sites@2021-02-01' = {
+resource webApp 'Microsoft.Web/sites@2024-11-01' = {
   kind: 'app'
   location: location
   name: webAppName

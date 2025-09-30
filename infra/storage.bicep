@@ -3,7 +3,7 @@ param location string = resourceGroup().location
 param containerName string
 param userAssignedIdentityPrincipalId string
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2025-01-01' = {
   name: storageAccountName
   location: location
   
@@ -21,14 +21,14 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   }
 }
 
-resource blobContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-01-01' = {
+resource blobContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2025-01-01' = {
   name: '${storageAccount.name}/default/${containerName}'
   properties: {
     publicAccess: 'None'
   }
 }
 
-resource storageBlobContributor 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+resource storageBlobContributor 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(storageAccount.id, userAssignedIdentityPrincipalId, 'storageBlobContributor')
   scope: storageAccount
   properties: {

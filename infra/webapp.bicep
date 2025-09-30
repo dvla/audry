@@ -71,7 +71,7 @@ var vFeatureFlags = [
 ]
 
 // Compute resources for your Web App
-resource appServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
+resource appServicePlan 'Microsoft.Web/serverfarms@2024-11-01' = {
   kind: 'app,linux'
   location: location
   name: serverfarmName
@@ -84,7 +84,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
 }
 
 // Web App that hosts your bot
-resource webApp 'Microsoft.Web/sites@2021-02-01' = {
+resource webApp 'Microsoft.Web/sites@2024-11-01' = {
   location: location
   name: webAppName
   properties: {
@@ -210,7 +210,7 @@ resource webAppConfig 'Microsoft.AppConfiguration/configurationStores@2025-02-01
   }
 }
 
-resource Featureflag 'Microsoft.AppConfiguration/configurationStores/keyValues@2024-05-01' = [for featureFlag in featureFlags: {
+resource Featureflag 'Microsoft.AppConfiguration/configurationStores/keyValues@2024-06-01' = [for featureFlag in featureFlags: {
   parent: webAppConfig
   name: '.appconfig.featureflag~2F${featureFlag.id}'
   properties: {
@@ -228,7 +228,7 @@ resource Featureflag 'Microsoft.AppConfiguration/configurationStores/keyValues@2
   ]
 }]
 
-resource VariantFeatureflag 'Microsoft.AppConfiguration/configurationStores/keyValues@2024-05-01' = [for vFeatureFlag in vFeatureFlags: {
+resource VariantFeatureflag 'Microsoft.AppConfiguration/configurationStores/keyValues@2024-06-01' = [for vFeatureFlag in vFeatureFlags: {
   parent: webAppConfig
   name: '.appconfig.featureflag~2F${vFeatureFlag.id}'
   properties: {
