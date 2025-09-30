@@ -131,7 +131,7 @@ export class FileConsentHandler {
         while (uploadedBytes < fileSize) {
           const remainingBytes = fileSize - uploadedBytes
           const currentChunkSize = Math.min(chunkSize, remainingBytes)
-          const chunk = fileBuffer.slice(uploadedBytes, uploadedBytes + currentChunkSize)
+          const chunk = fileBuffer.subarray(uploadedBytes, uploadedBytes + currentChunkSize)
 
           const rangeStart = uploadedBytes
           const rangeEnd = uploadedBytes + currentChunkSize - 1

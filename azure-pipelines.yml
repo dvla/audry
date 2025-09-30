@@ -72,25 +72,20 @@ stages:
       - script: |
           npm run prettier
         displayName: 'Run prettier'
-        condition: always()
       - script: |
           npm run lint
         displayName: 'Run Linter'
-        condition: always()
       - script: |
           npm run audit
         displayName: 'Run Audit'
-        condition: always()
         continueOnError: true
       - script: |
           npm run outdated
         displayName: 'Run Outdated'
-        condition: always()
         continueOnError: true
       - script: |
           npm run test
         displayName: 'Run Tests'
-        condition: always()
       - task: PublishCodeCoverageResults@2
         displayName: 'Publish Code Coverage'
         inputs:
@@ -120,6 +115,7 @@ stages:
 
 # Deploy the infrastructure via Bicep
   - stage: Infrastructure
+    condition: not(and(contains(variables['Build.SourceBranchName'], 'renovate'), not(contains(variables['Build.SourceBranchName'], 'bicep')))) #Do not run this stage for Renovate branches unless they contain 'bicep' in the name
     displayName: Create infrastructure
     jobs:
     - job: CreateInfrastructure
@@ -159,7 +155,7 @@ stages:
 
 
   - stage: ZipDeploy
-    #condition: not(contains(variables['Build.SourceBranchName'], 'infra')) #Do not run this stage for Infrastructure branches
+    condition: not(contains(variables['Build.SourceBranchName'], 'renovate')) #Do not run this stage for Renovate branches
     displayName: Zip deploy
     jobs:
       - job: ZipDeploy
