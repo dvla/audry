@@ -2,6 +2,9 @@
   "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
   "type": "AdaptiveCard",
   "version": "1.6",
+  "msteams": {
+    "width": "Full"
+  },
   "body": [
     {
       "type": "Container",

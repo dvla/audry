@@ -107,7 +107,8 @@ describe('TranscriptToAudioHandler', () => {
       expect(generateAudioSpy).toHaveBeenCalledWith(
         mockContext.proactiveSend,
         mockContext.proactiveSendCard,
-        mockContext.conversation
+        mockContext.conversation,
+        0
       )
 
       generateAudioSpy.mockRestore()

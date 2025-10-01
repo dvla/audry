@@ -4,7 +4,13 @@ import fs from 'fs/promises'
 import { createFileConsentCard, processingCard, warningCard } from '../internal/cards'
 import { ActivityContext } from '../internal/conversationHandlers'
 import { log } from '../internal/logger'
-import { SHOW_NOTES, TRANSCRIPT_TEXT, readFile, writeFile } from '../internal/utils/documentUtils'
+import {
+  EDITED_TRANSCRIPT_TEXT,
+  SHOW_NOTES,
+  TRANSCRIPT_TEXT,
+  readFile,
+  writeFile,
+} from '../internal/utils/documentUtils'
 import { generateShowNotes } from '../internal/utils/graphUtils'
 import { DEFAULT_CONFIG } from '../tts/episodeConfig'
 import { transcriptToAudioProvider } from '../tts/textToTranscript'
@@ -19,10 +25,17 @@ export class TranscriptToAudioHandler {
    * @param context - The activity context containing the conversation and activity.
    * @returns An Adaptive Card indicating the processing state.
    */
-  async handleActionInvoked({ proactiveSend, proactiveSendCard, conversation }: ActivityContext): Promise<void> {
+  async handleActionInvoked({
+    proactiveSend,
+    proactiveSendCard,
+    conversation,
+    activity,
+  }: ActivityContext): Promise<void> {
     // Pass full context including state and turnContext to generateAudio
-    setImmediate(() => this.generateAudio(proactiveSend, proactiveSendCard, conversation))
-    return processingCard('Generating audio... This may take a few minutes.')
+    setImmediate(() =>
+      this.generateAudio(proactiveSend, proactiveSendCard, conversation, activity?.value?.action?.data?.index || 0)
+    )
+    return processingCard('Generating audio...', 'This may take a few minutes.')
   }
 
   /**
@@ -31,10 +44,15 @@ export class TranscriptToAudioHandler {
    * @returns A promise that resolves when the audio generation is complete.
    * @throws Will throw an error if the transcript generation fails.
    */
-  async generateAudio(proactiveSend, proactiveSendCard, conversation): Promise<void> {
+  async generateAudio(proactiveSend, proactiveSendCard, conversation, index = 0): Promise<void> {
     try {
       const documentId = conversation.documentId
-      const transcript = await readFile(conversation.userId, documentId, TRANSCRIPT_TEXT)
+      const transcript = await readFile(
+        conversation.userId,
+        documentId,
+        index === 0 ? TRANSCRIPT_TEXT : EDITED_TRANSCRIPT_TEXT
+      )
+      log.info('Transcript: ' + transcript)
       const config = conversation.config || DEFAULT_CONFIG
       const transcriptToAudio = await transcriptToAudioProvider(config)
       const { outputFileName, outputFilePath } = await transcriptToAudio(transcript)

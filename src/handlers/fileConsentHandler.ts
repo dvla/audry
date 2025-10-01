@@ -1,6 +1,6 @@
 import fs from 'fs/promises'
 
-import { createFileInfoAttachment, errorCard, warningCard } from '../internal/cards'
+import { createFileInfoAttachment, warningCard } from '../internal/cards'
 import { ActivityContext } from '../internal/conversationHandlers'
 import { log } from '../internal/logger'
 

@@ -1,0 +1,1601 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`DialogHandler > dialogCard > should render transcript dialog card snapshot 1`] = `
+{
+  "content": {
+    "actions": [
+      {
+        "data": {
+          "action": "saveTranscript",
+          "index": 0,
+        },
+        "style": "positive",
+        "title": "Save Changes",
+        "type": "Action.Submit",
+      },
+      {
+        "data": {
+          "action": "cancel",
+        },
+        "title": "Cancel",
+        "type": "Action.Submit",
+      },
+    ],
+    "body": [
+      {
+        "horizontalAlignment": "Center",
+        "size": "Large",
+        "spacing": "Medium",
+        "text": "🎙️ Podcast Transcript",
+        "type": "TextBlock",
+        "weight": "Bolder",
+      },
+      {
+        "id": "transcriptContainer",
+        "items": [
+          {
+            "isSubtle": true,
+            "size": "Small",
+            "text": "Speaker 1",
+            "type": "TextBlock",
+            "weight": "Lighter",
+          },
+          {
+            "items": [
+              {
+                "columns": [
+                  {
+                    "items": [
+                      {
+                        "id": "text_0",
+                        "text": "Hello",
+                        "type": "TextBlock",
+                        "wrap": true,
+                      },
+                      {
+                        "id": "edit_0",
+                        "isMultiline": true,
+                        "isVisible": false,
+                        "type": "Input.Text",
+                        "value": "Hello",
+                      },
+                    ],
+                    "type": "Column",
+                    "width": "stretch",
+                  },
+                  {
+                    "items": [
+                      {
+                        "actions": [
+                          {
+                            "id": "edit_btn_0",
+                            "isVisible": true,
+                            "targetElements": [
+                              "text_0",
+                              "edit_0",
+                              "edit_action_0",
+                              "done_action_0",
+                            ],
+                            "title": "Edit",
+                            "tooltip": "Edit this turn",
+                            "type": "Action.ToggleVisibility",
+                          },
+                        ],
+                        "id": "edit_action_0",
+                        "type": "ActionSet",
+                      },
+                      {
+                        "actions": [
+                          {
+                            "data": {
+                              "action": "toggleEdit",
+                              "id": 0,
+                              "index": 0,
+                            },
+                            "id": "done_btn_0",
+                            "style": "positive",
+                            "title": "Save",
+                            "tooltip": "Done editing",
+                            "type": "Action.Submit",
+                          },
+                        ],
+                        "id": "done_action_0",
+                        "isVisible": false,
+                        "type": "ActionSet",
+                      },
+                    ],
+                    "type": "Column",
+                    "width": "auto",
+                  },
+                ],
+                "type": "ColumnSet",
+              },
+            ],
+            "spacing": "Small",
+            "style": "emphasis",
+            "type": "Container",
+          },
+          {
+            "isSubtle": true,
+            "size": "Small",
+            "text": "Speaker 2",
+            "type": "TextBlock",
+            "weight": "Lighter",
+          },
+          {
+            "items": [
+              {
+                "columns": [
+                  {
+                    "items": [
+                      {
+                        "id": "text_1",
+                        "text": "Welcome",
+                        "type": "TextBlock",
+                        "wrap": true,
+                      },
+                      {
+                        "id": "edit_1",
+                        "isMultiline": true,
+                        "isVisible": false,
+                        "type": "Input.Text",
+                        "value": "Welcome",
+                      },
+                    ],
+                    "type": "Column",
+                    "width": "stretch",
+                  },
+                  {
+                    "items": [
+                      {
+                        "actions": [
+                          {
+                            "id": "edit_btn_1",
+                            "isVisible": true,
+                            "targetElements": [
+                              "text_1",
+                              "edit_1",
+                              "edit_action_1",
+                              "done_action_1",
+                            ],
+                            "title": "Edit",
+                            "tooltip": "Edit this turn",
+                            "type": "Action.ToggleVisibility",
+                          },
+                        ],
+                        "id": "edit_action_1",
+                        "type": "ActionSet",
+                      },
+                      {
+                        "actions": [
+                          {
+                            "data": {
+                              "action": "toggleEdit",
+                              "id": 1,
+                              "index": 0,
+                            },
+                            "id": "done_btn_1",
+                            "style": "positive",
+                            "title": "Save",
+                            "tooltip": "Done editing",
+                            "type": "Action.Submit",
+                          },
+                        ],
+                        "id": "done_action_1",
+                        "isVisible": false,
+                        "type": "ActionSet",
+                      },
+                    ],
+                    "type": "Column",
+                    "width": "auto",
+                  },
+                ],
+                "type": "ColumnSet",
+              },
+            ],
+            "spacing": "Small",
+            "style": "accent",
+            "type": "Container",
+          },
+        ],
+        "type": "Container",
+      },
+    ],
+    "msteams": {
+      "width": "Full",
+    },
+    "type": "AdaptiveCard",
+    "version": "1.6",
+  },
+  "contentType": "application/vnd.microsoft.card.adaptive",
+}
+`;
+
+exports[`DialogHandler > handleDialogInvoke > should send dialog response with snapshot 1`] = `
+[MockFunction spy] {
+  "calls": [
+    [
+      {
+        "type": "invokeResponse",
+        "value": {
+          "body": {
+            "task": {
+              "type": "continue",
+              "value": {
+                "card": {
+                  "content": {
+                    "actions": [
+                      {
+                        "data": {
+                          "action": "saveTranscript",
+                          "index": 1,
+                        },
+                        "style": "positive",
+                        "title": "Save Changes",
+                        "type": "Action.Submit",
+                      },
+                      {
+                        "data": {
+                          "action": "cancel",
+                        },
+                        "title": "Cancel",
+                        "type": "Action.Submit",
+                      },
+                    ],
+                    "body": [
+                      {
+                        "horizontalAlignment": "Center",
+                        "size": "Large",
+                        "spacing": "Medium",
+                        "text": "🎙️ Podcast Transcript",
+                        "type": "TextBlock",
+                        "weight": "Bolder",
+                      },
+                      {
+                        "id": "transcriptContainer",
+                        "items": [
+                          {
+                            "isSubtle": true,
+                            "size": "Small",
+                            "text": "Speaker 1",
+                            "type": "TextBlock",
+                            "weight": "Lighter",
+                          },
+                          {
+                            "items": [
+                              {
+                                "columns": [
+                                  {
+                                    "items": [
+                                      {
+                                        "id": "text_0",
+                                        "text": "Hello",
+                                        "type": "TextBlock",
+                                        "wrap": true,
+                                      },
+                                      {
+                                        "id": "edit_0",
+                                        "isMultiline": true,
+                                        "isVisible": false,
+                                        "type": "Input.Text",
+                                        "value": "Hello",
+                                      },
+                                    ],
+                                    "type": "Column",
+                                    "width": "stretch",
+                                  },
+                                  {
+                                    "items": [
+                                      {
+                                        "actions": [
+                                          {
+                                            "id": "edit_btn_0",
+                                            "isVisible": true,
+                                            "targetElements": [
+                                              "text_0",
+                                              "edit_0",
+                                              "edit_action_0",
+                                              "done_action_0",
+                                            ],
+                                            "title": "Edit",
+                                            "tooltip": "Edit this turn",
+                                            "type": "Action.ToggleVisibility",
+                                          },
+                                        ],
+                                        "id": "edit_action_0",
+                                        "type": "ActionSet",
+                                      },
+                                      {
+                                        "actions": [
+                                          {
+                                            "data": {
+                                              "action": "toggleEdit",
+                                              "id": 0,
+                                              "index": 1,
+                                            },
+                                            "id": "done_btn_0",
+                                            "style": "positive",
+                                            "title": "Save",
+                                            "tooltip": "Done editing",
+                                            "type": "Action.Submit",
+                                          },
+                                        ],
+                                        "id": "done_action_0",
+                                        "isVisible": false,
+                                        "type": "ActionSet",
+                                      },
+                                    ],
+                                    "type": "Column",
+                                    "width": "auto",
+                                  },
+                                ],
+                                "type": "ColumnSet",
+                              },
+                            ],
+                            "spacing": "Small",
+                            "style": "emphasis",
+                            "type": "Container",
+                          },
+                          {
+                            "isSubtle": true,
+                            "size": "Small",
+                            "text": "Speaker 2",
+                            "type": "TextBlock",
+                            "weight": "Lighter",
+                          },
+                          {
+                            "items": [
+                              {
+                                "columns": [
+                                  {
+                                    "items": [
+                                      {
+                                        "id": "text_1",
+                                        "text": "Welcome",
+                                        "type": "TextBlock",
+                                        "wrap": true,
+                                      },
+                                      {
+                                        "id": "edit_1",
+                                        "isMultiline": true,
+                                        "isVisible": false,
+                                        "type": "Input.Text",
+                                        "value": "Welcome",
+                                      },
+                                    ],
+                                    "type": "Column",
+                                    "width": "stretch",
+                                  },
+                                  {
+                                    "items": [
+                                      {
+                                        "actions": [
+                                          {
+                                            "id": "edit_btn_1",
+                                            "isVisible": true,
+                                            "targetElements": [
+                                              "text_1",
+                                              "edit_1",
+                                              "edit_action_1",
+                                              "done_action_1",
+                                            ],
+                                            "title": "Edit",
+                                            "tooltip": "Edit this turn",
+                                            "type": "Action.ToggleVisibility",
+                                          },
+                                        ],
+                                        "id": "edit_action_1",
+                                        "type": "ActionSet",
+                                      },
+                                      {
+                                        "actions": [
+                                          {
+                                            "data": {
+                                              "action": "toggleEdit",
+                                              "id": 1,
+                                              "index": 1,
+                                            },
+                                            "id": "done_btn_1",
+                                            "style": "positive",
+                                            "title": "Save",
+                                            "tooltip": "Done editing",
+                                            "type": "Action.Submit",
+                                          },
+                                        ],
+                                        "id": "done_action_1",
+                                        "isVisible": false,
+                                        "type": "ActionSet",
+                                      },
+                                    ],
+                                    "type": "Column",
+                                    "width": "auto",
+                                  },
+                                ],
+                                "type": "ColumnSet",
+                              },
+                            ],
+                            "spacing": "Small",
+                            "style": "accent",
+                            "type": "Container",
+                          },
+                        ],
+                        "type": "Container",
+                      },
+                    ],
+                    "msteams": {
+                      "width": "Full",
+                    },
+                    "type": "AdaptiveCard",
+                    "version": "1.6",
+                  },
+                  "contentType": "application/vnd.microsoft.card.adaptive",
+                },
+                "height": "large",
+                "title": "Podcast Transcript",
+                "width": "large",
+              },
+            },
+          },
+          "status": 200,
+        },
+      },
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`DialogHandler > handleDialogSubmit > should cancel dialog on unknown action 1`] = `
+{
+  "type": "invokeResponse",
+  "value": {
+    "status": 200,
+  },
+}
+`;
+
+exports[`DialogHandler > handleDialogSubmit > should save transcript and close dialog 1`] = `
+{
+  "type": "invokeResponse",
+  "value": {
+    "status": 200,
+  },
+}
+`;
+
+exports[`DialogHandler > handleDialogSubmit > should save transcript and close dialog 2`] = `
+{
+  "body": [
+    {
+      "bleed": true,
+      "items": [
+        {
+          "columns": [
+            {
+              "items": [
+                {
+                  "size": "Large",
+                  "text": "✅",
+                  "type": "TextBlock",
+                },
+              ],
+              "type": "Column",
+              "width": "auto",
+            },
+            {
+              "items": [
+                {
+                  "color": "Default",
+                  "size": "Medium",
+                  "text": "Transcript Updated",
+                  "type": "TextBlock",
+                  "weight": "Bolder",
+                  "wrap": true,
+                },
+                {
+                  "pages": [
+                    {
+                      "items": [
+                        {
+                          "id": "truncatedText_0",
+                          "maxLines": 5,
+                          "text": "Transcript A",
+                          "type": "TextBlock",
+                          "wrap": true,
+                        },
+                        {
+                          "id": "fullText_0",
+                          "isVisible": false,
+                          "text": "Transcript A",
+                          "type": "TextBlock",
+                          "wrap": true,
+                        },
+                        {
+                          "id": "showMore_0",
+                          "inlines": [
+                            {
+                              "selectAction": {
+                                "targetElements": [
+                                  "truncatedText_0",
+                                  "fullText_0",
+                                  "showMore_0",
+                                  "showLess_0",
+                                ],
+                                "type": "Action.ToggleVisibility",
+                              },
+                              "text": "Show Full Transcript",
+                              "type": "TextRun",
+                            },
+                          ],
+                          "targetWidth": "AtLeast:Narrow",
+                          "type": "RichTextBlock",
+                        },
+                        {
+                          "id": "showLess_0",
+                          "inlines": [
+                            {
+                              "selectAction": {
+                                "targetElements": [
+                                  "truncatedText_0",
+                                  "fullText_0",
+                                  "showMore_0",
+                                  "showLess_0",
+                                ],
+                                "type": "Action.ToggleVisibility",
+                              },
+                              "text": "Show Preview",
+                              "type": "TextRun",
+                            },
+                          ],
+                          "isVisible": false,
+                          "targetWidth": "AtLeast:Narrow",
+                          "type": "RichTextBlock",
+                        },
+                        {
+                          "actions": [
+                            {
+                              "data": {
+                                "index": 0,
+                              },
+                              "style": "positive",
+                              "title": "Create Podcast",
+                              "type": "Action.Execute",
+                              "verb": "transcriptToAudio",
+                            },
+                            {
+                              "data": {
+                                "index": 0,
+                                "msteams": {
+                                  "type": "task/fetch",
+                                },
+                                "taskModule": "openDialog",
+                                "transcript": "Transcript A",
+                              },
+                              "id": "openDialog",
+                              "title": "Edit Transcript",
+                              "type": "Action.Submit",
+                            },
+                          ],
+                          "type": "ActionSet",
+                        },
+                      ],
+                      "roundedCorners": true,
+                      "showBorder": true,
+                      "style": "accent",
+                      "type": "CarouselPage",
+                    },
+                    {
+                      "items": [
+                        {
+                          "id": "truncatedText_1",
+                          "maxLines": 5,
+                          "text": "Transcript B",
+                          "type": "TextBlock",
+                          "wrap": true,
+                        },
+                        {
+                          "id": "fullText_1",
+                          "isVisible": false,
+                          "text": "Transcript B",
+                          "type": "TextBlock",
+                          "wrap": true,
+                        },
+                        {
+                          "id": "showMore_1",
+                          "inlines": [
+                            {
+                              "selectAction": {
+                                "targetElements": [
+                                  "truncatedText_1",
+                                  "fullText_1",
+                                  "showMore_1",
+                                  "showLess_1",
+                                ],
+                                "type": "Action.ToggleVisibility",
+                              },
+                              "text": "Show Full Transcript",
+                              "type": "TextRun",
+                            },
+                          ],
+                          "targetWidth": "AtLeast:Narrow",
+                          "type": "RichTextBlock",
+                        },
+                        {
+                          "id": "showLess_1",
+                          "inlines": [
+                            {
+                              "selectAction": {
+                                "targetElements": [
+                                  "truncatedText_1",
+                                  "fullText_1",
+                                  "showMore_1",
+                                  "showLess_1",
+                                ],
+                                "type": "Action.ToggleVisibility",
+                              },
+                              "text": "Show Preview",
+                              "type": "TextRun",
+                            },
+                          ],
+                          "isVisible": false,
+                          "targetWidth": "AtLeast:Narrow",
+                          "type": "RichTextBlock",
+                        },
+                        {
+                          "actions": [
+                            {
+                              "data": {
+                                "index": 1,
+                              },
+                              "style": "positive",
+                              "title": "Create Podcast",
+                              "type": "Action.Execute",
+                              "verb": "transcriptToAudio",
+                            },
+                            {
+                              "data": {
+                                "index": 1,
+                                "msteams": {
+                                  "type": "task/fetch",
+                                },
+                                "taskModule": "openDialog",
+                                "transcript": "Transcript B",
+                              },
+                              "id": "openDialog",
+                              "title": "Edit Transcript",
+                              "type": "Action.Submit",
+                            },
+                          ],
+                          "type": "ActionSet",
+                        },
+                      ],
+                      "roundedCorners": true,
+                      "showBorder": true,
+                      "style": "accent",
+                      "type": "CarouselPage",
+                    },
+                  ],
+                  "type": "Carousel",
+                },
+              ],
+              "type": "Column",
+              "width": "stretch",
+            },
+          ],
+          "type": "ColumnSet",
+        },
+      ],
+      "style": "default",
+      "type": "Container",
+    },
+  ],
+  "msteams": {
+    "width": "Full",
+  },
+  "type": "AdaptiveCard",
+  "version": "1.5",
+}
+`;
+
+exports[`DialogHandler > handleDialogSubmit > should toggle edit and refresh dialog and carousel cards 1`] = `
+[MockFunction spy] {
+  "calls": [
+    [
+      {
+        "type": "invokeResponse",
+        "value": {
+          "body": {
+            "task": {
+              "type": "continue",
+              "value": {
+                "card": {
+                  "content": {
+                    "actions": [
+                      {
+                        "data": {
+                          "action": "saveTranscript",
+                          "index": 0,
+                        },
+                        "style": "positive",
+                        "title": "Save Changes",
+                        "type": "Action.Submit",
+                      },
+                      {
+                        "data": {
+                          "action": "cancel",
+                        },
+                        "title": "Cancel",
+                        "type": "Action.Submit",
+                      },
+                    ],
+                    "body": [
+                      {
+                        "horizontalAlignment": "Center",
+                        "size": "Large",
+                        "spacing": "Medium",
+                        "text": "🎙️ Podcast Transcript",
+                        "type": "TextBlock",
+                        "weight": "Bolder",
+                      },
+                      {
+                        "id": "transcriptContainer",
+                        "items": [
+                          {
+                            "isSubtle": true,
+                            "size": "Small",
+                            "text": "Speaker 1",
+                            "type": "TextBlock",
+                            "weight": "Lighter",
+                          },
+                          {
+                            "items": [
+                              {
+                                "columns": [
+                                  {
+                                    "items": [
+                                      {
+                                        "id": "text_0",
+                                        "text": "Original host",
+                                        "type": "TextBlock",
+                                        "wrap": true,
+                                      },
+                                      {
+                                        "id": "edit_0",
+                                        "isMultiline": true,
+                                        "isVisible": false,
+                                        "type": "Input.Text",
+                                        "value": "Original host",
+                                      },
+                                    ],
+                                    "type": "Column",
+                                    "width": "stretch",
+                                  },
+                                  {
+                                    "items": [
+                                      {
+                                        "actions": [
+                                          {
+                                            "id": "edit_btn_0",
+                                            "isVisible": true,
+                                            "targetElements": [
+                                              "text_0",
+                                              "edit_0",
+                                              "edit_action_0",
+                                              "done_action_0",
+                                            ],
+                                            "title": "Edit",
+                                            "tooltip": "Edit this turn",
+                                            "type": "Action.ToggleVisibility",
+                                          },
+                                        ],
+                                        "id": "edit_action_0",
+                                        "type": "ActionSet",
+                                      },
+                                      {
+                                        "actions": [
+                                          {
+                                            "data": {
+                                              "action": "toggleEdit",
+                                              "id": 0,
+                                              "index": 0,
+                                            },
+                                            "id": "done_btn_0",
+                                            "style": "positive",
+                                            "title": "Save",
+                                            "tooltip": "Done editing",
+                                            "type": "Action.Submit",
+                                          },
+                                        ],
+                                        "id": "done_action_0",
+                                        "isVisible": false,
+                                        "type": "ActionSet",
+                                      },
+                                    ],
+                                    "type": "Column",
+                                    "width": "auto",
+                                  },
+                                ],
+                                "type": "ColumnSet",
+                              },
+                            ],
+                            "spacing": "Small",
+                            "style": "emphasis",
+                            "type": "Container",
+                          },
+                          {
+                            "isSubtle": true,
+                            "size": "Small",
+                            "text": "Speaker 2",
+                            "type": "TextBlock",
+                            "weight": "Lighter",
+                          },
+                          {
+                            "items": [
+                              {
+                                "columns": [
+                                  {
+                                    "items": [
+                                      {
+                                        "id": "text_1",
+                                        "text": "Original guest",
+                                        "type": "TextBlock",
+                                        "wrap": true,
+                                      },
+                                      {
+                                        "id": "edit_1",
+                                        "isMultiline": true,
+                                        "isVisible": false,
+                                        "type": "Input.Text",
+                                        "value": "Original guest",
+                                      },
+                                    ],
+                                    "type": "Column",
+                                    "width": "stretch",
+                                  },
+                                  {
+                                    "items": [
+                                      {
+                                        "actions": [
+                                          {
+                                            "id": "edit_btn_1",
+                                            "isVisible": true,
+                                            "targetElements": [
+                                              "text_1",
+                                              "edit_1",
+                                              "edit_action_1",
+                                              "done_action_1",
+                                            ],
+                                            "title": "Edit",
+                                            "tooltip": "Edit this turn",
+                                            "type": "Action.ToggleVisibility",
+                                          },
+                                        ],
+                                        "id": "edit_action_1",
+                                        "type": "ActionSet",
+                                      },
+                                      {
+                                        "actions": [
+                                          {
+                                            "data": {
+                                              "action": "toggleEdit",
+                                              "id": 1,
+                                              "index": 0,
+                                            },
+                                            "id": "done_btn_1",
+                                            "style": "positive",
+                                            "title": "Save",
+                                            "tooltip": "Done editing",
+                                            "type": "Action.Submit",
+                                          },
+                                        ],
+                                        "id": "done_action_1",
+                                        "isVisible": false,
+                                        "type": "ActionSet",
+                                      },
+                                    ],
+                                    "type": "Column",
+                                    "width": "auto",
+                                  },
+                                ],
+                                "type": "ColumnSet",
+                              },
+                            ],
+                            "spacing": "Small",
+                            "style": "accent",
+                            "type": "Container",
+                          },
+                        ],
+                        "type": "Container",
+                      },
+                    ],
+                    "msteams": {
+                      "width": "Full",
+                    },
+                    "type": "AdaptiveCard",
+                    "version": "1.6",
+                  },
+                  "contentType": "application/vnd.microsoft.card.adaptive",
+                },
+                "height": "large",
+                "title": "Podcast Transcript",
+                "width": "large",
+              },
+            },
+          },
+          "status": 200,
+        },
+      },
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`DialogHandler > handleDialogSubmit > should toggle edit and refresh dialog and carousel cards 2`] = `
+{
+  "body": [
+    {
+      "bleed": true,
+      "items": [
+        {
+          "columns": [
+            {
+              "items": [
+                {
+                  "size": "Large",
+                  "text": "✅",
+                  "type": "TextBlock",
+                },
+              ],
+              "type": "Column",
+              "width": "auto",
+            },
+            {
+              "items": [
+                {
+                  "color": "Default",
+                  "size": "Medium",
+                  "text": "Transcript Updated",
+                  "type": "TextBlock",
+                  "weight": "Bolder",
+                  "wrap": true,
+                },
+                {
+                  "pages": [
+                    {
+                      "items": [
+                        {
+                          "id": "truncatedText_0",
+                          "maxLines": 5,
+                          "text": "Original transcript",
+                          "type": "TextBlock",
+                          "wrap": true,
+                        },
+                        {
+                          "id": "fullText_0",
+                          "isVisible": false,
+                          "text": "Original transcript",
+                          "type": "TextBlock",
+                          "wrap": true,
+                        },
+                        {
+                          "id": "showMore_0",
+                          "inlines": [
+                            {
+                              "selectAction": {
+                                "targetElements": [
+                                  "truncatedText_0",
+                                  "fullText_0",
+                                  "showMore_0",
+                                  "showLess_0",
+                                ],
+                                "type": "Action.ToggleVisibility",
+                              },
+                              "text": "Show Full Transcript",
+                              "type": "TextRun",
+                            },
+                          ],
+                          "targetWidth": "AtLeast:Narrow",
+                          "type": "RichTextBlock",
+                        },
+                        {
+                          "id": "showLess_0",
+                          "inlines": [
+                            {
+                              "selectAction": {
+                                "targetElements": [
+                                  "truncatedText_0",
+                                  "fullText_0",
+                                  "showMore_0",
+                                  "showLess_0",
+                                ],
+                                "type": "Action.ToggleVisibility",
+                              },
+                              "text": "Show Preview",
+                              "type": "TextRun",
+                            },
+                          ],
+                          "isVisible": false,
+                          "targetWidth": "AtLeast:Narrow",
+                          "type": "RichTextBlock",
+                        },
+                        {
+                          "actions": [
+                            {
+                              "data": {
+                                "index": 0,
+                              },
+                              "style": "positive",
+                              "title": "Create Podcast",
+                              "type": "Action.Execute",
+                              "verb": "transcriptToAudio",
+                            },
+                            {
+                              "data": {
+                                "index": 0,
+                                "msteams": {
+                                  "type": "task/fetch",
+                                },
+                                "taskModule": "openDialog",
+                                "transcript": "Original transcript",
+                              },
+                              "id": "openDialog",
+                              "title": "Edit Transcript",
+                              "type": "Action.Submit",
+                            },
+                          ],
+                          "type": "ActionSet",
+                        },
+                      ],
+                      "roundedCorners": true,
+                      "showBorder": true,
+                      "style": "accent",
+                      "type": "CarouselPage",
+                    },
+                    {
+                      "items": [
+                        {
+                          "id": "truncatedText_1",
+                          "maxLines": 5,
+                          "text": "Edited transcript",
+                          "type": "TextBlock",
+                          "wrap": true,
+                        },
+                        {
+                          "id": "fullText_1",
+                          "isVisible": false,
+                          "text": "Edited transcript",
+                          "type": "TextBlock",
+                          "wrap": true,
+                        },
+                        {
+                          "id": "showMore_1",
+                          "inlines": [
+                            {
+                              "selectAction": {
+                                "targetElements": [
+                                  "truncatedText_1",
+                                  "fullText_1",
+                                  "showMore_1",
+                                  "showLess_1",
+                                ],
+                                "type": "Action.ToggleVisibility",
+                              },
+                              "text": "Show Full Transcript",
+                              "type": "TextRun",
+                            },
+                          ],
+                          "targetWidth": "AtLeast:Narrow",
+                          "type": "RichTextBlock",
+                        },
+                        {
+                          "id": "showLess_1",
+                          "inlines": [
+                            {
+                              "selectAction": {
+                                "targetElements": [
+                                  "truncatedText_1",
+                                  "fullText_1",
+                                  "showMore_1",
+                                  "showLess_1",
+                                ],
+                                "type": "Action.ToggleVisibility",
+                              },
+                              "text": "Show Preview",
+                              "type": "TextRun",
+                            },
+                          ],
+                          "isVisible": false,
+                          "targetWidth": "AtLeast:Narrow",
+                          "type": "RichTextBlock",
+                        },
+                        {
+                          "actions": [
+                            {
+                              "data": {
+                                "index": 1,
+                              },
+                              "style": "positive",
+                              "title": "Create Podcast",
+                              "type": "Action.Execute",
+                              "verb": "transcriptToAudio",
+                            },
+                            {
+                              "data": {
+                                "index": 1,
+                                "msteams": {
+                                  "type": "task/fetch",
+                                },
+                                "taskModule": "openDialog",
+                                "transcript": "Edited transcript",
+                              },
+                              "id": "openDialog",
+                              "title": "Edit Transcript",
+                              "type": "Action.Submit",
+                            },
+                          ],
+                          "type": "ActionSet",
+                        },
+                      ],
+                      "roundedCorners": true,
+                      "showBorder": true,
+                      "style": "accent",
+                      "type": "CarouselPage",
+                    },
+                  ],
+                  "type": "Carousel",
+                },
+              ],
+              "type": "Column",
+              "width": "stretch",
+            },
+          ],
+          "type": "ColumnSet",
+        },
+      ],
+      "style": "default",
+      "type": "Container",
+    },
+  ],
+  "msteams": {
+    "width": "Full",
+  },
+  "type": "AdaptiveCard",
+  "version": "1.5",
+}
+`;
+
+exports[`DialogHandler > should handle a transcript with text before Speaker 1 1`] = `
+[MockFunction spy] {
+  "calls": [
+    [
+      {
+        "type": "invokeResponse",
+        "value": {
+          "body": {
+            "task": {
+              "type": "continue",
+              "value": {
+                "card": {
+                  "content": {
+                    "actions": [
+                      {
+                        "data": {
+                          "action": "saveTranscript",
+                          "index": 1,
+                        },
+                        "style": "positive",
+                        "title": "Save Changes",
+                        "type": "Action.Submit",
+                      },
+                      {
+                        "data": {
+                          "action": "cancel",
+                        },
+                        "title": "Cancel",
+                        "type": "Action.Submit",
+                      },
+                    ],
+                    "body": [
+                      {
+                        "horizontalAlignment": "Center",
+                        "size": "Large",
+                        "spacing": "Medium",
+                        "text": "🎙️ Podcast Transcript",
+                        "type": "TextBlock",
+                        "weight": "Bolder",
+                      },
+                      {
+                        "id": "transcriptContainer",
+                        "items": [
+                          {
+                            "isSubtle": true,
+                            "size": "Small",
+                            "text": "Speaker 1",
+                            "type": "TextBlock",
+                            "weight": "Lighter",
+                          },
+                          {
+                            "items": [
+                              {
+                                "columns": [
+                                  {
+                                    "items": [
+                                      {
+                                        "id": "text_0",
+                                        "text": "Hello",
+                                        "type": "TextBlock",
+                                        "wrap": true,
+                                      },
+                                      {
+                                        "id": "edit_0",
+                                        "isMultiline": true,
+                                        "isVisible": false,
+                                        "type": "Input.Text",
+                                        "value": "Hello",
+                                      },
+                                    ],
+                                    "type": "Column",
+                                    "width": "stretch",
+                                  },
+                                  {
+                                    "items": [
+                                      {
+                                        "actions": [
+                                          {
+                                            "id": "edit_btn_0",
+                                            "isVisible": true,
+                                            "targetElements": [
+                                              "text_0",
+                                              "edit_0",
+                                              "edit_action_0",
+                                              "done_action_0",
+                                            ],
+                                            "title": "Edit",
+                                            "tooltip": "Edit this turn",
+                                            "type": "Action.ToggleVisibility",
+                                          },
+                                        ],
+                                        "id": "edit_action_0",
+                                        "type": "ActionSet",
+                                      },
+                                      {
+                                        "actions": [
+                                          {
+                                            "data": {
+                                              "action": "toggleEdit",
+                                              "id": 0,
+                                              "index": 1,
+                                            },
+                                            "id": "done_btn_0",
+                                            "style": "positive",
+                                            "title": "Save",
+                                            "tooltip": "Done editing",
+                                            "type": "Action.Submit",
+                                          },
+                                        ],
+                                        "id": "done_action_0",
+                                        "isVisible": false,
+                                        "type": "ActionSet",
+                                      },
+                                    ],
+                                    "type": "Column",
+                                    "width": "auto",
+                                  },
+                                ],
+                                "type": "ColumnSet",
+                              },
+                            ],
+                            "spacing": "Small",
+                            "style": "emphasis",
+                            "type": "Container",
+                          },
+                          {
+                            "isSubtle": true,
+                            "size": "Small",
+                            "text": "Speaker 2",
+                            "type": "TextBlock",
+                            "weight": "Lighter",
+                          },
+                          {
+                            "items": [
+                              {
+                                "columns": [
+                                  {
+                                    "items": [
+                                      {
+                                        "id": "text_1",
+                                        "text": "Welcome",
+                                        "type": "TextBlock",
+                                        "wrap": true,
+                                      },
+                                      {
+                                        "id": "edit_1",
+                                        "isMultiline": true,
+                                        "isVisible": false,
+                                        "type": "Input.Text",
+                                        "value": "Welcome",
+                                      },
+                                    ],
+                                    "type": "Column",
+                                    "width": "stretch",
+                                  },
+                                  {
+                                    "items": [
+                                      {
+                                        "actions": [
+                                          {
+                                            "id": "edit_btn_1",
+                                            "isVisible": true,
+                                            "targetElements": [
+                                              "text_1",
+                                              "edit_1",
+                                              "edit_action_1",
+                                              "done_action_1",
+                                            ],
+                                            "title": "Edit",
+                                            "tooltip": "Edit this turn",
+                                            "type": "Action.ToggleVisibility",
+                                          },
+                                        ],
+                                        "id": "edit_action_1",
+                                        "type": "ActionSet",
+                                      },
+                                      {
+                                        "actions": [
+                                          {
+                                            "data": {
+                                              "action": "toggleEdit",
+                                              "id": 1,
+                                              "index": 1,
+                                            },
+                                            "id": "done_btn_1",
+                                            "style": "positive",
+                                            "title": "Save",
+                                            "tooltip": "Done editing",
+                                            "type": "Action.Submit",
+                                          },
+                                        ],
+                                        "id": "done_action_1",
+                                        "isVisible": false,
+                                        "type": "ActionSet",
+                                      },
+                                    ],
+                                    "type": "Column",
+                                    "width": "auto",
+                                  },
+                                ],
+                                "type": "ColumnSet",
+                              },
+                            ],
+                            "spacing": "Small",
+                            "style": "accent",
+                            "type": "Container",
+                          },
+                        ],
+                        "type": "Container",
+                      },
+                    ],
+                    "msteams": {
+                      "width": "Full",
+                    },
+                    "type": "AdaptiveCard",
+                    "version": "1.6",
+                  },
+                  "contentType": "application/vnd.microsoft.card.adaptive",
+                },
+                "height": "large",
+                "title": "Podcast Transcript",
+                "width": "large",
+              },
+            },
+          },
+          "status": 200,
+        },
+      },
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`DialogHandler > transcript helpers > should generate transcript blocks with edit controls 1`] = `
+[
+  {
+    "isSubtle": true,
+    "size": "Small",
+    "text": "Speaker 1",
+    "type": "TextBlock",
+    "weight": "Lighter",
+  },
+  {
+    "items": [
+      {
+        "columns": [
+          {
+            "items": [
+              {
+                "id": "text_0",
+                "text": "Hello host",
+                "type": "TextBlock",
+                "wrap": true,
+              },
+              {
+                "id": "edit_0",
+                "isMultiline": true,
+                "isVisible": false,
+                "type": "Input.Text",
+                "value": "Hello host",
+              },
+            ],
+            "type": "Column",
+            "width": "stretch",
+          },
+          {
+            "items": [
+              {
+                "actions": [
+                  {
+                    "id": "edit_btn_0",
+                    "isVisible": true,
+                    "targetElements": [
+                      "text_0",
+                      "edit_0",
+                      "edit_action_0",
+                      "done_action_0",
+                    ],
+                    "title": "Edit",
+                    "tooltip": "Edit this turn",
+                    "type": "Action.ToggleVisibility",
+                  },
+                ],
+                "id": "edit_action_0",
+                "type": "ActionSet",
+              },
+              {
+                "actions": [
+                  {
+                    "data": {
+                      "action": "toggleEdit",
+                      "id": 0,
+                      "index": 1,
+                    },
+                    "id": "done_btn_0",
+                    "style": "positive",
+                    "title": "Save",
+                    "tooltip": "Done editing",
+                    "type": "Action.Submit",
+                  },
+                ],
+                "id": "done_action_0",
+                "isVisible": false,
+                "type": "ActionSet",
+              },
+            ],
+            "type": "Column",
+            "width": "auto",
+          },
+        ],
+        "type": "ColumnSet",
+      },
+    ],
+    "spacing": "Small",
+    "style": "emphasis",
+    "type": "Container",
+  },
+  {
+    "isSubtle": true,
+    "size": "Small",
+    "text": "Speaker 2",
+    "type": "TextBlock",
+    "weight": "Lighter",
+  },
+  {
+    "items": [
+      {
+        "columns": [
+          {
+            "items": [
+              {
+                "id": "text_1",
+                "text": "Guest reply",
+                "type": "TextBlock",
+                "wrap": true,
+              },
+              {
+                "id": "edit_1",
+                "isMultiline": true,
+                "isVisible": false,
+                "type": "Input.Text",
+                "value": "Guest reply",
+              },
+            ],
+            "type": "Column",
+            "width": "stretch",
+          },
+          {
+            "items": [
+              {
+                "actions": [
+                  {
+                    "id": "edit_btn_1",
+                    "isVisible": true,
+                    "targetElements": [
+                      "text_1",
+                      "edit_1",
+                      "edit_action_1",
+                      "done_action_1",
+                    ],
+                    "title": "Edit",
+                    "tooltip": "Edit this turn",
+                    "type": "Action.ToggleVisibility",
+                  },
+                ],
+                "id": "edit_action_1",
+                "type": "ActionSet",
+              },
+              {
+                "actions": [
+                  {
+                    "data": {
+                      "action": "toggleEdit",
+                      "id": 1,
+                      "index": 1,
+                    },
+                    "id": "done_btn_1",
+                    "style": "positive",
+                    "title": "Save",
+                    "tooltip": "Done editing",
+                    "type": "Action.Submit",
+                  },
+                ],
+                "id": "done_action_1",
+                "isVisible": false,
+                "type": "ActionSet",
+              },
+            ],
+            "type": "Column",
+            "width": "auto",
+          },
+        ],
+        "type": "ColumnSet",
+      },
+    ],
+    "spacing": "Small",
+    "style": "accent",
+    "type": "Container",
+  },
+]
+`;
+
+exports[`DialogHandler > transcript helpers > should split transcript with alternating speakers 1`] = `
+[
+  {
+    "speaker": "Speaker 1",
+    "text": "Hello there",
+  },
+  {
+    "speaker": "Speaker 2",
+    "text": "Welcome to the show",
+  },
+  {
+    "speaker": "Speaker 1",
+    "text": "Another update",
+  },
+]
+`;

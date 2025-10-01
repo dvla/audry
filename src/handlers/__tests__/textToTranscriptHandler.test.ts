@@ -55,7 +55,7 @@ describe('TextToTranscriptHandler', () => {
 
   it('should return a processing card immediately on handleActionInvoked', async () => {
     await handler.handleActionInvoked(activityContext)
-    expect(cards.processingCard).toHaveBeenCalledWith('Generating transcript...')
+    expect(cards.processingCard).toMatchSnapshot()
   })
 
   it('should send error card if transcript generation fails', async () => {

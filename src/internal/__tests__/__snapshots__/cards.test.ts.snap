@@ -57,6 +57,9 @@ exports[`uploadFileCard > renders base card without Advanced settings when UICon
       "type": "ActionSet",
     },
   ],
+  "msteams": {
+    "width": "Full",
+  },
   "type": "AdaptiveCard",
   "version": "1.6",
 }
@@ -271,6 +274,9 @@ exports[`uploadFileCard > renders card with Advanced settings Action.ShowCard us
       "type": "ActionSet",
     },
   ],
+  "msteams": {
+    "width": "Full",
+  },
   "type": "AdaptiveCard",
   "version": "1.6",
 }

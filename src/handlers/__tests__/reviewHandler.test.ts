@@ -1,5 +1,5 @@
 import { ActivityTypes } from 'botbuilder'
-import { Mock, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ReviewHandler } from '../reviewHandler'
 
@@ -64,10 +64,13 @@ describe('ReviewHandler', () => {
     )
 
     expect(activityContext.proactiveSend).toHaveBeenCalledWith(
-      expect.stringContaining('British Grammar and Localisation Expert Feedback:')
+      expect.stringContaining('# British Grammar and Localisation Expert Feedback')
     )
     expect(activityContext.proactiveSend).toHaveBeenCalledWith(
-      expect.stringContaining('DVLA Content Reviewer Feedback:')
+      expect.stringContaining('# DVLA Content Reviewer Feedback')
+    )
+    expect(activityContext.proactiveSend).toHaveBeenCalledWith(
+      expect.stringContaining('# Expressive Delivery Advisor Feedback')
     )
     expect(mockWriteFile).toHaveBeenCalledWith('user456', 'doc123', 'transcript_edited.txt', 'edited transcript')
   })

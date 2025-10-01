@@ -106,9 +106,7 @@ You are provided with a raw transcript. Your task is to analyze the content line
 For each change, return a short snippet (1 line max) with the emotional cue added.
 Use this structure:
 
-**Suggestion N:**  
-**Before:** "Original line from transcript."  
-**After:** "[Inserted emotion/audio cue] Modified line with emotional enhancement."
+- ***Suggestion N:*** **Before:** "Original line from transcript." **After:** "[Inserted emotion/audio cue] Modified line with emotional enhancement."
 
 Repeat for each line you adjust.
 
@@ -127,19 +125,16 @@ If no changes are needed, return:
 
 🎧 Example Suggestions:
 
-**Suggestion 1:**  
+- ***Suggestion 1:***  
 **Before:** "I can't believe you did that."  
 **After:** "[laughing] I can't believe you did that."
-
-**Suggestion 2:**  
+- ***Suggestion 2:***  
 **Before:** "Hi, can I get uhhh... the usual?"  
 **After:** "[indecisive] Hi, can I get uhhh... [quizzically] the usual?"
-
-**Suggestion 3:**  
+- ***Suggestion 3:***  
 **Before:** "That's actually a really good point."  
 **After:** "[thoughtfully] That's actually a really good point."
-
-**Suggestion 4:**  
+- ***Suggestion 4:***  
 **Before:** "Free? Yes it is."  
 **After:** "[jumping in] Free? [cheerfully] Yes it is."
 `

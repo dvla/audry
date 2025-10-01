@@ -3,6 +3,7 @@ import path from 'path'
 import { Readable } from 'stream'
 
 import { Config } from '../config'
+import { ConversationState } from '../conversationHandlers'
 import { log } from '../logger'
 import { getBlobStorage, metadataType } from '../storage/blobStorage'
 
@@ -95,4 +96,25 @@ export const readFile = async (
 export const generatePodcastFileName = (): string => {
   const now = new Date()
   return `podcast_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`
+}
+
+/**
+ * Retrieves the transcripts for a given conversation.
+ * @param conversation - The conversation state containing user and document information.
+ * @returns An array of transcript strings.
+ */
+export const getTranscripts = async (conversation: ConversationState) => {
+  let transcripts = []
+
+  const originalTranscript = await readFile(conversation.userId, conversation.documentId, TRANSCRIPT_TEXT, false)
+  if (originalTranscript) {
+    transcripts.push(originalTranscript)
+  }
+
+  const editedTranscript = await readFile(conversation.userId, conversation.documentId, EDITED_TRANSCRIPT_TEXT, false)
+  if (editedTranscript) {
+    transcripts.push(editedTranscript)
+  }
+
+  return transcripts
 }

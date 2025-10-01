@@ -92,6 +92,24 @@
           "verb": "transcriptToAudio",
           "title": "Create Podcast",
           "style": "positive"
+        },
+        {
+          "type": "Action.Submit",
+          "title": "Edit Transcript",
+          "id": "openDialog",
+          "data": {
+            "msteams": {
+              "type": "task/fetch"
+            },
+            "taskModule": "openDialog",
+            "transcript": "${transcript}"
+          }
+        },
+        {
+          "type": "Action.Execute",
+          "verb": "textToTranscript",
+          "title": "Regenerate",
+          "style": "destructive"
         }
       ]
     }

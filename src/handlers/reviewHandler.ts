@@ -36,12 +36,16 @@ export class ReviewHandler {
       if (transcript) {
         const review = await reviewTranscript(transcript, documentId)
         if (review) {
-          const british = `British Grammar and Localisation Expert Feedback:\n${review.bgFeedback}`.trim()
-          const reviewer = `DVLA Content Reviewer Feedback:\n${review.crFeedback}`.trim()
-          const emotion = `Expressive Delivery Advisor Feedback:\n\n${review.edaFeedback}`.trim()
+          const british = `# British Grammar and Localisation Expert Feedback\n${review.bgFeedback}`.trim()
+          const reviewer = `# DVLA Content Reviewer Feedback\n${review.crFeedback}`.trim()
+          const emotion = `# Expressive Delivery Advisor Feedback\n${review.edaFeedback}`.trim()
           await proactiveSend(british)
+          // Add a delay to ensure messages are sent one after the other
+          await new Promise((resolve) => setTimeout(resolve, 500))
           await proactiveSend(reviewer)
+          await new Promise((resolve) => setTimeout(resolve, 500))
           await proactiveSend(emotion)
+          await new Promise((resolve) => setTimeout(resolve, 500))
           await writeFile(conversation.userId, documentId, EDITED_TRANSCRIPT_TEXT, review.finalTranscript)
         } else {
           await proactiveSend('No review for this transcript')

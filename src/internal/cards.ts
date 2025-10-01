@@ -3,7 +3,6 @@ import * as path from 'path'
 
 import errorCardJson from '../adaptiveCards/errorCard.json'
 import processingCardJson from '../adaptiveCards/processingCard.json'
-import textToTranscriptCardJson from '../adaptiveCards/textToTranscriptCard.json'
 import transcriptToAudioCardJson from '../adaptiveCards/transcriptToAudioCard.json'
 import uploadFileCardJson from '../adaptiveCards/uploadFileCard.json'
 import warningCardJson from '../adaptiveCards/warningCard.json'
@@ -57,9 +56,10 @@ export const warningCard = (message: string): any => {
  * @param message The message to display on the card indicating processing status.
  * @returns An Adaptive Card indicating processing status.
  */
-export const processingCard = (message: string) => {
+export const processingCard = (title: string, message: string) => {
   return new ACData.Template(processingCardJson).expand({
     $root: {
+      title: title,
       message: message,
     },
   })
@@ -96,11 +96,10 @@ export const uploadFileCard = async (title: string, body: string, config: Episod
  * @param transcript The transcript text to display on the card.
  * @returns An Adaptive Card with the title and transcript.
  */
-export const textToTranscriptCard = (title: string, transcript: string) => {
-  return new ACData.Template(textToTranscriptCardJson).expand({
+export const textToTranscriptCard = (title: string, transcripts: string[]) => {
+  return new ACData.Template(createTextToTranscriptCard(transcripts)).expand({
     $root: {
       title: title,
-      transcript: transcript,
     },
   })
 }
@@ -318,5 +317,153 @@ export const episodeConfigCard = (config: EpisodeConfig) => {
         },
       ],
     },
+  }
+}
+
+/**
+ * Creates an adaptive card for displaying all transcripts.
+ * @param transcripts - array of transcript strings
+ * @returns Adaptive card for text-to-transcript results
+ */
+const createTextToTranscriptCard = (transcripts: string[]) => {
+  return {
+    type: 'AdaptiveCard',
+    version: '1.5',
+    msteams: {
+      width: 'Full',
+    },
+    body: [
+      {
+        type: 'Container',
+        style: 'default',
+        bleed: true,
+        items: [
+          {
+            type: 'ColumnSet',
+            columns: [
+              {
+                type: 'Column',
+                width: 'auto',
+                items: [
+                  {
+                    type: 'TextBlock',
+                    text: '✅',
+                    size: 'Large',
+                  },
+                ],
+              },
+              {
+                type: 'Column',
+                width: 'stretch',
+                items: [
+                  {
+                    type: 'TextBlock',
+                    text: '${title}',
+                    weight: 'Bolder',
+                    size: 'Medium',
+                    color: 'Default',
+                    wrap: true,
+                  },
+                  createTranscriptCarousel(transcripts),
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  }
+}
+
+/**
+ * Creates a carousel of transcript pages with actions for each transcript.
+ * Each page includes truncated and full transcript views with toggle visibility actions,
+ * as well as buttons to create a podcast or edit the transcript.
+ * @param transcripts - array of transcript strings
+ * @returns Carousel card with pages for each transcript
+ */
+const createTranscriptCarousel = (transcripts: string[]) => {
+  const pages = transcripts.map((transcript, index) => ({
+    type: 'CarouselPage',
+    style: 'accent',
+    showBorder: true,
+    roundedCorners: true,
+    items: [
+      {
+        type: 'TextBlock',
+        id: `truncatedText_${index}`,
+        text: transcript,
+        wrap: true,
+        maxLines: 5,
+      },
+      {
+        type: 'TextBlock',
+        id: `fullText_${index}`,
+        text: transcript,
+        wrap: true,
+        isVisible: false,
+      },
+      {
+        type: 'RichTextBlock',
+        id: `showMore_${index}`,
+        targetWidth: 'AtLeast:Narrow',
+        inlines: [
+          {
+            type: 'TextRun',
+            text: 'Show Full Transcript',
+            selectAction: {
+              type: 'Action.ToggleVisibility',
+              targetElements: [`truncatedText_${index}`, `fullText_${index}`, `showMore_${index}`, `showLess_${index}`],
+            },
+          },
+        ],
+      },
+      {
+        type: 'RichTextBlock',
+        id: `showLess_${index}`,
+        targetWidth: 'AtLeast:Narrow',
+        inlines: [
+          {
+            type: 'TextRun',
+            text: 'Show Preview',
+            selectAction: {
+              type: 'Action.ToggleVisibility',
+              targetElements: [`truncatedText_${index}`, `fullText_${index}`, `showMore_${index}`, `showLess_${index}`],
+            },
+          },
+        ],
+        isVisible: false,
+      },
+      {
+        type: 'ActionSet',
+        actions: [
+          {
+            type: 'Action.Execute',
+            verb: 'transcriptToAudio',
+            title: 'Create Podcast',
+            style: 'positive',
+            data: { index: index },
+          },
+          {
+            type: 'Action.Submit',
+            title: 'Edit Transcript',
+            id: 'openDialog',
+            data: {
+              msteams: {
+                type: 'task/fetch',
+              },
+              taskModule: 'openDialog',
+              transcript: transcript,
+              index: index,
+            },
+          },
+        ],
+      },
+    ],
+  }))
+
+  return {
+    type: 'Carousel',
+    pages,
   }
 }

@@ -3,7 +3,7 @@ import { Selector } from '@microsoft/teams-ai'
 import { processingCard, textToTranscriptCard, warningCard } from '../internal/cards'
 import { ActivityContext } from '../internal/conversationHandlers'
 import { log } from '../internal/logger'
-import { EXTRACTED_TEXT, TRANSCRIPT_TEXT, readFile, writeFile } from '../internal/utils/documentUtils'
+import { EXTRACTED_TEXT, TRANSCRIPT_TEXT, getTranscripts, readFile, writeFile } from '../internal/utils/documentUtils'
 import { DEFAULT_CONFIG } from '../tts/episodeConfig'
 import { toTranscript } from '../tts/textToTranscript'
 
@@ -22,7 +22,16 @@ export class TextToTranscriptHandler {
   async handleActionInvoked(context: ActivityContext) {
     setImmediate(async () => this.generateTranscript(context))
 
-    return processingCard('Generating transcript...')
+    return processingCard(
+      'Generating transcript...',
+      "You'll receive another message when processing is complete. \n\n**Config:**" +
+        '\n\nKind: ' +
+        (context.conversation.config?.kind || DEFAULT_CONFIG.kind) +
+        '\n\nLength: ' +
+        (context.conversation.config?.length || DEFAULT_CONFIG.length) +
+        '\n\nVoices: ' +
+        (context.conversation.config?.voices || DEFAULT_CONFIG.voices.map((v) => v).join(', '))
+    )
   }
 
   /**
@@ -43,7 +52,7 @@ export class TextToTranscriptHandler {
       // Write the transcript to a file
       await writeFile(userId, documentId, TRANSCRIPT_TEXT, transcriptText)
       // Send a proactive card with the transcript
-      await proactiveSendCard(textToTranscriptCard('Transcript Created', transcriptText))
+      await proactiveSendCard(textToTranscriptCard('Transcript Created', await getTranscripts(conversation)))
     } catch (error) {
       log.error('Error generating transcript:', error)
       await proactiveSendCard(warningCard('The transcript could not be generated. Please try again later.'))

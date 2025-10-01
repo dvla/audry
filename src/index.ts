@@ -2,6 +2,8 @@ import { ActivityTypes, TurnContext } from 'botbuilder'
 import express from 'express'
 
 import { GenericCommandHandler } from './commands/genericCommandHandler'
+import { DialogHandler } from './handlers/dialogHandler'
+import { EditTranscriptHandler } from './handlers/editTranscriptHandler'
 import { FileConsentHandler } from './handlers/fileConsentHandler'
 import { ReviewHandler } from './handlers/reviewHandler'
 import { TextToTranscriptHandler } from './handlers/textToTranscriptHandler'
@@ -39,12 +41,18 @@ app.message(reviewHandler.triggerPatterns, async (context: TurnContext, state: A
   await reviewHandler.handleInvoked(MessageHandler(context, state))
 })
 
+const editTranscriptHandler = new EditTranscriptHandler()
+app.message(editTranscriptHandler.triggerPatterns, async (context: TurnContext, state: ApplicationTurnState) => {
+  await editTranscriptHandler.handleInvoked(MessageHandler(context, state))
+})
+
 /**
  * Handle Adaptive Card actions.
  */
 const textToTranscriptHandler = new TextToTranscriptHandler()
 const transcriptToAudioHandler = new TranscriptToAudioHandler()
 const fileConsentHandler = new FileConsentHandler()
+const dialogHandler = new DialogHandler()
 
 app.adaptiveCards.actionExecute(MATCH_ALL, async (context: TurnContext, state) => {
   switch (context.activity.value?.action?.verb) {
@@ -60,9 +68,11 @@ app.adaptiveCards.actionExecute(MATCH_ALL, async (context: TurnContext, state) =
 
 // File consent invoke handler
 const FILE_CONSENT_INVOKE_NAME = 'fileConsent/invoke'
+const TASK_INVOKE_NAME = 'task/fetch'
+const TASK_SUBMIT_NAME = 'task/submit'
 
 app.message(
-  async (context: TurnContext) => {
+  async (context: TurnContext): Promise<any> => {
     if (ActivityTypes.Invoke == context.activity.type && context.activity.name == FILE_CONSENT_INVOKE_NAME) {
       return true
     }
@@ -75,7 +85,6 @@ app.message(
   }
 )
 
-// Listen for messages with the SAVE_CONFIG_MESSAGE action
 app.message(
   async (context: TurnContext) => {
     if (ActivityTypes.Message == context.activity.type && context.activity.value?.action == SAVE_CONFIG_MESSAGE) {
@@ -86,6 +95,29 @@ app.message(
   async (context: TurnContext, state: ApplicationTurnState) => {
     if (context.activity.value?.action === SAVE_CONFIG_MESSAGE) {
       await uploadFileCommandHandler.handleSaveConfig(MessageHandler(context, state))
+    }
+  }
+)
+
+app.message(
+  async (context: TurnContext): Promise<any> => {
+    if (context.activity?.name == TASK_INVOKE_NAME || context.activity?.name == TASK_SUBMIT_NAME) {
+      return true
+    }
+    return false
+  },
+  async (context: TurnContext, state: ApplicationTurnState) => {
+    switch (context.activity.name) {
+      case TASK_INVOKE_NAME:
+        await dialogHandler.handleDialogInvoke(MessageHandler(context, state))
+        break
+      case TASK_SUBMIT_NAME:
+        await dialogHandler.handleDialogSubmit(MessageHandler(context, state))
+        break
+      default:
+        log.warn(`Unhandled invoke activity: ${context.activity.name}`)
+        await context.sendActivity(warningCard(`Unhandled invoke activity: ${context.activity.name}`))
+        break
     }
   }
 )

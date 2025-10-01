@@ -23,7 +23,7 @@ exports[`TranscriptToAudioHandler > handleActionInvoked > should return processi
             {
               "items": [
                 {
-                  "text": "Generating audio... This may take a few minutes.",
+                  "text": "Generating audio...",
                   "type": "TextBlock",
                   "weight": "Bolder",
                   "wrap": true,
@@ -31,7 +31,7 @@ exports[`TranscriptToAudioHandler > handleActionInvoked > should return processi
                 {
                   "isSubtle": true,
                   "spacing": "Small",
-                  "text": "You'll receive another message when processing is complete.",
+                  "text": "This may take a few minutes.",
                   "type": "TextBlock",
                   "wrap": true,
                 },
@@ -47,7 +47,10 @@ exports[`TranscriptToAudioHandler > handleActionInvoked > should return processi
       "type": "Container",
     },
   ],
+  "msteams": {
+    "width": "Full",
+  },
   "type": "AdaptiveCard",
-  "version": "1.5",
+  "version": "1.6",
 }
 `;

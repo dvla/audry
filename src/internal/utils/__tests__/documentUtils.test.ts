@@ -1,10 +1,13 @@
 import path from 'path'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
+import { DEFAULT_CONFIG } from '../../../tts/episodeConfig'
+import { ConversationState } from '../../conversationHandlers'
 import {
-  EXTRACTED_TEXT,
+  EDITED_TRANSCRIPT_TEXT,
   TRANSCRIPT_TEXT,
   generatePodcastFileName,
+  getTranscripts,
   readFile,
   writeFile,
 } from '../../utils/documentUtils'
@@ -164,10 +167,108 @@ describe('fileUtils', () => {
     })
   })
 
-  describe('constants', () => {
-    test('exports correct file name constants', () => {
-      expect(EXTRACTED_TEXT).toBe('extracted_text.txt')
-      expect(TRANSCRIPT_TEXT).toBe('transcript.txt')
+  describe('getTranscripts', () => {
+    const mockConversation: ConversationState = {
+      count: 0,
+      documentId: 'doc123',
+      documentPath: '/path/to/document',
+      audioFilePath: '/path/to/audio',
+      userId: 'user123',
+      config: DEFAULT_CONFIG,
+    }
+
+    beforeEach(() => {
+      vi.clearAllMocks()
+    })
+
+    test('returns both original and edited transcripts when both exist', async () => {
+      // Mock readFile to return different content for different files
+      vi.mocked(mockDownloadFile)
+        .mockResolvedValueOnce(Buffer.from('Original transcript content'))
+        .mockResolvedValueOnce(Buffer.from('Edited transcript content'))
+
+      const result = await getTranscripts(mockConversation)
+
+      expect(result).toEqual(['Original transcript content', 'Edited transcript content'])
+      expect(mockDownloadFile).toHaveBeenCalledTimes(2)
+      expect(mockDownloadFile).toHaveBeenNthCalledWith(1, 'user123', 'doc123', TRANSCRIPT_TEXT)
+      expect(mockDownloadFile).toHaveBeenNthCalledWith(2, 'user123', 'doc123', EDITED_TRANSCRIPT_TEXT)
+    })
+
+    test('returns only original transcript when edited transcript does not exist', async () => {
+      // Mock first call to succeed, second to fail
+      vi.mocked(mockDownloadFile)
+        .mockResolvedValueOnce(Buffer.from('Original transcript content'))
+        .mockRejectedValueOnce(new Error('File not found'))
+
+      const result = await getTranscripts(mockConversation)
+
+      expect(result).toEqual(['Original transcript content'])
+      expect(mockDownloadFile).toHaveBeenCalledTimes(2)
+    })
+
+    test('returns only edited transcript when original transcript does not exist', async () => {
+      // Mock first call to fail, second to succeed
+      vi.mocked(mockDownloadFile)
+        .mockRejectedValueOnce(new Error('File not found'))
+        .mockResolvedValueOnce(Buffer.from('Edited transcript content'))
+
+      const result = await getTranscripts(mockConversation)
+
+      expect(result).toEqual(['Edited transcript content'])
+      expect(mockDownloadFile).toHaveBeenCalledTimes(2)
+    })
+
+    test('returns empty array when neither transcript exists', async () => {
+      // Mock both calls to fail
+      vi.mocked(mockDownloadFile)
+        .mockRejectedValueOnce(new Error('File not found'))
+        .mockRejectedValueOnce(new Error('File not found'))
+
+      const result = await getTranscripts(mockConversation)
+
+      expect(result).toEqual([])
+      expect(mockDownloadFile).toHaveBeenCalledTimes(2)
+    })
+
+    test('handles file read errors gracefully', async () => {
+      // When Azure fails, it should fallback to local filesystem
+      vi.mocked(mockDownloadFile)
+        .mockRejectedValueOnce(new Error('Azure error'))
+        .mockRejectedValueOnce(new Error('Azure error'))
+
+      // Mock local file system reads to succeed
+      vi.mocked(mockFsReadFile)
+        .mockResolvedValueOnce('Local original transcript')
+        .mockResolvedValueOnce('Local edited transcript')
+
+      const result = await getTranscripts(mockConversation)
+
+      expect(result).toEqual([])
+    })
+
+    test('filters out falsy values correctly', async () => {
+      // Test the internal logic that only pushes truthy values
+      vi.mocked(mockDownloadFile)
+        .mockResolvedValueOnce(Buffer.from('Valid transcript'))
+        .mockRejectedValueOnce(new Error('File not found'))
+
+      const result = await getTranscripts(mockConversation)
+
+      expect(result).toEqual(['Valid transcript'])
+      expect(result).toHaveLength(1)
+    })
+
+    test('maintains order - original transcript first, edited transcript second', async () => {
+      vi.mocked(mockDownloadFile)
+        .mockResolvedValueOnce(Buffer.from('ORIGINAL'))
+        .mockResolvedValueOnce(Buffer.from('EDITED'))
+
+      const result = await getTranscripts(mockConversation)
+
+      expect(result[0]).toBe('ORIGINAL')
+      expect(result[1]).toBe('EDITED')
+      expect(result).toHaveLength(2)
     })
   })
 })

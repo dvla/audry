@@ -1,7 +1,10 @@
 {
   "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
   "type": "AdaptiveCard",
-  "version": "1.5",
+  "version": "1.6",
+  "msteams": {
+    "width": "Full"
+  },
   "body": [
     {
       "type": "Container",
@@ -28,13 +31,13 @@
               "items": [
                 {
                   "type": "TextBlock",
-                  "text": "${message}",
+                  "text": "${title}",
                   "weight": "Bolder",
                   "wrap": true
                 },
                 {
                   "type": "TextBlock",
-                  "text": "You'll receive another message when processing is complete.",
+                  "text": "${message}",
                   "isSubtle": true,
                   "wrap": true,
                   "spacing": "Small"

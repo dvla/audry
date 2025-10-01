@@ -1,0 +1,468 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`EditTranscriptHandler > handleInvoked > should handle empty transcripts array 1`] = `
+[MockFunction spy] {
+  "calls": [
+    [
+      {
+        "body": [
+          {
+            "bleed": true,
+            "items": [
+              {
+                "columns": [
+                  {
+                    "items": [
+                      {
+                        "size": "Large",
+                        "text": "✅",
+                        "type": "TextBlock",
+                      },
+                    ],
+                    "type": "Column",
+                    "width": "auto",
+                  },
+                  {
+                    "items": [
+                      {
+                        "color": "Default",
+                        "size": "Medium",
+                        "text": "Edit Transcript",
+                        "type": "TextBlock",
+                        "weight": "Bolder",
+                        "wrap": true,
+                      },
+                      {
+                        "pages": [],
+                        "type": "Carousel",
+                      },
+                    ],
+                    "type": "Column",
+                    "width": "stretch",
+                  },
+                ],
+                "type": "ColumnSet",
+              },
+            ],
+            "style": "default",
+            "type": "Container",
+          },
+        ],
+        "msteams": {
+          "width": "Full",
+        },
+        "type": "AdaptiveCard",
+        "version": "1.5",
+      },
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`EditTranscriptHandler > handleInvoked > should handle single transcript 1`] = `
+[MockFunction spy] {
+  "calls": [
+    [
+      {
+        "body": [
+          {
+            "bleed": true,
+            "items": [
+              {
+                "columns": [
+                  {
+                    "items": [
+                      {
+                        "size": "Large",
+                        "text": "✅",
+                        "type": "TextBlock",
+                      },
+                    ],
+                    "type": "Column",
+                    "width": "auto",
+                  },
+                  {
+                    "items": [
+                      {
+                        "color": "Default",
+                        "size": "Medium",
+                        "text": "Edit Transcript",
+                        "type": "TextBlock",
+                        "weight": "Bolder",
+                        "wrap": true,
+                      },
+                      {
+                        "pages": [
+                          {
+                            "items": [
+                              {
+                                "id": "truncatedText_0",
+                                "maxLines": 5,
+                                "text": "Only original transcript content",
+                                "type": "TextBlock",
+                                "wrap": true,
+                              },
+                              {
+                                "id": "fullText_0",
+                                "isVisible": false,
+                                "text": "Only original transcript content",
+                                "type": "TextBlock",
+                                "wrap": true,
+                              },
+                              {
+                                "id": "showMore_0",
+                                "inlines": [
+                                  {
+                                    "selectAction": {
+                                      "targetElements": [
+                                        "truncatedText_0",
+                                        "fullText_0",
+                                        "showMore_0",
+                                        "showLess_0",
+                                      ],
+                                      "type": "Action.ToggleVisibility",
+                                    },
+                                    "text": "Show Full Transcript",
+                                    "type": "TextRun",
+                                  },
+                                ],
+                                "targetWidth": "AtLeast:Narrow",
+                                "type": "RichTextBlock",
+                              },
+                              {
+                                "id": "showLess_0",
+                                "inlines": [
+                                  {
+                                    "selectAction": {
+                                      "targetElements": [
+                                        "truncatedText_0",
+                                        "fullText_0",
+                                        "showMore_0",
+                                        "showLess_0",
+                                      ],
+                                      "type": "Action.ToggleVisibility",
+                                    },
+                                    "text": "Show Preview",
+                                    "type": "TextRun",
+                                  },
+                                ],
+                                "isVisible": false,
+                                "targetWidth": "AtLeast:Narrow",
+                                "type": "RichTextBlock",
+                              },
+                              {
+                                "actions": [
+                                  {
+                                    "data": {
+                                      "index": 0,
+                                    },
+                                    "style": "positive",
+                                    "title": "Create Podcast",
+                                    "type": "Action.Execute",
+                                    "verb": "transcriptToAudio",
+                                  },
+                                  {
+                                    "data": {
+                                      "index": 0,
+                                      "msteams": {
+                                        "type": "task/fetch",
+                                      },
+                                      "taskModule": "openDialog",
+                                      "transcript": "Only original transcript content",
+                                    },
+                                    "id": "openDialog",
+                                    "title": "Edit Transcript",
+                                    "type": "Action.Submit",
+                                  },
+                                ],
+                                "type": "ActionSet",
+                              },
+                            ],
+                            "roundedCorners": true,
+                            "showBorder": true,
+                            "style": "accent",
+                            "type": "CarouselPage",
+                          },
+                        ],
+                        "type": "Carousel",
+                      },
+                    ],
+                    "type": "Column",
+                    "width": "stretch",
+                  },
+                ],
+                "type": "ColumnSet",
+              },
+            ],
+            "style": "default",
+            "type": "Container",
+          },
+        ],
+        "msteams": {
+          "width": "Full",
+        },
+        "type": "AdaptiveCard",
+        "version": "1.5",
+      },
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`EditTranscriptHandler > handleInvoked > should send textToTranscriptCard with Edit Transcript title and transcripts 1`] = `
+[MockFunction spy] {
+  "calls": [
+    [
+      {
+        "body": [
+          {
+            "bleed": true,
+            "items": [
+              {
+                "columns": [
+                  {
+                    "items": [
+                      {
+                        "size": "Large",
+                        "text": "✅",
+                        "type": "TextBlock",
+                      },
+                    ],
+                    "type": "Column",
+                    "width": "auto",
+                  },
+                  {
+                    "items": [
+                      {
+                        "color": "Default",
+                        "size": "Medium",
+                        "text": "Edit Transcript",
+                        "type": "TextBlock",
+                        "weight": "Bolder",
+                        "wrap": true,
+                      },
+                      {
+                        "pages": [
+                          {
+                            "items": [
+                              {
+                                "id": "truncatedText_0",
+                                "maxLines": 5,
+                                "text": "Original transcript content",
+                                "type": "TextBlock",
+                                "wrap": true,
+                              },
+                              {
+                                "id": "fullText_0",
+                                "isVisible": false,
+                                "text": "Original transcript content",
+                                "type": "TextBlock",
+                                "wrap": true,
+                              },
+                              {
+                                "id": "showMore_0",
+                                "inlines": [
+                                  {
+                                    "selectAction": {
+                                      "targetElements": [
+                                        "truncatedText_0",
+                                        "fullText_0",
+                                        "showMore_0",
+                                        "showLess_0",
+                                      ],
+                                      "type": "Action.ToggleVisibility",
+                                    },
+                                    "text": "Show Full Transcript",
+                                    "type": "TextRun",
+                                  },
+                                ],
+                                "targetWidth": "AtLeast:Narrow",
+                                "type": "RichTextBlock",
+                              },
+                              {
+                                "id": "showLess_0",
+                                "inlines": [
+                                  {
+                                    "selectAction": {
+                                      "targetElements": [
+                                        "truncatedText_0",
+                                        "fullText_0",
+                                        "showMore_0",
+                                        "showLess_0",
+                                      ],
+                                      "type": "Action.ToggleVisibility",
+                                    },
+                                    "text": "Show Preview",
+                                    "type": "TextRun",
+                                  },
+                                ],
+                                "isVisible": false,
+                                "targetWidth": "AtLeast:Narrow",
+                                "type": "RichTextBlock",
+                              },
+                              {
+                                "actions": [
+                                  {
+                                    "data": {
+                                      "index": 0,
+                                    },
+                                    "style": "positive",
+                                    "title": "Create Podcast",
+                                    "type": "Action.Execute",
+                                    "verb": "transcriptToAudio",
+                                  },
+                                  {
+                                    "data": {
+                                      "index": 0,
+                                      "msteams": {
+                                        "type": "task/fetch",
+                                      },
+                                      "taskModule": "openDialog",
+                                      "transcript": "Original transcript content",
+                                    },
+                                    "id": "openDialog",
+                                    "title": "Edit Transcript",
+                                    "type": "Action.Submit",
+                                  },
+                                ],
+                                "type": "ActionSet",
+                              },
+                            ],
+                            "roundedCorners": true,
+                            "showBorder": true,
+                            "style": "accent",
+                            "type": "CarouselPage",
+                          },
+                          {
+                            "items": [
+                              {
+                                "id": "truncatedText_1",
+                                "maxLines": 5,
+                                "text": "Edited transcript content",
+                                "type": "TextBlock",
+                                "wrap": true,
+                              },
+                              {
+                                "id": "fullText_1",
+                                "isVisible": false,
+                                "text": "Edited transcript content",
+                                "type": "TextBlock",
+                                "wrap": true,
+                              },
+                              {
+                                "id": "showMore_1",
+                                "inlines": [
+                                  {
+                                    "selectAction": {
+                                      "targetElements": [
+                                        "truncatedText_1",
+                                        "fullText_1",
+                                        "showMore_1",
+                                        "showLess_1",
+                                      ],
+                                      "type": "Action.ToggleVisibility",
+                                    },
+                                    "text": "Show Full Transcript",
+                                    "type": "TextRun",
+                                  },
+                                ],
+                                "targetWidth": "AtLeast:Narrow",
+                                "type": "RichTextBlock",
+                              },
+                              {
+                                "id": "showLess_1",
+                                "inlines": [
+                                  {
+                                    "selectAction": {
+                                      "targetElements": [
+                                        "truncatedText_1",
+                                        "fullText_1",
+                                        "showMore_1",
+                                        "showLess_1",
+                                      ],
+                                      "type": "Action.ToggleVisibility",
+                                    },
+                                    "text": "Show Preview",
+                                    "type": "TextRun",
+                                  },
+                                ],
+                                "isVisible": false,
+                                "targetWidth": "AtLeast:Narrow",
+                                "type": "RichTextBlock",
+                              },
+                              {
+                                "actions": [
+                                  {
+                                    "data": {
+                                      "index": 1,
+                                    },
+                                    "style": "positive",
+                                    "title": "Create Podcast",
+                                    "type": "Action.Execute",
+                                    "verb": "transcriptToAudio",
+                                  },
+                                  {
+                                    "data": {
+                                      "index": 1,
+                                      "msteams": {
+                                        "type": "task/fetch",
+                                      },
+                                      "taskModule": "openDialog",
+                                      "transcript": "Edited transcript content",
+                                    },
+                                    "id": "openDialog",
+                                    "title": "Edit Transcript",
+                                    "type": "Action.Submit",
+                                  },
+                                ],
+                                "type": "ActionSet",
+                              },
+                            ],
+                            "roundedCorners": true,
+                            "showBorder": true,
+                            "style": "accent",
+                            "type": "CarouselPage",
+                          },
+                        ],
+                        "type": "Carousel",
+                      },
+                    ],
+                    "type": "Column",
+                    "width": "stretch",
+                  },
+                ],
+                "type": "ColumnSet",
+              },
+            ],
+            "style": "default",
+            "type": "Container",
+          },
+        ],
+        "msteams": {
+          "width": "Full",
+        },
+        "type": "AdaptiveCard",
+        "version": "1.5",
+      },
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": Promise {},
+    },
+  ],
+}
+`;
