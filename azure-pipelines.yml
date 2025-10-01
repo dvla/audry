@@ -115,7 +115,7 @@ stages:
 
 # Deploy the infrastructure via Bicep
   - stage: Infrastructure
-    condition: not(and(contains(variables['Build.SourceBranchName'], 'renovate'), not(contains(variables['Build.SourceBranchName'], 'bicep')))) #Do not run this stage for Renovate branches unless they contain 'bicep' in the name
+    condition: and(succeeded(), not(and(contains(variables['Build.SourceBranchName'], 'renovate'), not(contains(variables['Build.SourceBranchName'], 'bicep'))))) # Do not run this stage for Renovate branches unless they contain 'bicep' in the name
     displayName: Create infrastructure
     jobs:
     - job: CreateInfrastructure
@@ -155,7 +155,7 @@ stages:
 
 
   - stage: ZipDeploy
-    condition: not(contains(variables['Build.SourceBranchName'], 'renovate')) #Do not run this stage for Renovate branches
+    condition: and(succeeded(), not(contains(variables['Build.SourceBranchName'], 'renovate'))) # Do not run this stage for Renovate branches
     displayName: Zip deploy
     jobs:
       - job: ZipDeploy
