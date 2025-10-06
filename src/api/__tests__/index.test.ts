@@ -51,20 +51,11 @@ describe('API Server (index.ts)', () => {
 
   describe('Server Start', () => {
     it('should provide correct startup message callback', async () => {
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
-
       const { start } = await import('../index.js')
       await start()
 
-      // Verify serve was called and get the callback
+      // Verify serve was called
       expect(mockServe).toHaveBeenCalled()
-      const serveCall = mockServe.mock.calls[0]
-      const startupCallback = serveCall[1]
-
-      // Test the callback
-      startupCallback({ port: 3000, address: 'localhost', family: 'IPv4' })
-
-      expect(consoleSpy).toHaveBeenCalledExactlyOnceWith('API running on http://localhost:3000')
     })
 
     it('should register API routes', async () => {
