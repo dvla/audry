@@ -42,7 +42,7 @@ describe('ReviewHandler', () => {
 
   it('should return typing activity on handleInvoked', async () => {
     const result = await handler.handleInvoked(activityContext)
-    expect(activityContext.send).toHaveBeenCalledWith(
+    expect(activityContext.send).toHaveBeenCalledExactlyOnceWith(
       expect.objectContaining({
         type: ActivityTypes.Typing,
       })
@@ -53,7 +53,8 @@ describe('ReviewHandler', () => {
     mockReadFile.mockResolvedValue('transcript content')
     mockReviewTranscript.mockResolvedValue({
       bgFeedback: 'British feedback',
-      hrFeedback: 'HR feedback',
+      crFeedback: 'Content reviewer feedback',
+      edaFeedback: 'Delivery advisor feedback',
       finalTranscript: 'edited transcript',
     })
 
@@ -63,16 +64,25 @@ describe('ReviewHandler', () => {
       activityContext.conversation
     )
 
-    expect(activityContext.proactiveSend).toHaveBeenCalledWith(
-      expect.stringContaining('# British Grammar and Localisation Expert Feedback')
+    expect(activityContext.proactiveSend).toHaveBeenNthCalledWith(
+      1,
+      '# British Grammar and Localisation Expert Feedback\nBritish feedback'
     )
-    expect(activityContext.proactiveSend).toHaveBeenCalledWith(
-      expect.stringContaining('# DVLA Content Reviewer Feedback')
+    expect(activityContext.proactiveSend).toHaveBeenNthCalledWith(
+      2,
+      '# DVLA Content Reviewer Feedback\nContent reviewer feedback'
     )
-    expect(activityContext.proactiveSend).toHaveBeenCalledWith(
-      expect.stringContaining('# Expressive Delivery Advisor Feedback')
+    expect(activityContext.proactiveSend).toHaveBeenNthCalledWith(
+      3,
+      '# Expressive Delivery Advisor Feedback\nDelivery advisor feedback'
     )
-    expect(mockWriteFile).toHaveBeenCalledWith('user456', 'doc123', 'transcript_edited.txt', 'edited transcript')
+    expect(activityContext.proactiveSend).toHaveBeenCalledTimes(3)
+    expect(mockWriteFile).toHaveBeenCalledExactlyOnceWith(
+      'user456',
+      'doc123',
+      'transcript_edited.txt',
+      'edited transcript'
+    )
   })
 
   it('should send message if no review returned', async () => {
@@ -85,7 +95,7 @@ describe('ReviewHandler', () => {
       activityContext.conversation
     )
 
-    expect(activityContext.proactiveSend).toHaveBeenCalledWith('No review for this transcript')
+    expect(activityContext.proactiveSend).toHaveBeenCalledExactlyOnceWith('No review for this transcript')
   })
 
   it('should send warning card if no transcript found', async () => {

@@ -104,7 +104,7 @@ describe('TranscriptToAudioHandler', () => {
       // wait a tick for setImmediate
       await new Promise((r) => setImmediate(r))
 
-      expect(generateAudioSpy).toHaveBeenCalledWith(
+      expect(generateAudioSpy).toHaveBeenCalledExactlyOnceWith(
         mockContext.proactiveSend,
         mockContext.proactiveSendCard,
         mockContext.conversation,
@@ -152,14 +152,14 @@ describe('TranscriptToAudioHandler', () => {
     it('should generate and send audio card', async () => {
       await handler.generateAudio(mockContext.proactiveSend, mockContext.proactiveSend, mockContext.conversation)
 
-      expect(mockReadFile).toHaveBeenCalledWith('test-user-456', 'test-doc-123', expect.any(String))
-      expect(mockTranscriptToSpeech).toHaveBeenCalledWith(
+      expect(mockReadFile).toHaveBeenCalledExactlyOnceWith('test-user-456', 'test-doc-123', expect.any(String))
+      expect(mockTranscriptToSpeech).toHaveBeenCalledExactlyOnceWith(
         { model: 'gemini-tts-v1', provider: 'google', temperature: 0.2 },
         'Test transcript',
         DEFAULT_CONFIG.voices
       )
       expect(mockCreateFileConsentCard).toHaveBeenCalled()
-      expect(mockContext.proactiveSend).toHaveBeenCalledWith(expect.objectContaining({ type: 'message' }))
+      expect(mockContext.proactiveSend).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ type: 'message' }))
     })
   })
 
@@ -174,7 +174,7 @@ describe('TranscriptToAudioHandler', () => {
       await handler.generateAudio(mockContext.proactiveSend, mockContext.proactiveSendCard, mockContext.conversation)
 
       expect(mockLogError).toHaveBeenCalled()
-      expect(mockContext.proactiveSendCard).toHaveBeenCalledWith(
+      expect(mockContext.proactiveSendCard).toHaveBeenCalledExactlyOnceWith(
         expect.objectContaining({ message: 'Failed to generate audio from transcript' })
       )
     })

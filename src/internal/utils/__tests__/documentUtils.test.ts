@@ -102,7 +102,7 @@ describe('fileUtils', () => {
     test('uploads to Azure when Azure is configured', async () => {
       const result = await writeFile(userId, documentId, fileName, content)
 
-      expect(mockUploadFile).toHaveBeenCalledWith(userId, documentId, fileName, content, undefined)
+      expect(mockUploadFile).toHaveBeenCalledExactlyOnceWith(userId, documentId, fileName, content, undefined)
       expect(result).toBe('https://fake-storage.blob.core.windows.net/fake-url')
     })
 
@@ -111,7 +111,7 @@ describe('fileUtils', () => {
 
       const result = await writeFile(userId, documentId, fileName, bufferContent)
 
-      expect(mockUploadFile).toHaveBeenCalledWith(userId, documentId, fileName, bufferContent, undefined)
+      expect(mockUploadFile).toHaveBeenCalledExactlyOnceWith(userId, documentId, fileName, bufferContent, undefined)
       expect(result).toBe('https://fake-storage.blob.core.windows.net/fake-url')
     })
   })

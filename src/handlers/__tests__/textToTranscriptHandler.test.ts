@@ -65,6 +65,8 @@ describe('TextToTranscriptHandler', () => {
 
     const cardArgs = (activityContext.proactiveSendCard as Mock).mock.calls[0][0]
     expect(cardArgs).toMatchSnapshot()
-    expect(cards.warningCard).toHaveBeenCalledWith('The transcript could not be generated. Please try again later.')
+    expect(cards.warningCard).toHaveBeenCalledExactlyOnceWith(
+      'The transcript could not be generated. Please try again later.'
+    )
   })
 })

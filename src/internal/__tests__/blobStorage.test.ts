@@ -118,7 +118,7 @@ describe('BlobStorage', () => {
   describe('Constructor', () => {
     it('should initialize with correct configuration', () => {
       expect(mockGetAzureCredentials).toHaveBeenCalled()
-      expect(mockBlobServiceClient.getContainerClient).toHaveBeenCalledWith('fake-container')
+      expect(mockBlobServiceClient.getContainerClient).toHaveBeenCalledExactlyOnceWith('fake-container')
     })
   })
 
@@ -132,9 +132,13 @@ describe('BlobStorage', () => {
 
       const result = await blobStorageInstance.uploadFile(userId, documentId, fileName, content)
 
-      expect(mockContainerClient.getBlockBlobClient).toHaveBeenCalledWith(`${userId}/${documentId}/${fileName}`)
-      expect(mockBlockBlobClient.upload).toHaveBeenCalledWith(content, content.length, EMPTY_OPTIONS)
-      expect(mockLogInfo).toHaveBeenCalledWith(`File uploaded to blob storage: ${userId}/${documentId}/${fileName}`)
+      expect(mockContainerClient.getBlockBlobClient).toHaveBeenCalledExactlyOnceWith(
+        `${userId}/${documentId}/${fileName}`
+      )
+      expect(mockBlockBlobClient.upload).toHaveBeenCalledExactlyOnceWith(content, content.length, EMPTY_OPTIONS)
+      expect(mockLogInfo).toHaveBeenCalledExactlyOnceWith(
+        `File uploaded to blob storage: ${userId}/${documentId}/${fileName}`
+      )
       expect(result).toBe('https://fake-storage.blob.core.windows.net/fake-blob-url')
     })
 
@@ -143,7 +147,7 @@ describe('BlobStorage', () => {
 
       const result = await blobStorageInstance.uploadFile(userId, documentId, fileName, content)
 
-      expect(mockBlockBlobClient.uploadData).toHaveBeenCalledWith(content, EMPTY_OPTIONS)
+      expect(mockBlockBlobClient.uploadData).toHaveBeenCalledExactlyOnceWith(content, EMPTY_OPTIONS)
       expect(result).toBe('https://fake-storage.blob.core.windows.net/fake-blob-url')
     })
 
@@ -157,7 +161,7 @@ describe('BlobStorage', () => {
 
       const result = await blobStorageInstance.uploadFile(userId, documentId, fileName, content)
 
-      expect(mockBlockBlobClient.uploadStream).toHaveBeenCalledWith(content, EMPTY_OPTIONS)
+      expect(mockBlockBlobClient.uploadStream).toHaveBeenCalledExactlyOnceWith(content, EMPTY_OPTIONS)
       expect(result).toBe('https://fake-storage.blob.core.windows.net/fake-blob-url')
     })
 
@@ -170,7 +174,7 @@ describe('BlobStorage', () => {
         'Failed to upload file to blob storage: Upload failed'
       )
 
-      expect(mockLogError).toHaveBeenCalledWith('Error uploading file to blob storage: Upload failed', error)
+      expect(mockLogError).toHaveBeenCalledExactlyOnceWith('Error uploading file to blob storage: Upload failed', error)
     })
   })
 
@@ -182,8 +186,10 @@ describe('BlobStorage', () => {
     it('should download file successfully', async () => {
       const result = await blobStorageInstance.downloadFile(userId, documentId, fileName)
 
-      expect(mockContainerClient.getBlockBlobClient).toHaveBeenCalledWith(`${userId}/${documentId}/${fileName}`)
-      expect(mockBlockBlobClient.download).toHaveBeenCalledWith(0)
+      expect(mockContainerClient.getBlockBlobClient).toHaveBeenCalledExactlyOnceWith(
+        `${userId}/${documentId}/${fileName}`
+      )
+      expect(mockBlockBlobClient.download).toHaveBeenCalledExactlyOnceWith(0)
       expect(result).toEqual(Buffer.from('test file content'))
     })
 
@@ -196,7 +202,7 @@ describe('BlobStorage', () => {
         'Failed to download file from blob storage: No readable stream available'
       )
 
-      expect(mockLogError).toHaveBeenCalledWith(
+      expect(mockLogError).toHaveBeenCalledExactlyOnceWith(
         'Error downloading file from blob storage: No readable stream available',
         expect.any(Error)
       )
@@ -210,7 +216,10 @@ describe('BlobStorage', () => {
         'Failed to download file from blob storage: Download failed'
       )
 
-      expect(mockLogError).toHaveBeenCalledWith('Error downloading file from blob storage: Download failed', error)
+      expect(mockLogError).toHaveBeenCalledExactlyOnceWith(
+        'Error downloading file from blob storage: Download failed',
+        error
+      )
     })
 
     it('should handle multiple chunks in stream', async () => {

@@ -29,5 +29,8 @@ module.exports = {
     sourceType: "module",
   },
   plugins: ["@vitest", "import", "@typescript-eslint"],
+  rules: {
+    "@vitest/prefer-called-exactly-once-with": "warn"
+  },
   ignorePatterns: ["prettierrc.js"],
 };

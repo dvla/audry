@@ -104,7 +104,7 @@ describe('EditTranscriptHandler', () => {
       mockGetTranscripts.mockRejectedValue(error)
 
       await expect(handler.handleInvoked(activityContext)).rejects.toThrow('Failed to read transcripts')
-      expect(mockGetTranscripts).toHaveBeenCalledWith(activityContext.conversation)
+      expect(mockGetTranscripts).toHaveBeenCalledExactlyOnceWith(activityContext.conversation)
       expect(cards.textToTranscriptCard).not.toHaveBeenCalled()
       expect(activityContext.sendCard).not.toHaveBeenCalled()
     })

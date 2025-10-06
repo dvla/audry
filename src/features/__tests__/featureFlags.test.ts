@@ -53,7 +53,7 @@ describe('featureFlags', () => {
       const result = await isFeatureEnabled(Feature.UIConfig)
 
       expect(result).toBe(true)
-      expect(mockFeatureManager.isEnabled).toHaveBeenCalledWith(Feature.UIConfig)
+      expect(mockFeatureManager.isEnabled).toHaveBeenCalledExactlyOnceWith(Feature.UIConfig)
     })
 
     it('should return false when feature is disabled', async () => {
@@ -63,7 +63,7 @@ describe('featureFlags', () => {
       const result = await isFeatureEnabled(Feature.TTSModel)
 
       expect(result).toBe(false)
-      expect(mockFeatureManager.isEnabled).toHaveBeenCalledWith(Feature.TTSModel)
+      expect(mockFeatureManager.isEnabled).toHaveBeenCalledExactlyOnceWith(Feature.TTSModel)
     })
 
     it('should return false and log error when feature check throws', async () => {
@@ -74,7 +74,10 @@ describe('featureFlags', () => {
       const result = await isFeatureEnabled(Feature.UIConfig)
 
       expect(result).toBe(false)
-      expect(consoleErrorSpy).toHaveBeenCalledWith("Error checking feature flag 'uiconfig':", expect.any(Error))
+      expect(consoleErrorSpy).toHaveBeenCalledExactlyOnceWith(
+        "Error checking feature flag 'uiconfig':",
+        expect.any(Error)
+      )
 
       consoleErrorSpy.mockRestore()
     })
@@ -92,7 +95,7 @@ describe('featureFlags', () => {
       const result = await getVariant(Feature.TTSModel)
 
       expect(result).toEqual(mockVariant)
-      expect(mockFeatureManager.getVariant).toHaveBeenCalledWith(Feature.TTSModel)
+      expect(mockFeatureManager.getVariant).toHaveBeenCalledExactlyOnceWith(Feature.TTSModel)
     })
 
     it('should return undefined when no variant is available', async () => {
@@ -102,7 +105,7 @@ describe('featureFlags', () => {
       const result = await getVariant(Feature.UIConfig)
 
       expect(result).toBeUndefined()
-      expect(mockFeatureManager.getVariant).toHaveBeenCalledWith(Feature.UIConfig)
+      expect(mockFeatureManager.getVariant).toHaveBeenCalledExactlyOnceWith(Feature.UIConfig)
     })
 
     it('should return undefined and log error when variant retrieval throws', async () => {
@@ -113,7 +116,10 @@ describe('featureFlags', () => {
       const result = await getVariant(Feature.TTSModel)
 
       expect(result).toBeUndefined()
-      expect(consoleErrorSpy).toHaveBeenCalledWith("Error getting variant for feature 'ttsmodel':", expect.any(Error))
+      expect(consoleErrorSpy).toHaveBeenCalledExactlyOnceWith(
+        "Error getting variant for feature 'ttsmodel':",
+        expect.any(Error)
+      )
 
       consoleErrorSpy.mockRestore()
     })

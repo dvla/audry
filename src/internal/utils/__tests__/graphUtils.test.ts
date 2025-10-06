@@ -21,7 +21,7 @@ describe('graphUtils', () => {
       const fakeShowNotes = { title: 'Test', shortSummary: 'Summary', numOfWords: '42' }
       mockShowNotesGraph.invoke.mockResolvedValueOnce({ showNotes: fakeShowNotes })
       const result = await generateShowNotes('transcript', 'podcast-1')
-      expect(mockShowNotesGraph.invoke).toHaveBeenCalledWith(
+      expect(mockShowNotesGraph.invoke).toHaveBeenCalledExactlyOnceWith(
         { transcript: 'transcript' },
         { configurable: { thread_id: 'podcast-1' } }
       )
@@ -40,7 +40,7 @@ describe('graphUtils', () => {
       const fakeReview = { originalTranscript: 't', bgFeedback: 'b', hrFeedback: 'h', finalTranscript: 'f' }
       mockReviewerGraph.invoke.mockResolvedValueOnce(fakeReview)
       const result = await reviewTranscript('trans', 'podcast-2')
-      expect(mockReviewerGraph.invoke).toHaveBeenCalledWith(
+      expect(mockReviewerGraph.invoke).toHaveBeenCalledExactlyOnceWith(
         { originalTranscript: 'trans' },
         { configurable: { thread_id: 'podcast-2' } }
       )

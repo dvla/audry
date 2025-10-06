@@ -91,7 +91,7 @@ describe('UploadFileCommandHandler', () => {
       proactiveSendCard,
     } as any)
 
-    expect(send).toHaveBeenCalledWith({ type: ActivityTypes.Typing })
+    expect(send).toHaveBeenCalledExactlyOnceWith({ type: ActivityTypes.Typing })
     expect(proactiveSendCard).toHaveBeenCalled()
     expect(cards.uploadFileCard).toMatchSnapshot()
   })

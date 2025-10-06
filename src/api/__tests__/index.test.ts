@@ -45,7 +45,7 @@ describe('API Server (index.ts)', () => {
     it('should create a new Hono application instance', async () => {
       await import('../index.js')
 
-      expect(mockHono).toHaveBeenCalledWith()
+      expect(mockHono).toHaveBeenCalledExactlyOnceWith()
     })
   })
 
@@ -64,7 +64,7 @@ describe('API Server (index.ts)', () => {
       // Test the callback
       startupCallback({ port: 3000, address: 'localhost', family: 'IPv4' })
 
-      expect(consoleSpy).toHaveBeenCalledWith('API running on http://localhost:3000')
+      expect(consoleSpy).toHaveBeenCalledExactlyOnceWith('API running on http://localhost:3000')
     })
 
     it('should register API routes', async () => {

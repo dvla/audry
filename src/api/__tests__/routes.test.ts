@@ -50,7 +50,7 @@ describe('API Routes', () => {
 
       expect(response.status).toBe(200)
       expect(await response.text()).toBe(mockTranscript)
-      expect(mockToTranscript).toHaveBeenCalledWith('Sample input text', DEFAULT_CONFIG)
+      expect(mockToTranscript).toHaveBeenCalledExactlyOnceWith('Sample input text', DEFAULT_CONFIG)
     })
 
     it('should use custom config when provided', async () => {
@@ -73,7 +73,10 @@ describe('API Routes', () => {
       })
 
       expect(response.status).toBe(200)
-      expect(mockToTranscript).toHaveBeenCalledWith('Sample input text', expect.objectContaining(customConfig))
+      expect(mockToTranscript).toHaveBeenCalledExactlyOnceWith(
+        'Sample input text',
+        expect.objectContaining(customConfig)
+      )
     })
 
     it('should return 400 for invalid request body', async () => {
@@ -140,8 +143,8 @@ describe('API Routes', () => {
       expect(response.status).toBe(200)
       expect(response.headers.get('Content-Type')).toBe('application/octet-stream')
       expect(response.headers.get('Content-Disposition')).toBe(`attachment; filename="${mockOutputFileName}"`)
-      expect(mockTranscriptToAudioProvider).toHaveBeenCalledWith(DEFAULT_CONFIG)
-      expect(mockAudioProvider).toHaveBeenCalledWith('This is a transcript to convert to audio.')
+      expect(mockTranscriptToAudioProvider).toHaveBeenCalledExactlyOnceWith(DEFAULT_CONFIG)
+      expect(mockAudioProvider).toHaveBeenCalledExactlyOnceWith('This is a transcript to convert to audio.')
     })
 
     it('should return 500 when transcript to audio conversion fails', async () => {
@@ -218,7 +221,7 @@ describe('API Routes', () => {
       })
 
       expect(response.status).toBe(200)
-      expect(mockTranscriptToAudioProvider).toHaveBeenCalledWith(expect.objectContaining(customConfig))
+      expect(mockTranscriptToAudioProvider).toHaveBeenCalledExactlyOnceWith(expect.objectContaining(customConfig))
     })
   })
 
@@ -258,9 +261,12 @@ describe('API Routes', () => {
       expect(response.headers.get('Content-Disposition')).toBe(`attachment; filename="${mockOutputFileName}"`)
 
       // Verify the complete flow
-      expect(mockToTranscript).toHaveBeenCalledWith('Original text to be converted to audio.', DEFAULT_CONFIG)
-      expect(mockTranscriptToAudioProvider).toHaveBeenCalledWith(DEFAULT_CONFIG)
-      expect(mockAudioProvider).toHaveBeenCalledWith(mockTranscript)
+      expect(mockToTranscript).toHaveBeenCalledExactlyOnceWith(
+        'Original text to be converted to audio.',
+        DEFAULT_CONFIG
+      )
+      expect(mockTranscriptToAudioProvider).toHaveBeenCalledExactlyOnceWith(DEFAULT_CONFIG)
+      expect(mockAudioProvider).toHaveBeenCalledExactlyOnceWith(mockTranscript)
     })
 
     it('should return 500 when transcript generation fails', async () => {
@@ -301,7 +307,7 @@ describe('API Routes', () => {
       expect(response.status).toBe(500)
       expect(await response.json()).toBe('transcriptToAudio failed')
       expect(mockToTranscript).toHaveBeenCalled()
-      expect(mockAudioProvider).toHaveBeenCalledWith(mockTranscript)
+      expect(mockAudioProvider).toHaveBeenCalledExactlyOnceWith(mockTranscript)
     })
 
     it('should work with custom configuration for both transcript and audio generation', async () => {
@@ -335,12 +341,12 @@ describe('API Routes', () => {
       })
 
       expect(response.status).toBe(200)
-      expect(mockToTranscript).toHaveBeenCalledWith(
+      expect(mockToTranscript).toHaveBeenCalledExactlyOnceWith(
         'Original Welsh text content.',
         expect.objectContaining(customConfig)
       )
-      expect(mockTranscriptToAudioProvider).toHaveBeenCalledWith(expect.objectContaining(customConfig))
-      expect(mockAudioProvider).toHaveBeenCalledWith(mockTranscript)
+      expect(mockTranscriptToAudioProvider).toHaveBeenCalledExactlyOnceWith(expect.objectContaining(customConfig))
+      expect(mockAudioProvider).toHaveBeenCalledExactlyOnceWith(mockTranscript)
     })
   })
 

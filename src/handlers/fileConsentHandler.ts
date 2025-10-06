@@ -188,7 +188,7 @@ export class FileConsentHandler {
         'Content-Range': bytes,
         'Content-Length': size.toString(),
       },
-      body: buffer,
+      body: new Uint8Array(buffer),
     })
   }
 }

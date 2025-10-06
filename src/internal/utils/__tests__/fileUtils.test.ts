@@ -147,7 +147,7 @@ describe('writeContentToFile', () => {
     await expect(writeContentToFile('http://example.com/file.pdf', 'output.pdf')).resolves.toBeUndefined()
 
     // Verify pipeline was called with correct arguments
-    expect(pipeline).toHaveBeenCalledWith(mockStream, mockWriteStream)
+    expect(pipeline).toHaveBeenCalledExactlyOnceWith(mockStream, mockWriteStream)
   })
 
   it('throws error on bad fetch', async () => {

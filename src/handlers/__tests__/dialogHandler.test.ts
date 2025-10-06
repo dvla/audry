@@ -75,7 +75,7 @@ describe('DialogHandler', () => {
 
       const card = await handler.dialogCard('user456', 'doc123', 0)
 
-      expect(mockReadFile).toHaveBeenCalledWith('user456', 'doc123', 'transcript.txt')
+      expect(mockReadFile).toHaveBeenCalledExactlyOnceWith('user456', 'doc123', 'transcript.txt')
       expect(card).toMatchSnapshot()
     })
   })
@@ -100,7 +100,7 @@ describe('DialogHandler', () => {
       await handler.handleDialogInvoke(context)
 
       expect(send).toMatchSnapshot()
-      expect(mockReadFile).toHaveBeenCalledWith('user456', 'doc123', 'transcript_edited.txt')
+      expect(mockReadFile).toHaveBeenCalledExactlyOnceWith('user456', 'doc123', 'transcript_edited.txt')
     })
   })
 
@@ -123,7 +123,7 @@ describe('DialogHandler', () => {
     await handler.handleDialogInvoke(context)
 
     expect(send).toMatchSnapshot()
-    expect(mockReadFile).toHaveBeenCalledWith('user456', 'doc123', 'transcript_edited.txt')
+    expect(mockReadFile).toHaveBeenCalledExactlyOnceWith('user456', 'doc123', 'transcript_edited.txt')
   })
 
   describe('handleDialogSubmit', () => {
@@ -152,7 +152,7 @@ describe('DialogHandler', () => {
 
       await handler.handleDialogSubmit(context)
 
-      expect(mockWriteFile).toHaveBeenCalledWith(
+      expect(mockWriteFile).toHaveBeenCalledExactlyOnceWith(
         'user456',
         'doc123',
         'transcript.txt',
@@ -186,7 +186,7 @@ describe('DialogHandler', () => {
 
       await handler.handleDialogSubmit(context)
 
-      expect(mockWriteFile).toHaveBeenCalledWith(
+      expect(mockWriteFile).toHaveBeenCalledExactlyOnceWith(
         'user456',
         'doc123',
         'transcript_edited.txt',

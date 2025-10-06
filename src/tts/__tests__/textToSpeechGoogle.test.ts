@@ -79,9 +79,11 @@ describe('saveWaveFile', () => {
 
     await saveWaveFile(filePath, buffer)
 
-    expect(writeMock).toHaveBeenCalledWith(buffer)
+    expect(writeMock).toHaveBeenCalledExactlyOnceWith(buffer)
     expect(endMock).toHaveBeenCalled()
-    expect(onMock).toHaveBeenCalledWith('done', expect.any(Function))
+    expect(onMock).toHaveBeenNthCalledWith(1, 'done', expect.any(Function))
+    expect(onMock).toHaveBeenNthCalledWith(2, 'error', expect.any(Function))
+    expect(onMock).toHaveBeenCalledTimes(2)
   })
 })
 
@@ -114,7 +116,7 @@ describe('transcriptToSpeech', () => {
     expect(outputFileName).toContain(`podcast`)
 
     // wav FileWriter's write called with decoded audio buffer
-    expect(writeMock).toHaveBeenCalledWith(Buffer.from(fakeBase64Audio, 'base64'))
+    expect(writeMock).toHaveBeenCalledExactlyOnceWith(Buffer.from(fakeBase64Audio, 'base64'))
   })
 
   test('throws error if no audio data received', async () => {
@@ -205,7 +207,7 @@ describe('processChunks', () => {
     })
     const result = await processChunks('Hello world', voiceConfiguration, DEFAULT_TTS_MODEL_CONFIG)
     expect(result).toBe('base64audio')
-    expect(fakeGenerateContent).toHaveBeenCalledWith({
+    expect(fakeGenerateContent).toHaveBeenCalledExactlyOnceWith({
       model: TTS_MODEL,
       contents: [{ parts: [{ text: `${STYLE}\n\nHello world` }] }],
       config: voiceConfiguration,
