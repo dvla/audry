@@ -86,6 +86,12 @@ stages:
       - script: |
           npm run test
         displayName: 'Run Tests'
+      - task: PublishTestResults@2
+        displayName: 'Publish Test Results'
+        condition: succeededOrFailed()
+        inputs:
+          testResultsFormat: JUnit
+          testResultsFiles: '$(Build.SourcesDirectory)/test/junit-report.xml'  
       - task: PublishCodeCoverageResults@2
         displayName: 'Publish Code Coverage'
         inputs:

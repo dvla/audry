@@ -11,6 +11,7 @@ export const DEFAULT_GEMINI_MODEL = 'gemini-2.0-flash-001'
 export const DEFAULT_GEMINI_TTS_MODEL = 'gemini-2.5-flash-preview-tts'
 export const DEFAULT_MAX_NUMBER_OF_LINES = '28'
 export const DEFAULT_LINES_PER_CHUNK = '4'
+export const DEFAULT_ORG = 'DVLA (Driver and Vehicle Licensing Agency)'
 
 /**
  * Checks if a variable is set and not equal to the placeholder.
@@ -56,4 +57,5 @@ export const Config = {
   // Azure Blob Storage configuration
   STORAGE_ACCOUNT_NAME: checkOptionalVariable(process.env.STORAGE_ACCOUNT_NAME, DEFAULT_EMPTY),
   STORAGE_BLOB_CONTAINER_NAME: checkOptionalVariable(process.env.STORAGE_BLOB_CONTAINER_NAME, DEFAULT_EMPTY),
+  ORGANISATION_NAME: checkOptionalVariable(process.env.ORGANIZATION_NAME, DEFAULT_ORG),
 }

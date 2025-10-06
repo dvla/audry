@@ -10,7 +10,6 @@
     ],
     "azureFunctions.stopFuncTaskPostDebug": false,
     "azureFunctions.showProjectWarning": false,
-    "csharp.suppressDotnetRestoreNotification": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "github.copilot.chat.commitMessageGeneration.instructions": [
         {
