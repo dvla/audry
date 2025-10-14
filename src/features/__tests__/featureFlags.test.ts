@@ -23,15 +23,16 @@ vi.mock('@microsoft/feature-management', () => ({
   FeatureManager: vi.fn(() => mockFeatureManager),
 }))
 
-// Mock config with default valid endpoint
-const mockConfig = vi.hoisted(() => ({
-  APP_CONFIG_ENDPOINT: 'https://mock-app-config.azconfig.io',
-}))
-
-vi.mock('../../internal/config', () => ({
-  Config: mockConfig,
-  DEFAULT_GEMINI_TTS_MODEL: 'gemini-great-tts',
-}))
+vi.mock('../../internal/config', async () => {
+  const actual = await vi.importActual<typeof import('../../internal/config')>('../../internal/config')
+  return {
+    Config: {
+      ...actual.Config,
+      APP_CONFIG_ENDPOINT: 'https://mock-app-config.azconfig.io',
+    },
+    DEFAULT_GEMINI_TTS_MODEL: 'gemini-great-tts',
+  }
+})
 
 // Mock file utils
 vi.mock('../../internal/utils/fileUtils', () => ({
@@ -41,8 +42,6 @@ vi.mock('../../internal/utils/fileUtils', () => ({
 describe('featureFlags', () => {
   beforeEach(() => {
     vi.resetAllMocks()
-    // Reset config to default
-    mockConfig.APP_CONFIG_ENDPOINT = 'https://mock-app-config.azconfig.io'
   })
 
   describe('isFeatureEnabled', () => {

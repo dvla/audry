@@ -1,5 +1,4 @@
 import os from 'os'
-import { DEFAULT_TTS_MODEL_CONFIG } from 'src/features/featureTTS'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { Config } from '../../internal/config'
@@ -18,8 +17,6 @@ Speaker 2: Okay, I'm with you. It's like air traffic control on steroids, but wi
 const seed = 12345
 
 describe('textToSpeechEleven config test', () => {
-  const originalEnv = process.env
-
   beforeEach(() => {
     vi.clearAllMocks()
     Config.ELEVENLABS_API_KEY = null
@@ -44,13 +41,17 @@ describe('textToSpeechEleven tests', () => {
   })
 
   test('should call and ping back', async () => {
-    vi.mock('../../internal/config', () => ({
-      Config: {
-        ELEVENLABS_API_KEY: 'mock-real-key',
-        FILES_DIR: os.tmpdir(),
-      },
-      DEFAULT_GEMINI_TTS_MODEL: 'gemini-2.5-flash-preview-tts',
-    }))
+    vi.mock('../../internal/config', async () => {
+      const actual = await vi.importActual<typeof import('../../internal/config')>('../../internal/config')
+      return {
+        Config: {
+          ...actual.Config,
+          ELEVENLABS_API_KEY: 'mock-real-key',
+          FILES_DIR: os.tmpdir(),
+        },
+        DEFAULT_GEMINI_TTS_MODEL: 'gemini-2.5-flash-preview-tts',
+      }
+    })
 
     vi.doMock('@elevenlabs/elevenlabs-js', () => ({
       ElevenLabsClient: vi.fn().mockImplementation(() => ({

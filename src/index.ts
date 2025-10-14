@@ -16,6 +16,7 @@ import { log } from './internal/logger'
 import { app } from './teamsBot'
 
 const MATCH_ALL = /.*/g
+
 // This template uses `express` to serve HTTP responses.
 // Create express application.
 const expressApp = express()

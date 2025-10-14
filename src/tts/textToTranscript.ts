@@ -1,6 +1,9 @@
+import { SpanKind, trace } from '@opentelemetry/api'
+import { Span } from 'node_modules/@opentelemetry/api/build/src/trace/span'
+
 import { Providers, getTTSModelConfig } from '../features/featureTTS'
 import { Config } from '../internal/config'
-import { log } from '../internal/logger'
+import { SERVICE_NAME, log } from '../internal/logger'
 import { EpisodeConfig } from './episodeConfig'
 import { promptForTranscript } from './promptForTranscript'
 import { transcriptToSpeech as ttsEleven } from './textToSpeechEleven'
@@ -27,24 +30,28 @@ export const toTranscript = async (text: string, episodeConfig: EpisodeConfig) =
  * @returns The generated transcript as a string.
  */
 export const textToTranscript = async (prompt: string, extractedText: string) => {
-  const ai = getGoogleClient()
-  const response = await ai.models.generateContentStream({
-    model: Config.GEMINI_MODEL,
-    config: {
-      responseMimeType: MIME_TYPE,
-      systemInstruction: prompt,
-    },
-    contents: extractedText,
+  const tracer = trace.getTracer(SERVICE_NAME)
+  return tracer.startActiveSpan('text-to-transcript', { kind: SpanKind.CLIENT }, async (span: Span) => {
+    const ai = getGoogleClient()
+    const response = await ai.models.generateContentStream({
+      model: Config.GEMINI_MODEL,
+      config: {
+        responseMimeType: MIME_TYPE,
+        systemInstruction: prompt,
+      },
+      contents: extractedText,
+    })
+
+    // Process the streamed response
+    let responseText = ''
+    for await (const chunk of response) {
+      log.debug(chunk.text)
+      responseText += chunk.text
+    }
+
+    span.end()
+    return responseText
   })
-
-  // Process the streamed response
-  let responseText = ''
-  for await (const chunk of response) {
-    log.debug(chunk.text)
-    responseText += chunk.text
-  }
-
-  return responseText
 }
 
 /**

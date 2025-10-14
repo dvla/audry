@@ -12,6 +12,7 @@ export const DEFAULT_GEMINI_TTS_MODEL = 'gemini-2.5-flash-preview-tts'
 export const DEFAULT_MAX_NUMBER_OF_LINES = '28'
 export const DEFAULT_LINES_PER_CHUNK = '4'
 export const DEFAULT_ORG = 'DVLA (Driver and Vehicle Licensing Agency)'
+export const DEFAULT_SITE_NAME = 'dev'
 
 /**
  * Checks if a variable is set and not equal to the placeholder.
@@ -54,8 +55,14 @@ export const Config = {
   DOCINT_ENDPOINT: checkOptionalVariable(process.env.DOCINT_ENDPOINT, DEFAULT_EMPTY),
 
   APP_CONFIG_ENDPOINT: checkOptionalVariable(process.env.AZURE_APP_CONFIG_ENDPOINT, DEFAULT_EMPTY),
+  APPlICATIONINSIGHTS_CONNECTION_STRING: checkOptionalVariable(
+    process.env.APPlICATIONINSIGHTS_CONNECTION_STRING,
+    DEFAULT_EMPTY
+  ),
   // Azure Blob Storage configuration
   STORAGE_ACCOUNT_NAME: checkOptionalVariable(process.env.STORAGE_ACCOUNT_NAME, DEFAULT_EMPTY),
   STORAGE_BLOB_CONTAINER_NAME: checkOptionalVariable(process.env.STORAGE_BLOB_CONTAINER_NAME, DEFAULT_EMPTY),
   ORGANISATION_NAME: checkOptionalVariable(process.env.ORGANIZATION_NAME, DEFAULT_ORG),
+
+  WEBSITE_SITE_NAME: checkOptionalVariable(process.env.WEBSITE_SITE_NAME, DEFAULT_SITE_NAME),
 }

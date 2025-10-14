@@ -1,11 +1,12 @@
 import { GenerateContentConfig, GoogleGenAI, SpeakerVoiceConfig, VoiceConfig } from '@google/genai'
+import { Span, SpanKind, SpanStatusCode, trace } from '@opentelemetry/api'
 import * as fs from 'node:fs'
 import * as path from 'path'
 import * as wav from 'wav'
 
 import { TTSModelConfig } from '../features/featureTTS'
 import { Config } from '../internal/config'
-import { log } from '../internal/logger'
+import { SERVICE_NAME, log } from '../internal/logger'
 import { generatePodcastFileName } from '../internal/utils/documentUtils'
 import { DEFAULT_CONFIG, EpisodeVoices } from './episodeConfig'
 
@@ -102,27 +103,33 @@ export async function transcriptToSpeech(
   log.info(
     `Start audio generation with model: ${modelConfig.model} and provider: ${modelConfig.provider} and temperature: ${modelConfig.temperature}`
   )
-  const startTime = Date.now()
-  const seed = parseInt(startTime.toString().slice(-8))
-  const generatedConfiguration = generateConfig(voices, seed, modelConfig)
-  const audioResponse = await Promise.all(
-    transcriptChunks.map((chunk) => processChunks(chunk, generatedConfiguration, modelConfig))
-  )
-  const totalSeconds = ((Date.now() - startTime) / 1000).toFixed(2)
-  log.info(`Total audio generation time: ${totalSeconds} seconds`)
+  const tracer = trace.getTracer(SERVICE_NAME)
+  return tracer.startActiveSpan('google-tts', { kind: SpanKind.CLIENT }, async (span: Span) => {
+    const startTime = Date.now()
+    const seed = parseInt(startTime.toString().slice(-8))
+    const generatedConfiguration = generateConfig(voices, seed, modelConfig)
+    const audioResponse = await Promise.all(
+      transcriptChunks.map((chunk) => processChunks(chunk, generatedConfiguration, modelConfig))
+    )
+    const totalSeconds = ((Date.now() - startTime) / 1000).toFixed(2)
+    span.setAttribute('totalChunks', transcriptChunks.length)
+    span.setAttribute('totalTimeSeconds', parseFloat(totalSeconds))
+    log.info(`Total audio generation time: ${totalSeconds} seconds`)
 
-  const audioData = audioResponse.filter((a) => a?.length > 0)
-  if (audioData.length === 0) {
-    throw new Error(`No audio data generated from ${modelConfig.model}`)
-  }
-  const audioBuffers = Buffer.concat(audioData.map((data) => Buffer.from(data, 'base64')))
-  const outputFileName = generatePodcastFileName() + '.wav'
-  const outputFilePath = path.join(Config.FILES_DIR, outputFileName)
-  // Pre-create the empty file
-  fs.writeFileSync(outputFilePath, '')
-  log.debug('Saving audio file to ' + outputFilePath)
-  await saveWaveFile(outputFilePath, audioBuffers)
-  return { outputFileName, outputFilePath }
+    const audioData = audioResponse.filter((a) => a?.length > 0)
+    if (audioData.length === 0) {
+      throw new Error(`No audio data generated from ${modelConfig.model}`)
+    }
+    const audioBuffers = Buffer.concat(audioData.map((data) => Buffer.from(data, 'base64')))
+    const outputFileName = generatePodcastFileName() + '.wav'
+    const outputFilePath = path.join(Config.FILES_DIR, outputFileName)
+    // Pre-create the empty file
+    fs.writeFileSync(outputFilePath, '')
+    log.debug('Saving audio file to ' + outputFilePath)
+    await saveWaveFile(outputFilePath, audioBuffers)
+    span.end()
+    return { outputFileName, outputFilePath }
+  })
 }
 
 /**
@@ -171,31 +178,53 @@ export const processChunks = async (
   generateConfiguration: GenerateContentConfig,
   modelConfig: TTSModelConfig
 ) => {
-  const ai = getGoogleClient()
-  const prompt = `${STYLE}\n\n${chunk}`
-  const chunkStartTime = Date.now()
-  let data
+  const tracer = trace.getTracer(SERVICE_NAME)
+  return tracer.startActiveSpan('google-tts-chunk', { kind: SpanKind.CLIENT }, async (span: Span) => {
+    const ai = getGoogleClient()
+    const prompt = `${STYLE}\n\n${chunk}`
+    const chunkStartTime = Date.now()
 
-  try {
-    const response = await ai.models.generateContent({
-      model: modelConfig.model,
-      contents: [{ parts: [{ text: prompt }] }],
-      config: generateConfiguration,
-    })
+    let data
+    span.setAttribute('model', modelConfig.model)
+    span.setAttribute('chunkLength', chunk.length)
+    try {
+      const response = await ai.models.generateContent({
+        model: modelConfig.model,
+        contents: [{ parts: [{ text: prompt }] }],
+        config: generateConfiguration,
+      })
 
-    log.debug(`- totalTokenCount: ${response.usageMetadata?.totalTokenCount}`)
+      log.debug(`- totalTokenCount: ${response.usageMetadata?.totalTokenCount}`)
 
-    data = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data
-    if (!data) {
-      log.warn('No audio data received from the API: ' + JSON.stringify(response.candidates?.[0]))
+      data = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data
+      if (!data) {
+        log.warn('No audio data received from the API: ' + JSON.stringify(response.candidates?.[0]))
+      }
+      span.setAttribute('totalTokenCount', response.usageMetadata?.totalTokenCount || 0)
+
+      data = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data
+      if (!data) {
+        span.recordException(
+          new Error('No audio data received from the API: ' + JSON.stringify(response.candidates?.[0]))
+        )
+        span.setStatus({
+          code: SpanStatusCode.ERROR,
+          message: 'No audio data received from the API: ' + JSON.stringify(response.candidates?.[0]),
+        })
+        log.warn('No audio data received from the API: ' + JSON.stringify(response.candidates?.[0]))
+      }
+    } catch (error) {
+      log.error('Error generating audio chunk:', error)
+      span.recordException(error as Error)
+      span.setStatus({ code: SpanStatusCode.ERROR, message: error.message })
+    } finally {
+      const chunkSeconds = ((Date.now() - chunkStartTime) / 1000).toFixed(2)
+      log.debug(`Chunk processed in ${chunkSeconds} seconds`)
     }
-  } catch (error) {
-    log.error('Error generating audio chunk:', error)
-  } finally {
-    const chunkSeconds = ((Date.now() - chunkStartTime) / 1000).toFixed(2)
-    log.debug(`Chunk processed in ${chunkSeconds} seconds`)
-  }
-  return data
+
+    span.end()
+    return data
+  })
 }
 
 /**

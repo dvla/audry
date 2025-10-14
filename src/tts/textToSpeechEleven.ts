@@ -1,11 +1,13 @@
 import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js'
 import { DialogueInput } from '@elevenlabs/elevenlabs-js/api'
+import { SpanKind, trace } from '@opentelemetry/api'
 import { promises as fs } from 'fs'
+import { Span } from 'node_modules/@opentelemetry/api/build/src/trace/span'
 import * as path from 'path'
 
 import { TTSModelConfig } from '../features/featureTTS'
 import { Config } from '../internal/config'
-import { log } from '../internal/logger'
+import { SERVICE_NAME, log } from '../internal/logger'
 import { generatePodcastFileName } from '../internal/utils/documentUtils'
 import { EpisodeVoices } from './episodeConfig'
 
@@ -164,26 +166,30 @@ export async function transcriptToSpeech(
   transcript: string,
   voices: EpisodeVoices[] = DEFAULT_VOICES
 ): Promise<{ outputFileName: string; outputFilePath: string }> {
-  let dialogue = parseTranscriptToSpeakerDialogue(transcript, voices)
-  if (dialogue.length === 0) {
-    dialogue = parseTranscriptToSimpleDialogue(transcript, voices)
-  }
-  log.info(`Start audio Elevenlabs with model: ${modelConfig.model} and provider: ${modelConfig.provider}`)
-  if (dialogue && dialogue.length > 0) {
-    log.info(`We will make ${dialogue.length} requests`)
-    const startTime = Date.now()
-    const seed = parseInt(startTime.toString().slice(-8))
-    let i = 0
-    const { outputFileName, outputFilePath } = await textToSpeech(dialogue, seed, modelConfig.model, () => {
-      if (i % 100 === 0) {
-        log.debug(`Processed ${i} chunks...`)
-      }
-      i++
-    })
-    const totalSeconds = ((Date.now() - startTime) / 1000).toFixed(2)
-    log.info(`Total audio generation time: ${totalSeconds} seconds`)
-    return { outputFileName, outputFilePath }
-  }
+  const tracer = trace.getTracer(SERVICE_NAME)
+  return tracer.startActiveSpan('eleven-labs-tts', { kind: SpanKind.CLIENT }, async (span: Span) => {
+    let dialogue = parseTranscriptToSpeakerDialogue(transcript, voices)
+    if (dialogue.length === 0) {
+      dialogue = parseTranscriptToSimpleDialogue(transcript, voices)
+    }
+    log.info(`Start audio Elevenlabs with model: ${modelConfig.model} and provider: ${modelConfig.provider}`)
+    if (dialogue && dialogue.length > 0) {
+      log.info(`We will make ${dialogue.length} requests`)
+      const startTime = Date.now()
+      const seed = parseInt(startTime.toString().slice(-8))
+      let i = 0
+      const { outputFileName, outputFilePath } = await textToSpeech(dialogue, seed, modelConfig.model, () => {
+        if (i % 100 === 0) {
+          log.debug(`Processed ${i} chunks...`)
+        }
+        i++
+      })
+      const totalSeconds = ((Date.now() - startTime) / 1000).toFixed(2)
+      log.info(`Total audio generation time: ${totalSeconds} seconds`)
+      span.end()
+      return { outputFileName, outputFilePath }
+    }
+  })
 }
 
 /**
