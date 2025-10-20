@@ -1,0 +1,29 @@
+meta {
+  name: API transcripttoaudio Jingles
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{HOST}}/api/transcripttoaudio
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "config": {
+      "voices": [
+        "Matthew",
+        "Ellie"
+      ],
+      "intro_effect" : "welcome10",
+      "outro_effect" : "synth10"
+    },
+    "text": "Speaker 2: Digital licences! [excitedly] Like something out of a sci-fi film! That sounds kinda cool actually."
+  }
+}
+
+settings {
+  encodeUrl: true
+}

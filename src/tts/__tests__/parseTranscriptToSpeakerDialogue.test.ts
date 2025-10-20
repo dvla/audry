@@ -137,7 +137,7 @@ describe('parseTranscriptToSpeakerDialogue', () => {
 
       // Should be split into 2 chunks since 2000 + 2500 > 3000
       expect(result).toHaveLength(2)
-      expect(result[0]).toHaveLength(1) // First chunk has first speaker
+      expect(result[0]).toHaveLength(2) // First chunk has first speaker + pause
       expect(result[1]).toHaveLength(1) // Second chunk has second speaker
       expect(result[0][0].text).toBe(longText)
       expect(result[1][0].text).toBe(veryLongText)
@@ -168,9 +168,10 @@ describe('parseTranscriptToSpeakerDialogue', () => {
       const result = parseTranscriptToSpeakerDialogue(transcript, defaultVoices)
 
       // Should split because adding "One more character" would exceed limit
-      expect(result).toHaveLength(2)
+      expect(result).toHaveLength(3) // 2 chunks for first speaker + pause, 1 for second speaker
       expect(result[0]).toHaveLength(1)
-      expect(result[1]).toHaveLength(1)
+      expect(result[1]).toHaveLength(2)
+      expect(result[2]).toHaveLength(1)
     })
   })
 

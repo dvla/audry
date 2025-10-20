@@ -2,6 +2,7 @@ import { ZodError } from 'zod'
 
 import {
   EpisodeConfig,
+  EpisodeIntro,
   EpisodeKind,
   EpisodeLanguages,
   EpisodeLength,
@@ -22,8 +23,8 @@ describe('Default Episode Config', () => {
   })
 
   it('should have intro_effect, outro_effect set to false', () => {
-    expect(simpleConfig.intro_effect).toBe(false)
-    expect(simpleConfig.outro_effect).toBe(false)
+    expect(simpleConfig.intro_effect).toBeUndefined()
+    expect(simpleConfig.outro_effect).toBeUndefined()
   })
 
   it('simpleConfig should parse correctly', () => {
@@ -36,6 +37,7 @@ describe('Default Episode Config', () => {
       kind: 'News Briefing',
       language: 'Welsh',
       voices: [EpisodeVoices.ELLIE],
+      intro_effect: EpisodeIntro.HAPPY10,
     })
     expect(customConfig.language).toBe(EpisodeLanguages.WELSH)
     expect(customConfig.kind).toBe(EpisodeKind.NEWS)
@@ -43,8 +45,8 @@ describe('Default Episode Config', () => {
     expect(customConfig.voices).toContain(EpisodeVoices.ELLIE)
     expect(customConfig.voices.length).toBe(1)
     expect(customConfig.voices).not.toContain(EpisodeVoices.MATTHEW)
-    expect(customConfig.intro_effect).toBe(false)
-    expect(customConfig.outro_effect).toBe(false)
+    expect(customConfig.intro_effect).toBe(EpisodeIntro.HAPPY10)
+    expect(customConfig.outro_effect).toBeUndefined()
   })
 
   it('should not allow invalid configurations', () => {

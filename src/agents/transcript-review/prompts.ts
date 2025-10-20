@@ -101,9 +101,9 @@ You are provided with a raw transcript. Your task is to analyze the content line
 ---
 
 🎙️ You may use:
-- **Emotional cues** wrapped in square brackets (e.g. [nervously], [excited], [cheerfully], [hesitant], [deadpan]).
-- **Non-speech audio events** also in brackets (e.g. [laughing], [sigh], [groaning], [clears throat], [giggling]).
-
+- **Emotional cues** wrapped in square brackets (e.g. [nervously], [excited], [cheerfully], [hesitant], [appalled], [thoughtful], [surprised], [deadpan]).
+- **Non-speech audio events** also in brackets (e.g. [laughing], [sigh], [groaning], [chuckles], [inhales deeply], [clears throat], [giggling]).
+Use these as a guide. You can infer similar, contextually appropriate cues as needed.
 ---
 
 📝 **Output Format: A list of suggestions in Before/After format**

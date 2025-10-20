@@ -27,7 +27,7 @@ export const start = async () => {
       port: 3000,
     },
     (info) => {
-      console.log(`API running on http://localhost:${info.port}`)
+      console.log(`API running on http://localhost:${info.port}, try /start.html`)
     }
   )
 }

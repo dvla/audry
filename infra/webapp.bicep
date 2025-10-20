@@ -21,9 +21,9 @@ param webAppConfigName string
 
 var featureFlags = [
   {
-    id: 'uiconfig'
-    description: 'Controls whether the UI features are enabled or not'
-    enabled: true
+    id: 'exconfig'
+    description: 'Extended config for advanced features'
+    enabled: false
   }
   // Add more feature flags as needed
 ]

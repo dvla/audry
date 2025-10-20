@@ -40,6 +40,31 @@ export enum EpisodeVoices {
   DANIEL = 'Daniel',
   JAMIE = 'Jamie',
   CLAIRE = 'Claire',
+  SAMARA = 'Samara',
+  LUCY = 'Lucy',
+  EMMA = 'Emma',
+}
+
+/**
+ * Intro audio effects options.
+ */
+export enum EpisodeIntro {
+  BEAT5 = 'beat5',
+  IN5 = 'in5',
+  HAPPY10 = 'happy10',
+  SYNTH10 = 'synth10',
+  WELCOME10 = 'welcome10',
+}
+
+/**
+ * Outro audio effects options.
+ */
+export enum EpisodeOutro {
+  BEAT5 = 'beat5',
+  IN5 = 'in5',
+  HAPPY10 = 'happy10',
+  SYNTH10 = 'synth10',
+  WELCOME10 = 'welcome10',
 }
 
 /**
@@ -52,8 +77,8 @@ export const EpisodeSchema = z.object({
   length: z.nativeEnum(EpisodeLength).default(EpisodeLength.FULL),
   voices: z.array(z.nativeEnum(EpisodeVoices)).min(1).max(2).default([EpisodeVoices.MATTHEW, EpisodeVoices.ELLIE]),
   style: z.nativeEnum(EpisodeStyle).default(EpisodeStyle.CONVERSATIONAL),
-  intro_effect: z.boolean().default(false),
-  outro_effect: z.boolean().default(false),
+  intro_effect: z.nativeEnum(EpisodeIntro).optional(),
+  outro_effect: z.nativeEnum(EpisodeOutro).optional(),
 })
 
 /**

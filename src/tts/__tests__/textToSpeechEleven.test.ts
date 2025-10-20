@@ -1,8 +1,17 @@
+import { parseBuffer } from 'music-metadata'
 import os from 'os'
+import path from 'path'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
-import { Config } from '../../internal/config'
-import { DEFAULT_VOICES, parseTranscriptToSpeakerDialogue, textToSpeech, writeFile } from '../textToSpeechEleven'
+import { Config, DEFAULT_AUDIO_FILES_DIR } from '../../internal/config'
+import { EpisodeIntro, EpisodeOutro } from '../episodeConfig'
+import {
+  DEFAULT_VOICES,
+  getAudioEffects,
+  parseTranscriptToSpeakerDialogue,
+  textToSpeech,
+  writeFile,
+} from '../textToSpeechEleven'
 
 const exampleTranscript = `
 Speaker 1: Ellie, welcome back to the show! Today, we're diving deep into something that affects every single one of us who has ever flown on a plane.
@@ -15,6 +24,7 @@ Speaker 2: Okay, I'm with you. It's like air traffic control on steroids, but wi
 `
 
 const seed = 12345
+const NO_AUDIO_EFFECTS: [undefined, undefined] = [undefined, undefined]
 
 describe('textToSpeechEleven config test', () => {
   beforeEach(() => {
@@ -24,7 +34,9 @@ describe('textToSpeechEleven config test', () => {
 
   test('should Fail with missing API KEY', async () => {
     const dialogue = [[{ text: 'Test', voiceId: 'test-voice' }]]
-    await expect(textToSpeech(dialogue, seed, 'eleven_multilingual_v2')).rejects.toThrow('ELEVENLABS_API_KEY not set')
+    await expect(textToSpeech(dialogue, seed, [undefined, undefined], 'eleven_multilingual_v2')).rejects.toThrow(
+      'ELEVENLABS_API_KEY not set'
+    )
   })
 
   test('writeFile throws error if buffers empty', async () => {
@@ -48,6 +60,7 @@ describe('textToSpeechEleven tests', () => {
           ...actual.Config,
           ELEVENLABS_API_KEY: 'mock-real-key',
           FILES_DIR: os.tmpdir(),
+          AUDIO_FILES_DIR: DEFAULT_AUDIO_FILES_DIR,
         },
         DEFAULT_GEMINI_TTS_MODEL: 'gemini-2.5-flash-preview-tts',
       }
@@ -70,7 +83,13 @@ describe('textToSpeechEleven tests', () => {
       [{ text: 'Matthew text', voiceId: 'test-voice' }],
       [{ text: 'Ellie text', voiceId: 'test-voice2' }],
     ]
-    const result = await textToSpeechStreamModule.textToSpeech(dialogue, seed, 'eleven_multilingual_v2', myPingBack)
+    const result = await textToSpeechStreamModule.textToSpeech(
+      dialogue,
+      seed,
+      NO_AUDIO_EFFECTS,
+      'eleven_multilingual_v2',
+      myPingBack
+    )
     expect(myPingBack).toBeCalled()
     expect(result.outputFileName).toContain('.mp3')
     expect(result.outputFilePath).toContain(os.tmpdir())
@@ -86,9 +105,9 @@ describe('textToSpeechEleven tests', () => {
     }))
     const textToSpeechStreamModule = await import('../textToSpeechEleven.js')
     const dialogue = [[{ text: '', voiceId: 'test-voice' }]]
-    await expect(textToSpeechStreamModule.textToSpeech(dialogue, seed, 'eleven_multilingual_v2')).rejects.toThrow(
-      'No audio buffers generated from eleven textToSpeech'
-    )
+    await expect(
+      textToSpeechStreamModule.textToSpeech(dialogue, seed, NO_AUDIO_EFFECTS, 'eleven_multilingual_v2')
+    ).rejects.toThrow('No audio buffers generated from eleven textToSpeech')
   })
 
   test('should convert transcript to speech', async () => {
@@ -105,8 +124,47 @@ describe('textToSpeechEleven tests', () => {
     }))
     const textToSpeechStreamModule = await import('../textToSpeechEleven.js')
     const dialogue = parseTranscriptToSpeakerDialogue(exampleTranscript, DEFAULT_VOICES)
-    const result = await textToSpeechStreamModule.textToSpeech(dialogue, seed, 'eleven_multilingual_v2')
+    const result = await textToSpeechStreamModule.textToSpeech(
+      dialogue,
+      seed,
+      NO_AUDIO_EFFECTS,
+      'eleven_multilingual_v2'
+    )
     expect(result.outputFileName).toContain('.mp3')
     expect(result.outputFilePath).toContain(os.tmpdir())
+  })
+})
+
+describe('Audio Effects tests', () => {
+  beforeEach(() => {
+    vi.mock('../../internal/config', () => ({
+      Config: {
+        ELEVENLABS_API_KEY: 'mock-real-key',
+        FILES_DIR: os.tmpdir(),
+        AUDIO_FILES_DIR: path.join(__dirname, '../../audio'),
+      },
+      DEFAULT_GEMINI_TTS_MODEL: 'gemini-2.5-flash-preview-tts',
+    }))
+  })
+
+  test('should get Audio Effects', async () => {
+    const result = await getAudioEffects(EpisodeIntro.BEAT5, EpisodeOutro.HAPPY10)
+    expect(result[0]).toBeDefined()
+    expect(result[1]).toBeDefined()
+    const meta = await parseBuffer(result[0] as Buffer, { mimeType: 'audio/mpeg' })
+    console.log(JSON.stringify(meta, null, 2))
+    expect(meta).toMatchObject({
+      format: {
+        codec: 'MPEG 1 Layer 3',
+        container: 'MPEG',
+        duration: 5.0416326530612245,
+      },
+    })
+  })
+
+  test('should handle not found Audio Effects', async () => {
+    const result = await getAudioEffects(EpisodeIntro.BEAT5, 'Outro.NOT_FOUND' as EpisodeOutro)
+    expect(result[0]).toBeDefined()
+    expect(result[1]).toBeUndefined()
   })
 })

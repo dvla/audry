@@ -66,11 +66,9 @@ exports[`UploadFileCommandHandler > should handle saving config and update the c
       "File Processed",
       "Successfully extracted text from file: test.txt",
       {
-        "intro_effect": false,
         "kind": "News Briefing",
         "language": "English",
         "length": "Full",
-        "outro_effect": false,
         "style": "Conversational",
         "voices": [
           "Matthew",
@@ -94,11 +92,9 @@ exports[`UploadFileCommandHandler > should process file successfully 1`] = `
       "File Processed",
       "Successfully extracted text from file: test.txt",
       {
-        "intro_effect": false,
         "kind": "Podcast",
         "language": "English",
         "length": "Full",
-        "outro_effect": false,
         "style": "Conversational",
         "voices": [
           "Matthew",

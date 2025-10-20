@@ -1,4 +1,5 @@
 import os from 'os'
+import path from 'path'
 
 // Environment variable placeholder
 export const ENV_PLACEHOLDER = '<not_set>'
@@ -6,6 +7,7 @@ export const DEFAULT_EMPTY = ''
 
 // Default values for environment variables
 export const DEFAULT_FILES_DIR = os.tmpdir()
+export const DEFAULT_AUDIO_FILES_DIR = path.join(__dirname, '../audio')
 export const DEFAULT_LOG_LEVEL = 'info'
 export const DEFAULT_GEMINI_MODEL = 'gemini-2.0-flash-001'
 export const DEFAULT_GEMINI_TTS_MODEL = 'gemini-2.5-flash-preview-tts'
@@ -39,6 +41,7 @@ export const Config = {
   ELEVENLABS_API_KEY: checkOptionalVariable(process.env.ELEVENLABS_API_KEY, DEFAULT_EMPTY),
   // Audry Temporary Files Directory
   FILES_DIR: checkOptionalVariable(process.env.AUDRY_FILES_DIR, DEFAULT_FILES_DIR),
+  AUDIO_FILES_DIR: checkOptionalVariable(process.env.AUDRY_AUDIO_FILES_DIR, DEFAULT_AUDIO_FILES_DIR),
   //Gemini API Key
   GEMINI_API_KEY: checkOptionalVariable(process.env.GEMINI_API_KEY, DEFAULT_EMPTY),
   //Gemini Model

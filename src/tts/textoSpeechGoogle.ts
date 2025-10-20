@@ -31,6 +31,9 @@ const VOICE_CONFIGS = new Map<EpisodeVoices, VoiceConfig>([
   [EpisodeVoices.JAMIE, { prebuiltVoiceConfig: { voiceName: 'Rasalgethi' } }],
   [EpisodeVoices.DANIEL, { prebuiltVoiceConfig: { voiceName: 'Charon' } }],
   [EpisodeVoices.CLAIRE, { prebuiltVoiceConfig: { voiceName: 'Callirrhoe' } }],
+  [EpisodeVoices.SAMARA, { prebuiltVoiceConfig: { voiceName: 'Zephyr' } }],
+  [EpisodeVoices.LUCY, { prebuiltVoiceConfig: { voiceName: 'Leda' } }],
+  [EpisodeVoices.EMMA, { prebuiltVoiceConfig: { voiceName: 'Kore' } }],
 ])
 
 /**

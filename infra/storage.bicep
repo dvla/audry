@@ -89,13 +89,13 @@ resource storageMgmtPolicy 'Microsoft.Storage/storageAccounts/managementPolicies
         }
         {
           enabled: true
-          name: 'DeleteAfter90Days'
+          name: 'DeleteAfter30Days'
           type: 'Lifecycle'
           definition: {
             actions: {
               baseBlob: {
                 delete: {
-                  daysAfterLastAccessTimeGreaterThan: 90
+                  daysAfterLastAccessTimeGreaterThan: 30
                 }
               }
             }

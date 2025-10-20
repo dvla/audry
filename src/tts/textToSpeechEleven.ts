@@ -1,6 +1,6 @@
 import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js'
 import { DialogueInput } from '@elevenlabs/elevenlabs-js/api'
-import { SpanKind, trace } from '@opentelemetry/api'
+import { SpanKind, SpanStatusCode, trace } from '@opentelemetry/api'
 import { promises as fs } from 'fs'
 import { Span } from 'node_modules/@opentelemetry/api/build/src/trace/span'
 import * as path from 'path'
@@ -9,10 +9,10 @@ import { TTSModelConfig } from '../features/featureTTS'
 import { Config } from '../internal/config'
 import { SERVICE_NAME, log } from '../internal/logger'
 import { generatePodcastFileName } from '../internal/utils/documentUtils'
-import { EpisodeVoices } from './episodeConfig'
+import { EpisodeIntro, EpisodeOutro, EpisodeVoices } from './episodeConfig'
 
 const OUTPUT_FORMAT = 'mp3_44100_128'
-const MAX_CHAR_COUNT = 3000 - 800 // Leave large buffer for any extra tokens
+const MAX_CHAR_COUNT = 3000 - 300 // Leave large buffer for any extra tokens
 
 let cloudClient: ElevenLabsClient | null = null
 
@@ -20,10 +20,13 @@ export const DEFAULT_VOICES = [EpisodeVoices.ELLIE, EpisodeVoices.DANIEL]
 // Predefined voice configurations for different episode voices
 export const VOICE_CONFIGS = new Map<EpisodeVoices, { voiceId: string }>([
   [EpisodeVoices.MATTHEW, { voiceId: 'wUkGqD7qevNIshEdEC5s' }],
-  [EpisodeVoices.ELLIE, { voiceId: '19STyYD15bswVz51nqLf' }], // Samara X
-  [EpisodeVoices.DANIEL, { voiceId: 'NNl6r8mD7vthiJatiJt1' }], // Bradford
-  [EpisodeVoices.JAMIE, { voiceId: 'gU0LNdkMOQCOrPrwtbee' }], // Football
+  [EpisodeVoices.ELLIE, { voiceId: 'ZF6FPAbjXT4488VcRRnw' }], // Amelia
+  [EpisodeVoices.JAMIE, { voiceId: 'llNlEi50DSCIEuoOIaH7' }], // Jamie
   [EpisodeVoices.CLAIRE, { voiceId: 'RILOU7YmBhvwJGDGjNmP' }], // Jane
+  [EpisodeVoices.DANIEL, { voiceId: 'NNl6r8mD7vthiJatiJt1' }], // Bradford
+  [EpisodeVoices.SAMARA, { voiceId: '19STyYD15bswVz51nqLf' }], // Samara X
+  [EpisodeVoices.LUCY, { voiceId: 'lcMyyd2HUfFzxdCaC4Ta' }], // Lucy
+  [EpisodeVoices.EMMA, { voiceId: 'YPbk892xlMnFoVOkxyGD' }], // BLONDIE News reporter
 ])
 
 /**
@@ -63,34 +66,47 @@ const textToSpeechStream = async (
 ): Promise<Buffer | null> => {
   const client = getClient()
   const numOfChars = dialogue.reduce((sum, input) => sum + input.text.length, 0)
-  log.debug(`Chunk request ${numOfChars} characters...`)
+  const dialogueChars = JSON.stringify(dialogue).length
+  log.debug(`Chunk request ${numOfChars} text characters...`)
+  log.debug(`Chunk request ${dialogueChars} dialog characters...`)
   const startTime = Date.now()
-  try {
-    const audio = await client.textToDialogue.stream(
-      {
-        inputs: dialogue,
-        modelId,
-        seed,
-        outputFormat: OUTPUT_FORMAT,
-        settings: voiceSettings,
-      },
-      {
-        timeoutInSeconds: 60 * 5, // 5 minutes timeout
+
+  const tracer = trace.getTracer(SERVICE_NAME)
+  return tracer.startActiveSpan('eleven-labs-tts-chunk', { kind: SpanKind.CLIENT }, async (span: Span) => {
+    try {
+      const context = span.spanContext()
+      span.setAttribute('model', modelId)
+      span.setAttribute('textLength', numOfChars)
+      span.setAttribute('chunkLength', dialogueChars)
+      const audio = await client.textToDialogue.stream(
+        {
+          inputs: dialogue,
+          modelId,
+          seed,
+          outputFormat: OUTPUT_FORMAT,
+          settings: voiceSettings,
+        },
+        {
+          timeoutInSeconds: 60 * 5, // 5 minutes timeout
+        }
+      )
+      const chunks: Buffer[] = []
+      for await (const chunk of audio) {
+        if (ping) ping()
+        chunks.push(Buffer.from(chunk))
       }
-    )
-    const chunks: Buffer[] = []
-    for await (const chunk of audio) {
-      if (ping) ping()
-      chunks.push(Buffer.from(chunk))
+      return Buffer.concat(chunks)
+    } catch (error) {
+      log.error('Failed to convert text to speech.', error)
+      span.recordException(error as Error)
+      span.setStatus({ code: SpanStatusCode.ERROR, message: error.message })
+      return null // Return null to indicate failure
+    } finally {
+      const totalSeconds = ((Date.now() - startTime) / 1000).toFixed(2)
+      log.debug(`Chunk request ${numOfChars} characters, time: ${totalSeconds} seconds`)
+      if (span) span.end()
     }
-    return Buffer.concat(chunks)
-  } catch (error) {
-    log.error('Failed to convert text to speech.', error)
-    return null // Return null to indicate failure
-  } finally {
-    const totalSeconds = ((Date.now() - startTime) / 1000).toFixed(2)
-    log.debug(`Chunk request ${numOfChars} characters, time: ${totalSeconds} seconds`)
-  }
+  })
 }
 
 /**
@@ -109,11 +125,14 @@ const textToSpeechStream = async (
 export const textToSpeech = async (
   dialogue: DialogueInput[][],
   seed: number,
+  audioEffects: [Buffer | undefined, Buffer | undefined],
   modelId: string,
   ping?: () => void
 ): Promise<{ outputFileName: string; outputFilePath: string }> => {
   const outputFileName = generatePodcastFileName() + '.mp3'
   const outputFilePath = path.join(Config.FILES_DIR, outputFileName)
+  let span: Span | undefined
+  let nonEmptyBuffers: Buffer[]
   if (log.isDebugEnabled()) {
     for (let i = 0; i < dialogue.length; i++) {
       let dialogueFilePath = path.join(Config.FILES_DIR, seed + '_' + i + '_dialogue.txt')
@@ -121,24 +140,33 @@ export const textToSpeech = async (
       await fs.writeFile(dialogueFilePath, JSON.stringify(dialogue[i], null, 2))
     }
   }
-  const buffers: Buffer[] = await Promise.all(
-    dialogue.map((chunk) =>
-      textToSpeechStream(
-        chunk,
-        seed,
-        modelId,
-        {
-          stability: 1.0,
-          useSpeakerBoost: true,
-        },
-        ping
+  try {
+    const tracer = trace.getTracer(SERVICE_NAME)
+    span = tracer.startSpan('eleven-labs-tts', { kind: SpanKind.CLIENT })
+    span.setAttribute('model', modelId)
+    const buffers: Buffer[] = await Promise.all(
+      dialogue.map((chunk) =>
+        textToSpeechStream(
+          chunk,
+          seed,
+          modelId,
+          {
+            stability: 0.5,
+            useSpeakerBoost: false,
+          },
+          ping
+        )
       )
     )
-  )
-  const nonEmptyBuffers = buffers.filter((buffer) => buffer.length > 0)
-  if (nonEmptyBuffers.length === 0) {
-    throw new Error('No audio buffers generated from eleven textToSpeech')
+    const audioBuffers = [audioEffects[0], ...buffers, audioEffects[1]]
+    nonEmptyBuffers = audioBuffers.filter((buffer) => buffer?.length > 0)
+    if (nonEmptyBuffers.length === 0) {
+      throw new Error('No audio buffers generated from eleven textToSpeech')
+    }
+  } finally {
+    if (span) span.end()
   }
+
   if (log.isDebugEnabled()) {
     for (let i = 0; i < nonEmptyBuffers.length; i++) {
       const buffer = nonEmptyBuffers[i]
@@ -164,32 +192,36 @@ export const textToSpeech = async (
 export async function transcriptToSpeech(
   modelConfig: TTSModelConfig,
   transcript: string,
+  introOutroEffects: [EpisodeIntro | undefined, EpisodeOutro | undefined],
   voices: EpisodeVoices[] = DEFAULT_VOICES
 ): Promise<{ outputFileName: string; outputFilePath: string }> {
-  const tracer = trace.getTracer(SERVICE_NAME)
-  return tracer.startActiveSpan('eleven-labs-tts', { kind: SpanKind.CLIENT }, async (span: Span) => {
-    let dialogue = parseTranscriptToSpeakerDialogue(transcript, voices)
-    if (dialogue.length === 0) {
-      dialogue = parseTranscriptToSimpleDialogue(transcript, voices)
-    }
-    log.info(`Start audio Elevenlabs with model: ${modelConfig.model} and provider: ${modelConfig.provider}`)
-    if (dialogue && dialogue.length > 0) {
-      log.info(`We will make ${dialogue.length} requests`)
-      const startTime = Date.now()
-      const seed = parseInt(startTime.toString().slice(-8))
-      let i = 0
-      const { outputFileName, outputFilePath } = await textToSpeech(dialogue, seed, modelConfig.model, () => {
+  let dialogue = parseTranscriptToSpeakerDialogue(transcript, voices)
+  if (dialogue.length === 0) {
+    dialogue = parseTranscriptToSimpleDialogue(transcript, voices)
+  }
+  log.info(`Start audio Elevenlabs with model: ${modelConfig.model} and provider: ${modelConfig.provider}`)
+  if (dialogue && dialogue.length > 0) {
+    log.info(`We will make ${dialogue.length} requests`)
+    const startTime = Date.now()
+    const seed = parseInt(startTime.toString().slice(-8))
+    let i = 0
+    const audioEffects = await getAudioEffects(introOutroEffects[0], introOutroEffects[1])
+    const { outputFileName, outputFilePath } = await textToSpeech(
+      dialogue,
+      seed,
+      audioEffects,
+      modelConfig.model,
+      () => {
         if (i % 100 === 0) {
           log.debug(`Processed ${i} chunks...`)
         }
         i++
-      })
-      const totalSeconds = ((Date.now() - startTime) / 1000).toFixed(2)
-      log.info(`Total audio generation time: ${totalSeconds} seconds`)
-      span.end()
-      return { outputFileName, outputFilePath }
-    }
-  })
+      }
+    )
+    const totalSeconds = ((Date.now() - startTime) / 1000).toFixed(2)
+    log.info(`Total audio generation time: ${totalSeconds} seconds`)
+    return { outputFileName, outputFilePath }
+  }
 }
 
 /**
@@ -216,14 +248,20 @@ export const parseTranscriptToSpeakerDialogue = (transcript: string, voices: Epi
       text,
       voiceId: voiceConfig.voiceId,
     }
+    const dialogueLength = JSON.stringify(dialogueInput).length
 
-    if (charCount + text.length < MAX_CHAR_COUNT) {
+    if (charCount + dialogueLength < MAX_CHAR_COUNT) {
       currentInputs.push(dialogueInput)
-      charCount += text.length
+      charCount += dialogueLength
     } else {
+      // Add a pause at the end of dialogue chunk
+      currentInputs.push({
+        text: '[pauses] hmm...',
+        voiceId: voiceConfig.voiceId,
+      })
       dialogue.push(currentInputs)
       currentInputs = [dialogueInput]
-      charCount = text.length
+      charCount = dialogueLength
     }
   }
 
@@ -279,6 +317,34 @@ export const parseTranscriptToSimpleDialogue = (
       ],
     ]
   }
+}
+
+/** Loads intro and outro audio effects from files.
+ *
+ * @param introEffect - The intro effect to load (e.g., 'HAPPY10')
+ * @param outroEffect - The outro effect to load (e.g., 'SYNTH10')
+ * @returns A promise that resolves to a tuple containing the intro and outro audio buffers, or undefined if not found
+ */
+export const getAudioEffects = async (
+  introEffect: EpisodeIntro | undefined,
+  outroEffect: EpisodeOutro | undefined
+): Promise<[Buffer | undefined, Buffer | undefined]> => {
+  let introBuffer, outroBuffer
+  try {
+    if (introEffect) {
+      const audioRoot = Config.AUDIO_FILES_DIR
+      if (!audioRoot) throw new Error('AUDIO_FILES_DIR not set')
+      const intro = path.join(Config.AUDIO_FILES_DIR, `${introEffect.toLowerCase()}.mp3`)
+      introBuffer = await fs.readFile(intro)
+    }
+    if (outroEffect) {
+      const outro = path.join(Config.AUDIO_FILES_DIR, `${outroEffect.toLowerCase()}.mp3`)
+      outroBuffer = await fs.readFile(outro)
+    }
+  } catch (error) {
+    log.error('Failed to load audio effects', error)
+  }
+  return [introEffect ? introBuffer : undefined, outroEffect ? outroBuffer : undefined]
 }
 
 /**

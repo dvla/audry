@@ -10,10 +10,11 @@ import { Feature, isFeatureEnabled } from '../features/featureFlags'
 import {
   DEFAULT_CONFIG,
   EpisodeConfig,
+  EpisodeIntro,
   EpisodeKind,
   EpisodeLanguages,
   EpisodeLength,
-  EpisodeStyle,
+  EpisodeOutro,
   EpisodeVoices,
 } from '../tts/episodeConfig'
 
@@ -72,14 +73,12 @@ export const processingCard = (title: string, message: string) => {
  * @returns An Adaptive Card with the title and body text.
  */
 export const uploadFileCard = async (title: string, body: string, config: EpisodeConfig) => {
-  const showConfig = await isFeatureEnabled(Feature.UIConfig)
+  const extendedConfig = await isFeatureEnabled(Feature.ExtendedConfig)
   // Create a deep copy so we don't mutate the original
   const uploadFileCardCopy = structuredClone(uploadFileCardJson)
-  if (showConfig) {
-    const actionSet = uploadFileCardCopy.body.find((item: CardItem) => item.type === CARD_ACTION_SET)
-    if (actionSet) {
-      actionSet.actions = [...actionSet.actions, episodeConfigCard(config)]
-    }
+  const actionSet = uploadFileCardCopy.body.find((item: CardItem) => item.type === CARD_ACTION_SET)
+  if (actionSet) {
+    actionSet.actions = [...actionSet.actions, episodeConfigCard(config, extendedConfig)]
   }
 
   return new ACData.Template(uploadFileCardCopy).expand({
@@ -224,9 +223,10 @@ const toChoices = (configName: Record<string, string>) => {
  * Creates an adaptive card for episode configuration using EpisodeSchema.
  * Uses Input.ChoiceSet for multiple value options and sets default values from DEFAULT_CONFIG.
  * @param config - The episode configuration object
+ * @param extendedConfig - Whether to include extended configuration options
  * @returns Adaptive card for episode configuration
  */
-export const episodeConfigCard = (config: EpisodeConfig) => {
+export const episodeConfigCard = (config: EpisodeConfig, extendedConfig: boolean) => {
   return {
     type: SHOW_CARD_ACTION,
     title: 'Advanced',
@@ -286,22 +286,14 @@ export const episodeConfigCard = (config: EpisodeConfig) => {
             {
               type: 'Input.ChoiceSet',
               id: 'voices',
-              label: 'Voices (Select one or two)',
+              label: 'Voices (Select two)',
               isMultiSelect: true,
               isRequired: true,
               value: config.voices.join(',') || DEFAULT_CONFIG.voices.join(','),
-              style: 'expanded',
+              style: 'compact',
               choices: toChoices(EpisodeVoices),
             },
-            {
-              type: 'Input.ChoiceSet',
-              id: 'style',
-              label: 'Episode Style',
-              isRequired: true,
-              value: config.style || DEFAULT_CONFIG.style,
-              style: 'expanded',
-              choices: toChoices(EpisodeStyle),
-            },
+            extendedConfig ? extendConfig(config) : null,
           ],
           spacing: 'Medium',
         },
@@ -375,6 +367,34 @@ const createTextToTranscriptCard = (transcripts: string[]) => {
   }
 }
 
+/** * Extends the episode configuration card with additional advanced options.
+ * @param config - The episode configuration object
+ * @returns Array of additional card items
+ */
+const extendConfig = (config: EpisodeConfig) => {
+  return [
+    {
+      type: 'Input.ChoiceSet',
+      id: 'intro_effect',
+      label: 'Intro Style',
+      isMultiSelect: false,
+      isRequired: false,
+      value: config.intro_effect,
+      style: 'compact',
+      choices: [...toChoices(EpisodeIntro), { title: 'None', value: '' }],
+    },
+    {
+      type: 'Input.ChoiceSet',
+      id: 'outro_effect',
+      label: 'Outro Style',
+      isMultiSelect: false,
+      isRequired: false,
+      value: config.outro_effect,
+      style: 'compact',
+      choices: [...toChoices(EpisodeOutro), { title: 'None', value: '' }],
+    },
+  ]
+}
 /**
  * Creates a carousel of transcript pages with actions for each transcript.
  * Each page includes truncated and full transcript views with toggle visibility actions,

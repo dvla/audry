@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`uploadFileCard > renders base card without Advanced settings when UIConfig feature is disabled 1`] = `
+exports[`uploadFileCard > renders base card without Extended settings when ExtendedConfig feature is disabled 1`] = `
 {
   "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
   "body": [
@@ -53,6 +53,152 @@ exports[`uploadFileCard > renders base card without Advanced settings when UICon
           "type": "Action.Execute",
           "verb": "textToTranscript",
         },
+        {
+          "card": {
+            "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+            "actions": [
+              {
+                "data": {
+                  "action": "saveConfig",
+                },
+                "style": "positive",
+                "title": "Save",
+                "type": "Action.Submit",
+              },
+            ],
+            "body": [
+              {
+                "isVisible": false,
+                "text": "1700000000000",
+                "type": "TextBlock",
+              },
+              {
+                "bleed": true,
+                "items": [
+                  {
+                    "horizontalAlignment": "Center",
+                    "size": "Large",
+                    "spacing": "Medium",
+                    "text": "Settings",
+                    "type": "TextBlock",
+                    "weight": "Bolder",
+                  },
+                  {
+                    "choices": [
+                      {
+                        "title": "Podcast",
+                        "value": "Podcast",
+                      },
+                      {
+                        "title": "Brief Podcast",
+                        "value": "Brief Podcast",
+                      },
+                      {
+                        "title": "News Briefing",
+                        "value": "News Briefing",
+                      },
+                    ],
+                    "id": "kind",
+                    "isRequired": true,
+                    "label": "Episode Kind",
+                    "style": "expanded",
+                    "type": "Input.ChoiceSet",
+                    "value": "Podcast",
+                  },
+                  {
+                    "choices": [
+                      {
+                        "title": "English",
+                        "value": "English",
+                      },
+                      {
+                        "title": "Welsh",
+                        "value": "Welsh",
+                      },
+                    ],
+                    "id": "language",
+                    "isRequired": true,
+                    "label": "Language",
+                    "style": "expanded",
+                    "type": "Input.ChoiceSet",
+                    "value": "English",
+                  },
+                  {
+                    "choices": [
+                      {
+                        "title": "Brief",
+                        "value": "Brief",
+                      },
+                      {
+                        "title": "Full",
+                        "value": "Full",
+                      },
+                    ],
+                    "id": "length",
+                    "isRequired": true,
+                    "label": "Episode Length",
+                    "style": "expanded",
+                    "type": "Input.ChoiceSet",
+                    "value": "Full",
+                  },
+                  {
+                    "choices": [
+                      {
+                        "title": "Matthew",
+                        "value": "Matthew",
+                      },
+                      {
+                        "title": "Ellie",
+                        "value": "Ellie",
+                      },
+                      {
+                        "title": "Daniel",
+                        "value": "Daniel",
+                      },
+                      {
+                        "title": "Jamie",
+                        "value": "Jamie",
+                      },
+                      {
+                        "title": "Claire",
+                        "value": "Claire",
+                      },
+                      {
+                        "title": "Samara",
+                        "value": "Samara",
+                      },
+                      {
+                        "title": "Lucy",
+                        "value": "Lucy",
+                      },
+                      {
+                        "title": "Emma",
+                        "value": "Emma",
+                      },
+                    ],
+                    "id": "voices",
+                    "isMultiSelect": true,
+                    "isRequired": true,
+                    "label": "Voices (Select two)",
+                    "style": "compact",
+                    "type": "Input.ChoiceSet",
+                    "value": "Matthew,Ellie",
+                  },
+                ],
+                "showBorder": true,
+                "spacing": "Medium",
+                "style": "accent",
+                "type": "Container",
+              },
+            ],
+            "type": "AdaptiveCard",
+            "version": "1.6",
+          },
+          "style": "default",
+          "title": "Advanced",
+          "type": "Action.ShowCard",
+          "verb": "showConfig",
+        },
       ],
       "type": "ActionSet",
     },
@@ -65,7 +211,7 @@ exports[`uploadFileCard > renders base card without Advanced settings when UICon
 }
 `;
 
-exports[`uploadFileCard > renders card with Advanced settings Action.ShowCard using provided config when UIConfig is enabled 1`] = `
+exports[`uploadFileCard > renders card with Advanced settings Action.ShowCard using provided config when Extended is enabled 1`] = `
 {
   "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
   "body": [
@@ -228,32 +374,94 @@ exports[`uploadFileCard > renders card with Advanced settings Action.ShowCard us
                         "title": "Claire",
                         "value": "Claire",
                       },
+                      {
+                        "title": "Samara",
+                        "value": "Samara",
+                      },
+                      {
+                        "title": "Lucy",
+                        "value": "Lucy",
+                      },
+                      {
+                        "title": "Emma",
+                        "value": "Emma",
+                      },
                     ],
                     "id": "voices",
                     "isMultiSelect": true,
                     "isRequired": true,
-                    "label": "Voices (Select one or two)",
-                    "style": "expanded",
+                    "label": "Voices (Select two)",
+                    "style": "compact",
                     "type": "Input.ChoiceSet",
                     "value": "Matthew,Ellie",
                   },
                   {
                     "choices": [
                       {
-                        "title": "Solo",
-                        "value": "Solo",
+                        "title": "beat5",
+                        "value": "beat5",
                       },
                       {
-                        "title": "Conversational",
-                        "value": "Conversational",
+                        "title": "in5",
+                        "value": "in5",
+                      },
+                      {
+                        "title": "happy10",
+                        "value": "happy10",
+                      },
+                      {
+                        "title": "synth10",
+                        "value": "synth10",
+                      },
+                      {
+                        "title": "welcome10",
+                        "value": "welcome10",
+                      },
+                      {
+                        "title": "None",
+                        "value": "",
                       },
                     ],
-                    "id": "style",
-                    "isRequired": true,
-                    "label": "Episode Style",
-                    "style": "expanded",
+                    "id": "intro_effect",
+                    "isMultiSelect": false,
+                    "isRequired": false,
+                    "label": "Intro Style",
+                    "style": "compact",
                     "type": "Input.ChoiceSet",
-                    "value": "Conversational",
+                  },
+                  {
+                    "choices": [
+                      {
+                        "title": "beat5",
+                        "value": "beat5",
+                      },
+                      {
+                        "title": "in5",
+                        "value": "in5",
+                      },
+                      {
+                        "title": "happy10",
+                        "value": "happy10",
+                      },
+                      {
+                        "title": "synth10",
+                        "value": "synth10",
+                      },
+                      {
+                        "title": "welcome10",
+                        "value": "welcome10",
+                      },
+                      {
+                        "title": "None",
+                        "value": "",
+                      },
+                    ],
+                    "id": "outro_effect",
+                    "isMultiSelect": false,
+                    "isRequired": false,
+                    "label": "Outro Style",
+                    "style": "compact",
+                    "type": "Input.ChoiceSet",
                   },
                 ],
                 "showBorder": true,

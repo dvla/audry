@@ -6,7 +6,7 @@ import { getAzureCredentials } from '../internal/utils/authUtils'
 
 // Enum for feature flags
 export enum Feature {
-  UIConfig = 'uiconfig',
+  ExtendedConfig = 'exconfig',
   TTSModel = 'ttsmodel',
   // Add more feature flags here as needed
 }

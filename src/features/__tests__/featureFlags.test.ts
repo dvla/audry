@@ -49,10 +49,10 @@ describe('featureFlags', () => {
       mockLoad.mockResolvedValue(mockAppConfig)
       mockFeatureManager.isEnabled.mockResolvedValue(true)
 
-      const result = await isFeatureEnabled(Feature.UIConfig)
+      const result = await isFeatureEnabled(Feature.ExtendedConfig)
 
       expect(result).toBe(true)
-      expect(mockFeatureManager.isEnabled).toHaveBeenCalledExactlyOnceWith(Feature.UIConfig)
+      expect(mockFeatureManager.isEnabled).toHaveBeenCalledExactlyOnceWith(Feature.ExtendedConfig)
     })
 
     it('should return false when feature is disabled', async () => {
@@ -70,11 +70,11 @@ describe('featureFlags', () => {
       mockFeatureManager.isEnabled.mockRejectedValue(new Error('Connection failed'))
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
-      const result = await isFeatureEnabled(Feature.UIConfig)
+      const result = await isFeatureEnabled(Feature.ExtendedConfig)
 
       expect(result).toBe(false)
       expect(consoleErrorSpy).toHaveBeenCalledExactlyOnceWith(
-        "Error checking feature flag 'uiconfig':",
+        "Error checking feature flag 'exconfig':",
         expect.any(Error)
       )
 
@@ -101,10 +101,10 @@ describe('featureFlags', () => {
       mockLoad.mockResolvedValue({})
       mockFeatureManager.getVariant.mockResolvedValue(undefined)
 
-      const result = await getVariant(Feature.UIConfig)
+      const result = await getVariant(Feature.ExtendedConfig)
 
       expect(result).toBeUndefined()
-      expect(mockFeatureManager.getVariant).toHaveBeenCalledExactlyOnceWith(Feature.UIConfig)
+      expect(mockFeatureManager.getVariant).toHaveBeenCalledExactlyOnceWith(Feature.ExtendedConfig)
     })
 
     it('should return undefined and log error when variant retrieval throws', async () => {
