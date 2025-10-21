@@ -8,13 +8,7 @@ import { TTSModelConfig } from '../features/featureTTS'
 import { Config } from '../internal/config'
 import { SERVICE_NAME, log } from '../internal/logger'
 import { generatePodcastFileName } from '../internal/utils/documentUtils'
-import { DEFAULT_CONFIG, EpisodeVoices } from './episodeConfig'
-
-export const STYLE = `This is a short audio episode. 
-ALL SPEAKERS should have a warm, and inviting British accent. 
-The delivery should be conversational and engaging, with a dynamic rhythm that captures the listener's attention. 
-The tone should be informative yet friendly. 
-Here is the text to turn into speech:\n`
+import { DEFAULT_CONFIG, EpisodeConfig, EpisodeVoices, LANGUAGE_CONFIG } from './episodeConfig'
 
 let cloudClient: GoogleGenAI | null = null
 
@@ -35,6 +29,20 @@ const VOICE_CONFIGS = new Map<EpisodeVoices, VoiceConfig>([
   [EpisodeVoices.LUCY, { prebuiltVoiceConfig: { voiceName: 'Leda' } }],
   [EpisodeVoices.EMMA, { prebuiltVoiceConfig: { voiceName: 'Kore' } }],
 ])
+
+/**
+ * Generates the style prompt for the TTS conversion based on the episode configuration.
+ *
+ * @param episodeConfig - The configuration object for the episode.
+ * @returns A string containing the style prompt for TTS conversion.
+ */
+export const generateStyle = (episodeConfig: EpisodeConfig) => {
+  return `This is a short audio episode. 
+  ALL SPEAKERS should have a warm, and inviting ${episodeConfig.language} accent. 
+  The delivery should be conversational and engaging, with a dynamic rhythm that captures the listener's attention. 
+  The tone should be informative yet friendly. 
+  Here is the text to turn into speech:\n`
+}
 
 /**
  * Generates speaker voice configurations from an array of episode voices.
@@ -58,14 +66,14 @@ const generateVoiceConfig = (voices: EpisodeVoices[]): SpeakerVoiceConfig[] => {
  * @returns The configuration object for generating speech with multiple speaker voices
  */
 export const generateConfig = (
-  voices: EpisodeVoices[],
+  { language, voices }: EpisodeConfig,
   seed: number,
   modelConfig: TTSModelConfig
 ): GenerateContentConfig => {
   return {
     responseModalities: ['AUDIO'],
     speechConfig: {
-      languageCode: 'en-GB',
+      languageCode: LANGUAGE_CONFIG[language].code,
       multiSpeakerVoiceConfig: {
         speakerVoiceConfigs: generateVoiceConfig(voices),
       },
@@ -99,7 +107,7 @@ export const getGoogleClient = (): GoogleGenAI => {
 export async function transcriptToSpeech(
   modelConfig: TTSModelConfig,
   transcript: string,
-  voices: EpisodeVoices[] = DEFAULT_CONFIG.voices
+  episodeConfig: EpisodeConfig = DEFAULT_CONFIG
 ): Promise<{ outputFileName: string; outputFilePath: string }> {
   const transcriptChunks = splitTranscript(transcript)
 
@@ -110,9 +118,9 @@ export async function transcriptToSpeech(
   return tracer.startActiveSpan('google-tts', { kind: SpanKind.CLIENT }, async (span: Span) => {
     const startTime = Date.now()
     const seed = parseInt(startTime.toString().slice(-8))
-    const generatedConfiguration = generateConfig(voices, seed, modelConfig)
+    const generatedConfiguration = generateConfig(episodeConfig, seed, modelConfig)
     const audioResponse = await Promise.all(
-      transcriptChunks.map((chunk) => processChunks(chunk, generatedConfiguration, modelConfig))
+      transcriptChunks.map((chunk) => processChunks(chunk, generatedConfiguration, modelConfig, episodeConfig))
     )
     const totalSeconds = ((Date.now() - startTime) / 1000).toFixed(2)
     span.setAttribute('totalChunks', transcriptChunks.length)
@@ -179,12 +187,13 @@ export const splitTranscript = (
 export const processChunks = async (
   chunk: string,
   generateConfiguration: GenerateContentConfig,
-  modelConfig: TTSModelConfig
+  modelConfig: TTSModelConfig,
+  episodeConfig: EpisodeConfig = DEFAULT_CONFIG
 ) => {
   const tracer = trace.getTracer(SERVICE_NAME)
   return tracer.startActiveSpan('google-tts-chunk', { kind: SpanKind.CLIENT }, async (span: Span) => {
     const ai = getGoogleClient()
-    const prompt = `${STYLE}\n\n${chunk}`
+    const prompt = `${generateStyle(episodeConfig)}\n\n${chunk}`
     const chunkStartTime = Date.now()
 
     let data

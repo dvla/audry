@@ -34,6 +34,7 @@ const countingNode = async (state: ShowNotesStateType): Promise<ShowNotesStateTy
  */
 const writeNotesNode = async (state: ShowNotesStateType): Promise<ShowNotesStateType> => {
   const { wordCount, transcript } = state
+
   const response = await structuredllm.invoke([
     { role: 'system', content: SYSTEM_PROMPT },
     new HumanMessage(`The number of words in the transcript is ${wordCount} \n`),

@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-import { EpisodeConfig, EpisodeKind, EpisodeLength, EpisodeSchema, EpisodeVoices } from '../episodeConfig'
+import {
+  EpisodeConfig,
+  EpisodeKind,
+  EpisodeLanguages,
+  EpisodeLength,
+  EpisodeSchema,
+  EpisodeVoices,
+} from '../episodeConfig'
 import { promptForTranscript } from '../promptForTranscript'
 
 const defaultConfig: EpisodeConfig = EpisodeSchema.parse({})
@@ -42,6 +49,7 @@ describe('promptForTranscript with different episode kinds', () => {
     const prompt = promptForTranscript(config)
     expect(prompt).toContain('You are a world-class news writer')
     expect(prompt).toContain('about 1 minute long')
+    expect(prompt).toMatchSnapshot()
   })
 
   it('Produces a short podcast', () => {
@@ -54,5 +62,14 @@ describe('promptForTranscript with different episode kinds', () => {
     expect(prompt).toContain('You are a world-class podcast writer')
     expect(prompt).toContain('GET STRAIGHT INTO THE CONTENT')
     expect(prompt).toContain('about 1 minute long')
+    expect(prompt).toMatchSnapshot()
+  })
+
+  describe('prompt for languages', () => {
+    it('supports welsh', () => {
+      const config = EpisodeSchema.parse({ length: EpisodeLength.BRIEF, languages: [EpisodeLanguages.WELSH] })
+      const prompt = promptForTranscript(config)
+      expect(prompt).toMatchSnapshot()
+    })
   })
 })

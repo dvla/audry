@@ -13,7 +13,9 @@ Kind: Podcast
 
 Length: Full
 
-Voices: Matthew,Ellie",
+Voices: Matthew,Ellie
+
+Language: English",
     ],
   ],
   "results": [
@@ -57,7 +59,9 @@ Kind: Podcast
 
 Length: Full
 
-Voices: Matthew,Ellie",
+Voices: Matthew,Ellie
+
+Language: English",
                         "type": "TextBlock",
                         "wrap": true,
                       },

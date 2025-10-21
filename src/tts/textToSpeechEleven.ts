@@ -9,7 +9,7 @@ import { TTSModelConfig } from '../features/featureTTS'
 import { Config } from '../internal/config'
 import { SERVICE_NAME, log } from '../internal/logger'
 import { generatePodcastFileName } from '../internal/utils/documentUtils'
-import { EpisodeIntro, EpisodeOutro, EpisodeVoices } from './episodeConfig'
+import { EpisodeConfig, EpisodeIntro, EpisodeOutro, EpisodeVoices, LANGUAGE_CONFIG } from './episodeConfig'
 
 const OUTPUT_FORMAT = 'mp3_44100_128'
 const MAX_CHAR_COUNT = 3000 - 300 // Leave large buffer for any extra tokens
@@ -62,6 +62,7 @@ const textToSpeechStream = async (
   seed: number,
   modelId: string,
   voiceSettings: any,
+  languageCode: string,
   ping?: () => void
 ): Promise<Buffer | null> => {
   const client = getClient()
@@ -85,6 +86,7 @@ const textToSpeechStream = async (
           seed,
           outputFormat: OUTPUT_FORMAT,
           settings: voiceSettings,
+          languageCode,
         },
         {
           timeoutInSeconds: 60 * 5, // 5 minutes timeout
@@ -127,6 +129,7 @@ export const textToSpeech = async (
   seed: number,
   audioEffects: [Buffer | undefined, Buffer | undefined],
   modelId: string,
+  languageCode: string,
   ping?: () => void
 ): Promise<{ outputFileName: string; outputFilePath: string }> => {
   const outputFileName = generatePodcastFileName() + '.mp3'
@@ -154,6 +157,7 @@ export const textToSpeech = async (
             stability: 0.5,
             useSpeakerBoost: false,
           },
+          languageCode,
           ping
         )
       )
@@ -192,8 +196,7 @@ export const textToSpeech = async (
 export async function transcriptToSpeech(
   modelConfig: TTSModelConfig,
   transcript: string,
-  introOutroEffects: [EpisodeIntro | undefined, EpisodeOutro | undefined],
-  voices: EpisodeVoices[] = DEFAULT_VOICES
+  { voices, intro_effect, outro_effect, language }: EpisodeConfig
 ): Promise<{ outputFileName: string; outputFilePath: string }> {
   let dialogue = parseTranscriptToSpeakerDialogue(transcript, voices)
   if (dialogue.length === 0) {
@@ -205,12 +208,13 @@ export async function transcriptToSpeech(
     const startTime = Date.now()
     const seed = parseInt(startTime.toString().slice(-8))
     let i = 0
-    const audioEffects = await getAudioEffects(introOutroEffects[0], introOutroEffects[1])
+    const audioEffects = await getAudioEffects(intro_effect, outro_effect)
     const { outputFileName, outputFilePath } = await textToSpeech(
       dialogue,
       seed,
       audioEffects,
       modelConfig.model,
+      LANGUAGE_CONFIG[language].shortCode,
       () => {
         if (i % 100 === 0) {
           log.debug(`Processed ${i} chunks...`)

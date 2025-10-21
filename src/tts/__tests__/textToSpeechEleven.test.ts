@@ -25,6 +25,7 @@ Speaker 2: Okay, I'm with you. It's like air traffic control on steroids, but wi
 
 const seed = 12345
 const NO_AUDIO_EFFECTS: [undefined, undefined] = [undefined, undefined]
+const LANGUAGE = 'en'
 
 describe('textToSpeechEleven config test', () => {
   beforeEach(() => {
@@ -34,9 +35,9 @@ describe('textToSpeechEleven config test', () => {
 
   test('should Fail with missing API KEY', async () => {
     const dialogue = [[{ text: 'Test', voiceId: 'test-voice' }]]
-    await expect(textToSpeech(dialogue, seed, [undefined, undefined], 'eleven_multilingual_v2')).rejects.toThrow(
-      'ELEVENLABS_API_KEY not set'
-    )
+    await expect(
+      textToSpeech(dialogue, seed, [undefined, undefined], 'eleven_multilingual_v2', LANGUAGE)
+    ).rejects.toThrow('ELEVENLABS_API_KEY not set')
   })
 
   test('writeFile throws error if buffers empty', async () => {
@@ -88,6 +89,7 @@ describe('textToSpeechEleven tests', () => {
       seed,
       NO_AUDIO_EFFECTS,
       'eleven_multilingual_v2',
+      LANGUAGE,
       myPingBack
     )
     expect(myPingBack).toBeCalled()
@@ -106,7 +108,7 @@ describe('textToSpeechEleven tests', () => {
     const textToSpeechStreamModule = await import('../textToSpeechEleven.js')
     const dialogue = [[{ text: '', voiceId: 'test-voice' }]]
     await expect(
-      textToSpeechStreamModule.textToSpeech(dialogue, seed, NO_AUDIO_EFFECTS, 'eleven_multilingual_v2')
+      textToSpeechStreamModule.textToSpeech(dialogue, seed, NO_AUDIO_EFFECTS, 'eleven_multilingual_v2', LANGUAGE)
     ).rejects.toThrow('No audio buffers generated from eleven textToSpeech')
   })
 
@@ -128,7 +130,8 @@ describe('textToSpeechEleven tests', () => {
       dialogue,
       seed,
       NO_AUDIO_EFFECTS,
-      'eleven_multilingual_v2'
+      'eleven_multilingual_v2',
+      LANGUAGE
     )
     expect(result.outputFileName).toContain('.mp3')
     expect(result.outputFilePath).toContain(os.tmpdir())

@@ -15,6 +15,7 @@ Guidelines:
 - Do NOT exceed word limits for the title or bullet points.
 - Keep the tone professional but engaging.
 - Summarize accurately without introducing new information not present in the transcript.
+- The title and summary MUST be in the same language as the transcript.
 
 You must return the title, summary, and word count.
 `

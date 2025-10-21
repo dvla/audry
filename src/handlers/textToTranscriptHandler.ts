@@ -30,7 +30,9 @@ export class TextToTranscriptHandler {
         '\n\nLength: ' +
         (context.conversation.config?.length || DEFAULT_CONFIG.length) +
         '\n\nVoices: ' +
-        (context.conversation.config?.voices || DEFAULT_CONFIG.voices.map((v) => v).join(', '))
+        (context.conversation.config?.voices || DEFAULT_CONFIG.voices.map((v) => v).join(', ')) +
+        '\n\nLanguage: ' +
+        (context.conversation.config?.language || DEFAULT_CONFIG.language)
     )
   }
 

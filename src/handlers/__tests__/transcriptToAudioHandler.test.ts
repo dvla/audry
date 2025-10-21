@@ -156,7 +156,7 @@ describe('TranscriptToAudioHandler', () => {
       expect(mockTranscriptToSpeech).toHaveBeenCalledExactlyOnceWith(
         { model: 'gemini-tts-v1', provider: 'google', temperature: 0.2 },
         'Test transcript',
-        DEFAULT_CONFIG.voices
+        DEFAULT_CONFIG
       )
       expect(mockCreateFileConsentCard).toHaveBeenCalled()
       expect(mockContext.proactiveSend).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ type: 'message' }))

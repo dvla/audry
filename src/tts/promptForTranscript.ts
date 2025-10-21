@@ -74,10 +74,12 @@ export const promptForTranscript = (episodeConfig: EpisodeConfig) => {
       prompt.push(NEWS_INSTRUCTIONS)
       break
   }
+
   prompt.push(`\nSpeaker 1 is called ${speaker1}.`)
   if (speaker2) {
     prompt.push(` Speaker 2 is called ${speaker2}.`)
   }
+
   prompt.push(`\n`)
   switch (episodeConfig.length) {
     case 'Brief':
@@ -86,5 +88,9 @@ export const promptForTranscript = (episodeConfig: EpisodeConfig) => {
     case 'Full':
       prompt.push('\nThe episode should be about 6 minutes long, so no more than approximately 1000 words.')
   }
+
+  prompt.push(`\n`)
+  prompt.push(`\nThe episode should be in ${episodeConfig.language}.`)
+
   return prompt.join('')
 }

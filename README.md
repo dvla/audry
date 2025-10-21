@@ -74,6 +74,43 @@ To view the graph use `npm run graph` which will generate a visual representatio
 - Show Notes - Defined in `src/agents/show-notes/graph.ts`. It includes steps for summarizing the transcript, extracting key points, and generating a title and short summary.
 - Transcript Review - Defined in `src/agents/transcript-review/graph.ts`. It includes steps for reviewing the transcript, providing feedback, and re-drafting a new edition.
 
+## Languages
+
+Cuurently Audry supports English and Welsh in the episodeConfig.ts. To add new languages you must update the EpisodeLanguages enum and the LANGUAGE_CONFIG.
+
+```
+/**
+ * Supported languages for episodes.
+ */
+export enum EpisodeLanguages {
+  ENGLISH = 'English',
+  WELSH = 'Welsh',
+  SPANISH = 'Spanish' //Spanish Added
+}
+
+/**
+ * Configuration mapping for each supported language.
+ */
+export const LANGUAGE_CONFIG = {
+  [EpisodeLanguages.ENGLISH]: {
+    code: 'en-GB',
+    shortCode: 'en',
+    name: EpisodeLanguages.ENGLISH,
+  },
+  [EpisodeLanguages.WELSH]: {
+    code: 'cy-GB',
+    shortCode: 'cy',
+    name: EpisodeLanguages.WELSH,
+  },
+  // Added Spanish Config
+  [EpisodeLanguages.SPANISH]: {
+    code: 'es-ES',
+    shortCode: 'es,
+    name: EpisodeLanguages.SPANISH,
+  },
+}
+```
+
 ## License
 The MIT License (MIT)
 

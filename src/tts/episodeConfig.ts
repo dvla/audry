@@ -9,6 +9,22 @@ export enum EpisodeLanguages {
 }
 
 /**
+ * Configuration mapping for each supported language.
+ */
+export const LANGUAGE_CONFIG = {
+  [EpisodeLanguages.ENGLISH]: {
+    code: 'en-GB',
+    shortCode: 'en',
+    name: EpisodeLanguages.ENGLISH,
+  },
+  [EpisodeLanguages.WELSH]: {
+    code: 'cy-GB',
+    shortCode: 'cy',
+    name: EpisodeLanguages.WELSH,
+  },
+}
+
+/**
  * Types of episodes (e.g., Podcast, News Briefing).
  */
 export enum EpisodeKind {

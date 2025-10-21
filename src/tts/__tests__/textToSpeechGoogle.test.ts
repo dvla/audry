@@ -3,10 +3,10 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { DEFAULT_TTS_MODEL_CONFIG } from '../../features/featureTTS'
 import { Config } from '../../internal/config'
-import { EpisodeVoices } from '../episodeConfig'
+import { DEFAULT_CONFIG, EpisodeLanguages, EpisodeVoices } from '../episodeConfig'
 import {
-  STYLE,
   generateConfig,
+  generateStyle,
   processChunks,
   saveWaveFile,
   splitTranscript,
@@ -64,7 +64,11 @@ Config.GEMINI_API_KEY = 'fake-api-key'
 
 // Some reusable base64 audio data
 const fakeBase64Audio = Buffer.from('test audio').toString('base64')
-const voiceConfiguration = generateConfig([EpisodeVoices.MATTHEW, EpisodeVoices.ELLIE], 123, DEFAULT_TTS_MODEL_CONFIG)
+const voiceConfiguration = generateConfig(
+  { voices: [EpisodeVoices.MATTHEW, EpisodeVoices.ELLIE], language: EpisodeLanguages.ENGLISH },
+  123,
+  DEFAULT_TTS_MODEL_CONFIG
+)
 
 describe('saveWaveFile', () => {
   beforeEach(() => {
@@ -209,7 +213,7 @@ describe('processChunks', () => {
     expect(result).toBe('base64audio')
     expect(fakeGenerateContent).toHaveBeenCalledExactlyOnceWith({
       model: TTS_MODEL,
-      contents: [{ parts: [{ text: `${STYLE}\n\nHello world` }] }],
+      contents: [{ parts: [{ text: `${generateStyle(DEFAULT_CONFIG)}\n\nHello world` }] }],
       config: voiceConfiguration,
     })
   })

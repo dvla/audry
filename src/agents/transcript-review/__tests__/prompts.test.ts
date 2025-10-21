@@ -29,7 +29,7 @@ describe('Transcript Review Prompts', () => {
     })
 
     it('should include all required review areas', () => {
-      expect(CR_SYSTEM_PROMPT).toContain('Clarity and Plain English')
+      expect(CR_SYSTEM_PROMPT).toContain('Clarity and Plain Language')
       expect(CR_SYSTEM_PROMPT).toContain('Tone and Style')
       expect(CR_SYSTEM_PROMPT).toContain('Use of Jargon or Technical Language')
       expect(CR_SYSTEM_PROMPT).toContain('Complexity and Cognitive Load')
