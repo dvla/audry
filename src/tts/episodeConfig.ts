@@ -80,7 +80,6 @@ export enum EpisodeOutro {
   IN5 = 'in5',
   HAPPY10 = 'happy10',
   SYNTH10 = 'synth10',
-  WELCOME10 = 'welcome10',
 }
 
 /**

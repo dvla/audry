@@ -448,10 +448,6 @@ exports[`uploadFileCard > renders card with Advanced settings Action.ShowCard us
                         "value": "synth10",
                       },
                       {
-                        "title": "welcome10",
-                        "value": "welcome10",
-                      },
-                      {
                         "title": "None",
                         "value": "",
                       },

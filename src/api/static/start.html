@@ -64,6 +64,25 @@
             <option value="Welsh">Welsh</option>
           </select>
         </div>
+        <div id="extended-config">
+          <fieldset>
+            <legend>Intro Effect</legend>
+            <label><input type="radio" name="config[intro_effect]" value="beat5" /> Beat 5</label>
+            <label><input type="radio" name="config[intro_effect]" value="in5" /> In 5</label>
+            <label><input type="radio" name="config[intro_effect]" value="happy10" /> Happy 10</label>
+            <label><input type="radio" name="config[intro_effect]" value="synth10" /> Synth 10</label>
+            <label><input type="radio" name="config[intro_effect]" value="welcome10" /> Welcome 10</label>
+            <button type="button" onclick="clearEffect('intro')">Clear</button>
+          </fieldset>
+          <fieldset>
+            <legend>Outro Effect</legend>
+            <label><input type="radio" name="config[outro_effect]" value="beat5" /> Beat 5</label>
+            <label><input type="radio" name="config[outro_effect]" value="in5" /> In 5</label>
+            <label><input type="radio" name="config[outro_effect]" value="happy10" /> Happy 10</label>
+            <label><input type="radio" name="config[outro_effect]" value="synth10" /> Synth 10</label>
+            <button type="button" onclick="clearEffect('outro')">Clear</button>
+          </fieldset>
+        </div>
         <!-- Error Message -->
         <div id="error-message" class="error-message" hidden></div>
         <section class="button-action">
@@ -100,6 +119,12 @@
       </form>
     </section>
     <script>
+      // Function to clear effect selection
+      function clearEffect(effectType) {
+        const radios = document.querySelectorAll(`input[name="config[${effectType}_effect]"]`)
+        radios.forEach((radio) => (radio.checked = false))
+      }
+
       // Configure requests for audio download buttons to expect binary data
       document.body.addEventListener('htmx:configRequest', function (evt) {
         const elt = evt.detail.elt

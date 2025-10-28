@@ -173,6 +173,7 @@ section.border-top {
 .htmx-request .indicator {
   display: block;
 }
+
 .htmx-request.indicator {
   display: block;
 }
@@ -180,6 +181,7 @@ section.border-top {
 .htmx-request .indicator-start {
   display: flex;
 }
+
 .htmx-request.indicator-start {
   display: flex;
 }
@@ -212,8 +214,27 @@ label {
   flex-direction: row;
   align-items: flex-start;
 }
+
 #config > * {
   margin: 5px 0 0 5px;
+}
+
+#extended-config {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+fieldset {
+  border-radius: 5px;
+  background-color: #eff2fb;
+  border: 1px solid #ddd;
+}
+
+fieldset legend {
+  background: #dadfed;
+  padding: 5px 10px;
+  border-radius: 5px;
 }
 
 @media (min-width: 1500px) {

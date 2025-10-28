@@ -6,7 +6,7 @@ import { Hono } from 'hono'
 config({ path: 'env/.env.local' })
 
 const app = new Hono()
-app.get('/', (c) => c.text('Api server is running.'))
+app.get('/', (c) => c.text('Api server is running, try /start.html'))
 app.use('*', serveStatic({ root: './lib/static' }))
 /**
  * Start the API server

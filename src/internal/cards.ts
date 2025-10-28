@@ -74,6 +74,9 @@ export const processingCard = (title: string, message: string) => {
  */
 export const uploadFileCard = async (title: string, body: string, config: EpisodeConfig) => {
   const extendedConfig = await isFeatureEnabled(Feature.ExtendedConfig)
+  if (!extendedConfig) {
+    resetExtendedConfig(config)
+  }
   // Create a deep copy so we don't mutate the original
   const uploadFileCardCopy = structuredClone(uploadFileCardJson)
   const actionSet = uploadFileCardCopy.body.find((item: CardItem) => item.type === CARD_ACTION_SET)
@@ -395,6 +398,15 @@ const extendConfig = (config: EpisodeConfig) => {
     },
   ]
 }
+
+/** Resets the extended episode configuration.
+ * @param config - The episode configuration object
+ */
+const resetExtendedConfig = (config: EpisodeConfig) => {
+  if (config.intro_effect) config.intro_effect = null
+  if (config.outro_effect) config.outro_effect = null
+}
+
 /**
  * Creates a carousel of transcript pages with actions for each transcript.
  * Each page includes truncated and full transcript views with toggle visibility actions,

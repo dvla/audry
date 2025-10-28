@@ -143,33 +143,35 @@ export const textToSpeech = async (
       await fs.writeFile(dialogueFilePath, JSON.stringify(dialogue[i], null, 2))
     }
   }
-  try {
-    const tracer = trace.getTracer(SERVICE_NAME)
-    span = tracer.startSpan('eleven-labs-tts', { kind: SpanKind.CLIENT })
-    span.setAttribute('model', modelId)
-    const buffers: Buffer[] = await Promise.all(
-      dialogue.map((chunk) =>
-        textToSpeechStream(
-          chunk,
-          seed,
-          modelId,
-          {
-            stability: 0.5,
-            useSpeakerBoost: false,
-          },
-          languageCode,
-          ping
+
+  const tracer = trace.getTracer(SERVICE_NAME)
+  await tracer.startActiveSpan('eleven-labs-tts', { kind: SpanKind.CLIENT }, async (span: Span) => {
+    try {
+      span.setAttribute('model', modelId)
+      const buffers: Buffer[] = await Promise.all(
+        dialogue.map((chunk) =>
+          textToSpeechStream(
+            chunk,
+            seed,
+            modelId,
+            {
+              stability: 0.5,
+              useSpeakerBoost: false,
+            },
+            languageCode,
+            ping
+          )
         )
       )
-    )
-    const audioBuffers = [audioEffects[0], ...buffers, audioEffects[1]]
-    nonEmptyBuffers = audioBuffers.filter((buffer) => buffer?.length > 0)
-    if (nonEmptyBuffers.length === 0) {
-      throw new Error('No audio buffers generated from eleven textToSpeech')
+      const audioBuffers = [audioEffects[0], ...buffers, audioEffects[1]]
+      nonEmptyBuffers = audioBuffers.filter((buffer) => buffer?.length > 0)
+      if (nonEmptyBuffers.length === 0) {
+        throw new Error('No audio buffers generated from eleven textToSpeech')
+      }
+    } finally {
+      if (span) span.end()
     }
-  } finally {
-    if (span) span.end()
-  }
+  })
 
   if (log.isDebugEnabled()) {
     for (let i = 0; i < nonEmptyBuffers.length; i++) {
