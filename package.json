@@ -29,7 +29,7 @@
         "outdated": "ncu --errorLevel 2 --color -x npm-audit-resolver,eslint*",
         "check": "npm run build && npm run lint && npm run prettier && npm run test && npm run audit && npm run outdated",
         "test": "vitest run --coverage",
-        "release": "npx semantic-release"
+        "release": "semantic-release"
     },
     "dependencies": {
         "@azure-rest/ai-document-intelligence": "1.1.0",
