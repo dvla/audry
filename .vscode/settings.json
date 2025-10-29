@@ -13,16 +13,10 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "github.copilot.chat.commitMessageGeneration.instructions": [
         {
-            "text": "Use the Conventional Commits format: <type>[scope]: <description>."
+            "file": ".github/commit-instructions.md"
         },
         {
-            "text": "Allowed types: feat, fix, chore, docs."
-        },
-        {
-            "text": "The scope is the Jira ticket number, e.g., 'ET-1600'. Extract Jira ticket number from branch name if possible."
-        },
-        {
-            "text": "Keep the subject line under 70 characters if possible."
+            "file": ".git/HEAD"
         }
     ],
     "[typescript]": {
