@@ -115,6 +115,10 @@ stages:
           replaceExistingArchive: true
       - publish: '$(Pipeline.Workspace)/audry.zip'
         artifact: AudryZipDeployFile
+      - script: |
+          npm run release
+        displayName: 'Create release'
+        condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'main'))
 
 # Deploy the infrastructure via Bicep
   - stage: Infrastructure
