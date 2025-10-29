@@ -53,7 +53,9 @@ stages:
     - job: BuildAndTest
       displayName: Build and Test
       steps:
-      # Install Node.js
+      - checkout: self
+        persistCredentials: true
+        displayName: "Checking out git repository"
       - task: UseNode@1
         displayName: 'Install Node.js'
         inputs:
