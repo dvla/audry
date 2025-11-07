@@ -1,5 +1,12 @@
 # ETL Audry Change Log
 
+# [1.1.0](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.0.5...v1.1.0) (2025-11-07)
+
+
+### Features
+
+* Comment Out Tracing Initialisation ([fecf2a2](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/commit/fecf2a2c2535d458c5d6ed4ec092ea6a5fc5a8bb))
+
 ## [1.0.5](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.0.4...v1.0.5) (2025-10-29)
 
 
