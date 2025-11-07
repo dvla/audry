@@ -13,28 +13,28 @@ import { Config } from './config'
 export const SERVICE_NAME = Config.WEBSITE_SITE_NAME
 
 // Initialize OpenTelemetry only if Application Insights connection string is provided
-if (process.env.APPLICATIONINSIGHTS_CONNECTION_STRING) {
-  const resource = {
-    [ATTR_SERVICE_NAME]: SERVICE_NAME,
-  }
-  const exporter = new ConsoleSpanExporter()
-  const processor = new BatchSpanProcessor(exporter)
-  const options: AzureMonitorOpenTelemetryOptions = {
-    instrumentationOptions: {
-      http: { enabled: true },
-      azureSdk: { enabled: true },
-      winston: { enabled: true },
-    },
-    resource: resourceFromAttributes(resource),
-    spanProcessors: [processor],
-  }
-  useAzureMonitor(options)
-  registerInstrumentations({
-    tracerProvider: trace.getTracerProvider(),
-    meterProvider: metrics.getMeterProvider(),
-    instrumentations: [createAzureSdkInstrumentation(), new WinstonInstrumentation()],
-  })
-}
+// if (process.env.APPLICATIONINSIGHTS_CONNECTION_STRING) {
+//   const resource = {
+//     [ATTR_SERVICE_NAME]: SERVICE_NAME,
+//   }
+//   const exporter = new ConsoleSpanExporter()
+//   const processor = new BatchSpanProcessor(exporter)
+//   const options: AzureMonitorOpenTelemetryOptions = {
+//     instrumentationOptions: {
+//       http: { enabled: true },
+//       azureSdk: { enabled: true },
+//       winston: { enabled: true },
+//     },
+//     resource: resourceFromAttributes(resource),
+//     spanProcessors: [processor],
+//   }
+//   useAzureMonitor(options)
+//   registerInstrumentations({
+//     tracerProvider: trace.getTracerProvider(),
+//     meterProvider: metrics.getMeterProvider(),
+//     instrumentations: [createAzureSdkInstrumentation(), new WinstonInstrumentation()],
+//   })
+// }
 
 /**
  * Interface representing a generic logger with various log levels.
