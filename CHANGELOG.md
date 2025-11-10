@@ -1,5 +1,12 @@
 # ETL Audry Change Log
 
+## [1.1.2](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.1.1...v1.1.2) (2025-11-10)
+
+
+### Bug Fixes
+
+* ET-1702: remove unused Application Insights connection string and add to... ([3b7e6d1](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/commit/3b7e6d10c8da9cc18360fa9458525f39c570602f))
+
 ## [1.1.1](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.1.0...v1.1.1) (2025-11-10)
 
 
