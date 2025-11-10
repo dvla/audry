@@ -1,5 +1,12 @@
 # ETL Audry Change Log
 
+## [1.1.3](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.1.2...v1.1.3) (2025-11-10)
+
+
+### Bug Fixes
+
+* ET-1702: add health check endpoint to app ([e58fcf2](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/commit/e58fcf2e8de7a7706c3e034f7538547070ec4921))
+
 ## [1.1.2](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.1.1...v1.1.2) (2025-11-10)
 
 
