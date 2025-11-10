@@ -1,5 +1,12 @@
 # ETL Audry Change Log
 
+## [1.1.4](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.1.3...v1.1.4) (2025-11-10)
+
+
+### Bug Fixes
+
+* ET-1702: add AZURE_TENANT_ID and update WEB_APP_SKU to B2 ([0615423](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/commit/0615423ade7d40e51fe3a2db2d546113c8a2d708))
+
 ## [1.1.3](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.1.2...v1.1.3) (2025-11-10)
 
 
