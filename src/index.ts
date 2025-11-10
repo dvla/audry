@@ -27,6 +27,10 @@ expressApp.get('/', function (req, res) {
   res.send('Audry is running.')
 })
 
+expressApp.get('/health', function (req, res) {
+  res.send('OK')
+})
+
 const server = expressApp.listen(process.env.port || process.env.PORT || 3978, () => {
   log.info(`\nBot Started, ${expressApp.name} listening to ${JSON.stringify(server.address())}...`)
 })

@@ -92,6 +92,7 @@ resource webApp 'Microsoft.Web/sites@2024-11-01' = {
     httpsOnly: true
     siteConfig: {
       alwaysOn: true
+      healthCheckPath: '/health'
       appSettings: [
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
