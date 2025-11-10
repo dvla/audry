@@ -29,7 +29,7 @@ variables:
   - name: ENV_NAME
     value: 'dev'
   - name: WEB_APP_SKU
-    value: 'B1'
+    value: 'B2'
   - name: BOT_DISPLAY_NAME
     value: 'Bot-$(RESOURCE_BASE_NAME)-$(ENV_NAME)'
   - name: TEAMSAPP_CLI_VERSION

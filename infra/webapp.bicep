@@ -127,6 +127,10 @@ resource webApp 'Microsoft.Web/sites@2024-11-01' = {
           value: tenantId
         }
         {
+          name: 'AZURE_TENANT_ID'
+          value: tenantId
+        }
+        {
           name: 'BOT_TYPE'
           value: 'UserAssignedMsi'
         }
