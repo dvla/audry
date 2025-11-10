@@ -58,10 +58,6 @@ export const Config = {
   DOCINT_ENDPOINT: checkOptionalVariable(process.env.DOCINT_ENDPOINT, DEFAULT_EMPTY),
 
   APP_CONFIG_ENDPOINT: checkOptionalVariable(process.env.AZURE_APP_CONFIG_ENDPOINT, DEFAULT_EMPTY),
-  APPlICATIONINSIGHTS_CONNECTION_STRING: checkOptionalVariable(
-    process.env.APPlICATIONINSIGHTS_CONNECTION_STRING,
-    DEFAULT_EMPTY
-  ),
   // Azure Blob Storage configuration
   STORAGE_ACCOUNT_NAME: checkOptionalVariable(process.env.STORAGE_ACCOUNT_NAME, DEFAULT_EMPTY),
   STORAGE_BLOB_CONTAINER_NAME: checkOptionalVariable(process.env.STORAGE_BLOB_CONTAINER_NAME, DEFAULT_EMPTY),

@@ -25,6 +25,9 @@ if (process.env.APPLICATIONINSIGHTS_CONNECTION_STRING) {
       azureSdk: { enabled: true },
       winston: { enabled: true },
     },
+    azureMonitorExporterOptions: {
+      connectionString: process.env.APPLICATIONINSIGHTS_CONNECTION_STRING,
+    },
     resource: resourceFromAttributes(resource),
     spanProcessors: [processor],
   }
