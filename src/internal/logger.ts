@@ -2,7 +2,6 @@ import { AzureMonitorOpenTelemetryOptions, useAzureMonitor } from '@azure/monito
 import { createAzureSdkInstrumentation } from '@azure/opentelemetry-instrumentation-azure-sdk'
 import { metrics, trace } from '@opentelemetry/api'
 import { registerInstrumentations } from '@opentelemetry/instrumentation'
-import { WinstonInstrumentation } from '@opentelemetry/instrumentation-winston'
 import { resourceFromAttributes } from '@opentelemetry/resources'
 import { BatchSpanProcessor, ConsoleSpanExporter } from '@opentelemetry/sdk-trace-node'
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions'
@@ -23,7 +22,7 @@ if (process.env.APPLICATIONINSIGHTS_CONNECTION_STRING) {
     instrumentationOptions: {
       http: { enabled: true },
       azureSdk: { enabled: true },
-      winston: { enabled: true },
+      winston: { enabled: false },
     },
     azureMonitorExporterOptions: {
       connectionString: process.env.APPLICATIONINSIGHTS_CONNECTION_STRING,
@@ -35,7 +34,7 @@ if (process.env.APPLICATIONINSIGHTS_CONNECTION_STRING) {
   registerInstrumentations({
     tracerProvider: trace.getTracerProvider(),
     meterProvider: metrics.getMeterProvider(),
-    instrumentations: [createAzureSdkInstrumentation(), new WinstonInstrumentation()],
+    instrumentations: [createAzureSdkInstrumentation()],
   })
 }
 

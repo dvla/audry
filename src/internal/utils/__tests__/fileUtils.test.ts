@@ -23,6 +23,7 @@ vi.mock('stream/promises')
 
 // Mock Azure Identity
 vi.mock('@azure/identity', () => ({
+  ManagedIdentityCredential: vi.fn(),
   DefaultAzureCredential: vi.fn(),
 }))
 
