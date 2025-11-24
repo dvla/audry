@@ -3,8 +3,8 @@ Audry is a Microsoft Teams bot that converts documents into podcast-style transc
 
 There are 3 ways to run this project:
 
-1. [**Microsoft 365 Agents Playground**](#get-started-with-the-teams-bot): Uses the Microsoft 365 Agents Toolkit extension.
-2. **Local API Server**: Runs the project as a rest API server using Hono.
+1. [**Teams Bot**](#get-started-with-the-teams-bot): Runs the project as a Teams bot using the Microsoft 365 Agents Toolkit.
+2. [**Local API Server**](#quick-start-api-only): Runs the project as a rest API server using Hono.
 3. [**Langgraph API**](#langgraph-ai-agent): Uses Langgraph and Langsmith studio to visualise the graph element of the project.
 
 ## Prerequisites
@@ -17,9 +17,10 @@ To get started quickly, you can use the following steps:
 
 1. Clone the repository
 
-2. Install dependencies:
+2. Install dependencies and build the project:
    ```bash
    npm install
+   npm run build
    ```
 
 3. Start the local **API server**:
@@ -27,44 +28,55 @@ To get started quickly, you can use the following steps:
    npm run api
    ```
 
-4. Open your browser and navigate to `http://localhost:3000` or `http://localhost:3000/start.html`.
+4. Set up the Gemini API key in `/env/.env.local` to enable AI-powered transcript generation:
+    ```bash
+     GEMINI_API_KEY="your_gemini_api_key"
+     GEMINI_MODEL="gemini-2.5-flash" # Or any latest available model
+    ```
+
+5. Open your browser and navigate to `http://localhost:3000` or `http://localhost:3000/start.html`.
 
 ## Get Started with the Teams bot
->
-> **Note**
->
-> Your app can be installed into a team, or a group chat, or as personal app. See [Installation and Uninstallation](https://aka.ms/teamsfx-command-response#customize-installation).
-> For local debugging using Microsoft 365 Agents Toolkit CLI, you need to do some extra steps described in [Set up your Microsoft 365 Agents Toolkit CLI for local debugging](https://aka.ms/teamsfx-cli-debugging).
 
-1. First, select the Microsoft 365 Agents Toolkit icon on the left in the VS Code toolbar.
-2. Press F5 to start debugging which launches your app in Microsoft 365 Agents Playground using a web browser. Select `Debug in Microsoft 365 Agents Playground`.
-3. The browser will pop up to open Microsoft 365 Agents Playground.
-4. Type or select `helloWorld` in the chat to send it to your bot.
+### Deploying with Azure AI Bot Service
 
+To deploy the bot using Azure AI Bot Service with client secrets, follow these steps:
 
-## What's included in the template
+1. **Provision Resources**:
+   - Follow the instructions in the [Azure Bot Service documentation](https://learn.microsoft.com/en-us/microsoft-365/agents-sdk/azure-bot-create-single-secret) to create and configure an Azure Bot resource.
+
+2. **Create Secrets**:
+   - Refer to the same documentation to generate a client secret and retrieve the Application (client) ID and Directory (tenant) ID.
+
+3. **Set Environment Variables**:
+   - Add the following variables to your `env/.env.local` file:
+     ```bash
+     BOT_ID="your_client_id"
+     TEAMS_APP_TENANT_ID="your_tenant_id"
+     SECRET_BOT_PASSWORD="your_client_secret"
+     ```
+
+4. **Run the Bot**:
+   - Select the Microsoft 365 Agents Toolkit icon on the left in the VS Code toolbar.
+   - Press F5 to start debugging, and choose `Debug in Teams` when prompted.
+   - The Teams app will launch in your browser or in the Teams desktop app. You can then interact with the bot by sending messages.
+
+## Project overview
 
 | Folder / File | Contents |
 | - | - |
 | `m365agents.yml` | Main project file describes your application configuration and defines the set of actions to run in each lifecycle stages |
 | `m365agents.local.yml`| This overrides `m365agents.yml` with actions that enable local execution and debugging |
-| `m365agents.playground.yml`| This overrides `m365agents.yml` with actions that enable local execution and debugging in Microsoft 365 Agents Playground |
 | `env/`| Name / value pairs are stored in environment files and used by `m365agents.yml` to customize the provisioning and deployment rules |
 | `.vscode/` | VSCode files for debugging |
-| `appPackage/` | Templates for the application manifest |
-| `infra/` | Templates for provisioning Azure resources |
+| `appPackage/` | Config for the application manifest |
+| `infra/` | Bicep templates for provisioning Azure resources |
 | `src/` | The source code for the application |
 
-The following files can be customized and demonstrate an example implementation to get you started.
+### Handler-Based Architecture
 
-| File | Contents |
-| - | - |
-| `src/index.ts`| Application entry point and `express` handlers for the Workflow bot |
-| `src/teamsBot.ts` | An empty teams activity handler for bot customization |
-| `src/commands/helloworldCommandHandler.ts` | Implementation that handles responding to a chat command |
-| `src/adaptiveCards/helloworldCommandResponse.json` | Defines the Adaptive Card (UI) that is displayed in response to a chat command |
-| `src/adaptiveCards/doStuffActionResponse.json` | A generated Adaptive Card that is sent to Teams for the response of "doStuff" action |
-| `src/cardActions/doStuffActionHandler.ts` | Implements the handler for the `doStuff` button displayed in the Adaptive Card |
+- **Action Handlers**: Handle Adaptive Card button interactions (`src/handlers/`)
+- **Message Routing**: Single entry point in `src/index.ts` routes activities to appropriate handlers based on patterns.
 
 ## Langgraph AI Agent
 Audry uses Langgraph to create AI agents that process the transcript and generates show notes.
@@ -110,6 +122,10 @@ export const LANGUAGE_CONFIG = {
   },
 }
 ```
+
+## Infrastructure Code
+
+The infrastructure code for provisioning Azure resources is located in the `/infra` folder. This folder contains templates and scripts to set up the necessary cloud resources for the application.
 
 ## License
 The MIT License (MIT)
