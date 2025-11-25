@@ -1,5 +1,12 @@
 # ETL Audry Change Log
 
+# [1.3.0](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.2.0...v1.3.0) (2025-11-25)
+
+
+### Features
+
+* ET-1708: add tests for FileConsentHandler and MessageHandler ([6b108d6](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/commit/6b108d6890e9cedc489545080a616f7d6691e2bb))
+
 # [1.2.0](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.1.4...v1.2.0) (2025-11-25)
 
 
