@@ -1,5 +1,12 @@
 # ETL Audry Change Log
 
+# [1.2.0](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.1.4...v1.2.0) (2025-11-25)
+
+
+### Features
+
+* ET-1702: Updated config and logger ([91134af](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/commit/91134afc311789f4fcf9b22a65872267b23bac9d))
+
 ## [1.1.4](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.1.3...v1.1.4) (2025-11-10)
 
 
