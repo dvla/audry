@@ -19,11 +19,6 @@ if (process.env.APPLICATIONINSIGHTS_CONNECTION_STRING) {
   const exporter = new ConsoleSpanExporter()
   const processor = new BatchSpanProcessor(exporter)
   const options: AzureMonitorOpenTelemetryOptions = {
-    instrumentationOptions: {
-      http: { enabled: true },
-      azureSdk: { enabled: true },
-      winston: { enabled: false },
-    },
     azureMonitorExporterOptions: {
       connectionString: process.env.APPLICATIONINSIGHTS_CONNECTION_STRING,
     },

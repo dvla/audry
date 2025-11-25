@@ -12,7 +12,7 @@ export const DEFAULT_LOG_LEVEL = 'info'
 export const DEFAULT_GEMINI_MODEL = 'gemini-2.0-flash-001'
 export const DEFAULT_GEMINI_TTS_MODEL = 'gemini-2.5-flash-preview-tts'
 export const DEFAULT_MAX_NUMBER_OF_LINES = '28'
-export const DEFAULT_LINES_PER_CHUNK = '4'
+export const DEFAULT_LINES_PER_CHUNK = '28'
 export const DEFAULT_ORG = 'DVLA (Driver and Vehicle Licensing Agency)'
 export const DEFAULT_SITE_NAME = 'dev'
 

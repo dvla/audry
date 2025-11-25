@@ -38,7 +38,7 @@ const VOICE_CONFIGS = new Map<EpisodeVoices, VoiceConfig>([
  */
 export const generateStyle = (episodeConfig: EpisodeConfig) => {
   return `This is a short audio episode. 
-  ALL SPEAKERS should have a warm, and inviting ${episodeConfig.language} accent. 
+  ALL SPEAKERS should have a warm, and inviting BRITISH ${episodeConfig.language} accent. 
   The delivery should be conversational and engaging, with a dynamic rhythm that captures the listener's attention. 
   The tone should be informative yet friendly. 
   Here is the text to turn into speech:\n`
