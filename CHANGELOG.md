@@ -1,5 +1,12 @@
 # ETL Audry Change Log
 
+# [1.4.0](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.3.0...v1.4.0) (2025-11-27)
+
+
+### Features
+
+* ET-1704: add review button to transcript card ([5db682c](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/commit/5db682c432e28751f467842038fb8f2da7430ddd))
+
 # [1.3.0](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.2.0...v1.3.0) (2025-11-25)
 
 
