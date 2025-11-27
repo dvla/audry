@@ -96,10 +96,11 @@ export const uploadFileCard = async (title: string, body: string, config: Episod
  * Generates a text-to-transcript card with the provided title and transcript.
  * @param title The title of the card.
  * @param transcript The transcript text to display on the card.
+ * @param showReview Whether to show the AI Review action on the card. Defaults to false.
  * @returns An Adaptive Card with the title and transcript.
  */
-export const textToTranscriptCard = (title: string, transcripts: string[]) => {
-  return new ACData.Template(createTextToTranscriptCard(transcripts)).expand({
+export const textToTranscriptCard = (title: string, transcripts: string[], showReview: boolean = false) => {
+  return new ACData.Template(createTextToTranscriptCard(transcripts, showReview)).expand({
     $root: {
       title: title,
     },
@@ -318,9 +319,10 @@ export const episodeConfigCard = (config: EpisodeConfig, extendedConfig: boolean
 /**
  * Creates an adaptive card for displaying all transcripts.
  * @param transcripts - array of transcript strings
+ * @param showReview Whether to show the AI Review action on the card.
  * @returns Adaptive card for text-to-transcript results
  */
-const createTextToTranscriptCard = (transcripts: string[]) => {
+const createTextToTranscriptCard = (transcripts: string[], showReview: boolean) => {
   return {
     type: 'AdaptiveCard',
     version: '1.5',
@@ -359,7 +361,7 @@ const createTextToTranscriptCard = (transcripts: string[]) => {
                     color: 'Default',
                     wrap: true,
                   },
-                  createTranscriptCarousel(transcripts),
+                  createTranscriptCarousel(transcripts, showReview),
                 ],
               },
             ],
@@ -412,9 +414,10 @@ const resetExtendedConfig = (config: EpisodeConfig) => {
  * Each page includes truncated and full transcript views with toggle visibility actions,
  * as well as buttons to create a podcast or edit the transcript.
  * @param transcripts - array of transcript strings
+ * @param showReview Whether to show the AI Review action on the card.
  * @returns Carousel card with pages for each transcript
  */
-const createTranscriptCarousel = (transcripts: string[]) => {
+const createTranscriptCarousel = (transcripts: string[], showReview: boolean) => {
   const pages = transcripts.map((transcript, index) => ({
     type: 'CarouselPage',
     style: 'accent',
@@ -478,7 +481,7 @@ const createTranscriptCarousel = (transcripts: string[]) => {
           },
           {
             type: 'Action.Submit',
-            title: 'Edit Transcript',
+            title: 'Edit',
             id: 'openDialog',
             data: {
               msteams: {
@@ -489,6 +492,9 @@ const createTranscriptCarousel = (transcripts: string[]) => {
               index: index,
             },
           },
+          ...(showReview
+            ? [{ type: 'Action.Execute', verb: 'reviewTranscript', title: 'AI Review', style: 'default' }]
+            : []),
         ],
       },
     ],

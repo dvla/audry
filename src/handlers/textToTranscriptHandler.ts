@@ -54,7 +54,7 @@ export class TextToTranscriptHandler {
       // Write the transcript to a file
       await writeFile(userId, documentId, TRANSCRIPT_TEXT, transcriptText)
       // Send a proactive card with the transcript
-      await proactiveSendCard(textToTranscriptCard('Transcript Created', await getTranscripts(conversation)))
+      await proactiveSendCard(textToTranscriptCard('Transcript Created', await getTranscripts(conversation), true))
     } catch (error) {
       log.error('Error generating transcript:', error)
       await proactiveSendCard(warningCard('The transcript could not be generated. Please try again later.'))

@@ -1,19 +1,31 @@
 import { Selector } from '@microsoft/teams-ai'
 import { ActivityTypes } from 'botbuilder'
 
-import { warningCard } from '../internal/cards'
+import { processingCard, warningCard } from '../internal/cards'
 import { ActivityContext } from '../internal/conversationHandlers'
 import { log } from '../internal/logger'
 import { EDITED_TRANSCRIPT_TEXT, TRANSCRIPT_TEXT, readFile, writeFile } from '../internal/utils/documentUtils'
 import { reviewTranscript } from '../internal/utils/graphUtils'
 
 const FILE_TRIGGER_PATTERN = /^.*\breview.*$/i
+const FILE_VERB = 'reviewTranscript'
 
 /**
  * Handles the review of a podcast transcript.
  */
 export class ReviewHandler {
   triggerPatterns: string | RegExp | Selector | (string | RegExp | Selector)[] = FILE_TRIGGER_PATTERN
+  triggerVerb: string | RegExp | Selector | (string | RegExp | Selector)[] = FILE_VERB
+
+  /**
+   * Handles the action when invoked from a button on an adaptive card.
+   * @param context - The activity context containing the conversation and activity.
+   * @returns An Adaptive Card indicating the processing state.
+   */
+  async handleActionInvoked(context: ActivityContext) {
+    setImmediate(() => this.reviewTranscript(context.proactiveSend, context.proactiveSendCard, context.conversation))
+    return processingCard('Reviewing transcript...', 'You will receive feedback shortly.')
+  }
 
   /**
    * Handles the invocation of the review handler.
