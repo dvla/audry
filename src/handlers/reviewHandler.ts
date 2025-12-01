@@ -1,10 +1,16 @@
 import { Selector } from '@microsoft/teams-ai'
 import { ActivityTypes } from 'botbuilder'
 
-import { processingCard, warningCard } from '../internal/cards'
+import { processingCard, textToTranscriptCard, warningCard } from '../internal/cards'
 import { ActivityContext } from '../internal/conversationHandlers'
 import { log } from '../internal/logger'
-import { EDITED_TRANSCRIPT_TEXT, TRANSCRIPT_TEXT, readFile, writeFile } from '../internal/utils/documentUtils'
+import {
+  EDITED_TRANSCRIPT_TEXT,
+  TRANSCRIPT_TEXT,
+  getTranscripts,
+  readFile,
+  writeFile,
+} from '../internal/utils/documentUtils'
 import { reviewTranscript } from '../internal/utils/graphUtils'
 
 const FILE_TRIGGER_PATTERN = /^.*\breview.*$/i
@@ -59,6 +65,10 @@ export class ReviewHandler {
           await proactiveSend(emotion)
           await new Promise((resolve) => setTimeout(resolve, 500))
           await writeFile(conversation.userId, documentId, EDITED_TRANSCRIPT_TEXT, review.finalTranscript)
+          await new Promise((resolve) => setTimeout(resolve, 500))
+          await proactiveSendCard(
+            textToTranscriptCard('Choose your preferred transcript', await getTranscripts(conversation))
+          )
         } else {
           await proactiveSend('No review for this transcript')
         }

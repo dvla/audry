@@ -15,6 +15,6 @@ export class EditTranscriptHandler {
    * @param conversation - the conversation context containing documentId
    */
   async handleInvoked({ sendCard, conversation }: ActivityContext) {
-    return await sendCard(textToTranscriptCard('Edit Transcript', await getTranscripts(conversation)))
+    return await sendCard(textToTranscriptCard('Choose your preferred transcript', await getTranscripts(conversation)))
   }
 }

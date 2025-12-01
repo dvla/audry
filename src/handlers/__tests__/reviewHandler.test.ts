@@ -47,6 +47,7 @@ describe('ReviewHandler', () => {
         type: ActivityTypes.Typing,
       })
     )
+    await new Promise((resolve) => setImmediate(resolve))
   })
 
   it('should send feedback and save file on successful review', async () => {

@@ -27,7 +27,7 @@ exports[`EditTranscriptHandler > handleInvoked > should handle empty transcripts
                       {
                         "color": "Default",
                         "size": "Medium",
-                        "text": "Edit Transcript",
+                        "text": "Choose your preferred transcript",
                         "type": "TextBlock",
                         "weight": "Bolder",
                         "wrap": true,
@@ -92,7 +92,7 @@ exports[`EditTranscriptHandler > handleInvoked > should handle single transcript
                       {
                         "color": "Default",
                         "size": "Medium",
-                        "text": "Edit Transcript",
+                        "text": "Choose your preferred transcript",
                         "type": "TextBlock",
                         "weight": "Bolder",
                         "wrap": true,
@@ -248,7 +248,7 @@ exports[`EditTranscriptHandler > handleInvoked > should send textToTranscriptCar
                       {
                         "color": "Default",
                         "size": "Medium",
-                        "text": "Edit Transcript",
+                        "text": "Choose your preferred transcript",
                         "type": "TextBlock",
                         "weight": "Bolder",
                         "wrap": true,
