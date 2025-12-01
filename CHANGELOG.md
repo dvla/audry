@@ -1,5 +1,12 @@
 # ETL Audry Change Log
 
+# [1.5.0](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.4.0...v1.5.0) (2025-12-01)
+
+
+### Features
+
+* ET-1705: add automatic editing to transcript selection following AI review ([5140102](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/commit/514010266dd34918912ea141da8ce893365286c8))
+
 # [1.4.0](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.3.0...v1.4.0) (2025-11-27)
 
 
