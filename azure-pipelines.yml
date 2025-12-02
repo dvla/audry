@@ -34,6 +34,8 @@ variables:
     value: 'Bot-$(RESOURCE_BASE_NAME)-$(ENV_NAME)'
   - name: TEAMSAPP_CLI_VERSION
     value: "3.0.4"
+  - name: pnpm_config_cache
+    value: $(Pipeline.Workspace)/.pnpm-store
   
   # These values will override the above if the branch is main (i.e. for production)
   - ${{ if contains(variables['Build.SourceBranchName'], 'main') }}:
@@ -61,29 +63,43 @@ stages:
         inputs:
           version: "22"
           checkLatest: true
+      - script: |
+          npm install -g pnpm
+        displayName: 'Install pnpm'
+      - task: Cache@2
+        inputs:
+          key: 'pnpm | "$(Agent.OS)" | pnpm-lock.yaml'
+          path: $(pnpm_config_cache)
+        displayName: Cache pnpm
+      - script: |
+          npm install --global corepack@latest
+          corepack enable
+          corepack prepare pnpm@latest-10 --activate
+          pnpm config set store-dir $(pnpm_config_cache)
+        displayName: "Setup pnpm"
       # Install dependencies
       - script: |
-          npm ci
+          pnpm install --frozen-lockfile
         displayName: 'Install dependencies'
       - script: |
-          npm run build
+          pnpm build
         displayName: 'Build the project'
       - script: |
-          npm run prettier
+          pnpm prettier
         displayName: 'Run prettier'
       - script: |
-          npm run lint
+          pnpm lint
         displayName: 'Run Linter'
       - script: |
-          npm run audit
+          pnpm audit
         displayName: 'Run Audit'
         continueOnError: true
       - script: |
-          npm run outdated
+          pnpm outdated
         displayName: 'Run Outdated'
         continueOnError: true
       - script: |
-          npm run test
+          pnpm test
         displayName: 'Run Tests'
       - task: PublishTestResults@2
         displayName: 'Publish Test Results'
@@ -96,11 +112,11 @@ stages:
         inputs:
           summaryFileLocation: '$(Build.SourcesDirectory)/coverage/cobertura-coverage.xml'
       - script: |
-          npm run release
+          pnpm release
         displayName: 'Create release'
         condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'main'))    
       - script: |
-          npm prune --omit=dev
+          pnpm prune --prod
         displayName: 'Remove dev dependencies'
         condition: always()
       - task: CopyFiles@2
