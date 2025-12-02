@@ -20,6 +20,7 @@ import {
 
 export const SAVE_CONFIG_MESSAGE = 'saveConfig'
 export const CARD_ACTION_SET = 'ActionSet'
+export const CARD_COLUMN_SET = 'ColumnSet'
 export const SHOW_CARD_ACTION = 'Action.ShowCard'
 
 interface CardItem {
@@ -78,8 +79,9 @@ export const uploadFileCard = async (title: string, body: string, config: Episod
     resetExtendedConfig(config)
   }
   // Create a deep copy so we don't mutate the original
-  const uploadFileCardCopy = structuredClone(uploadFileCardJson)
-  const actionSet = uploadFileCardCopy.body.find((item: CardItem) => item.type === CARD_ACTION_SET)
+  const uploadFileCardCopy = structuredClone(uploadFileCardJson) as any
+  const columnSet = uploadFileCardCopy.body.find((item: any) => item.type === CARD_COLUMN_SET)
+  let actionSet = columnSet.columns[0].items.find((item: any) => item.type === CARD_ACTION_SET)
   if (actionSet) {
     actionSet.actions = [...actionSet.actions, episodeConfigCard(config, extendedConfig)]
   }

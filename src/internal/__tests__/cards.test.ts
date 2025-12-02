@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { DEFAULT_CONFIG } from '../../tts/episodeConfig'
-import { CARD_ACTION_SET, SHOW_CARD_ACTION, uploadFileCard } from '../cards'
+import { CARD_ACTION_SET, CARD_COLUMN_SET, SHOW_CARD_ACTION, uploadFileCard } from '../cards'
 
 // Mock feature flag so we can toggle UIConfig ON/OFF per test
 const mockIsFeatureEnabled = vi.hoisted(() => vi.fn())
@@ -25,7 +25,9 @@ describe('uploadFileCard', () => {
 
     const card = await uploadFileCard('File Processed', 'Body text here', DEFAULT_CONFIG)
 
-    const actions = (card.body?.find((b: any) => b.type === CARD_ACTION_SET)?.actions ?? []) as any[]
+    const columnSet = card.body?.find((b: any) => b.type === CARD_COLUMN_SET)
+    const actionSet = columnSet?.columns?.[0]?.items?.find((i: any) => i.type === CARD_ACTION_SET)
+    const actions = (actionSet?.actions ?? []) as any[]
     const showCard = actions.find((a) => a.type === SHOW_CARD_ACTION)
     expect(showCard).toBeDefined()
 
@@ -48,7 +50,9 @@ describe('uploadFileCard', () => {
 
     const card = await uploadFileCard('File Processed', 'With configuration', DEFAULT_CONFIG)
 
-    const actions = (card.body?.find((b: any) => b.type === CARD_ACTION_SET)?.actions ?? []) as any[]
+    const columnSet = card.body?.find((b: any) => b.type === CARD_COLUMN_SET)
+    const actionSet = columnSet?.columns?.[0]?.items?.find((i: any) => i.type === CARD_ACTION_SET)
+    const actions = (actionSet?.actions ?? []) as any[]
     const showCard = actions.find((a) => a.type === SHOW_CARD_ACTION)
     expect(showCard).toBeDefined()
 

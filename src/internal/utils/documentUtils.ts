@@ -90,12 +90,13 @@ export const readFile = async (
 }
 
 /**
- * Generates a unique file name for the podcast based on the current date and time.
- * @returns A string representing the podcast file name.
+ * Generates a unique file name based on a base filename and the current date and time.
+ * @param baseName - The base name of the file.
+ * @returns A string representing the unique file name.
  */
-export const generatePodcastFileName = (): string => {
-  const now = new Date()
-  return `podcast_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`
+export const generateUniqueFileName = (baseName: string): string => {
+  const timestamp = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14) // YYYYMMDDHHmmss
+  return `${baseName}_${timestamp}`
 }
 
 /**

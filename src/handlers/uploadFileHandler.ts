@@ -1,12 +1,14 @@
 import { Selector } from '@microsoft/teams-ai'
 import { Activity, ActivityTypes, Attachment } from 'botbuilder'
+import fs from 'fs/promises'
 import path from 'path'
 import { v7 as uuidv7 } from 'uuid'
 
-import { uploadFileCard, warningCard } from '../internal/cards'
+import { createFileConsentCard, uploadFileCard, warningCard } from '../internal/cards'
 import { Config } from '../internal/config'
 import { ActivityContext, ConversationState } from '../internal/conversationHandlers'
 import { log } from '../internal/logger'
+import { EXTRACTED_TEXT, generateUniqueFileName, readFile } from '../internal/utils/documentUtils'
 import { extractAndWriteText, writeContentToFile } from '../internal/utils/fileUtils'
 import { getUserId } from '../internal/utils/userUtils'
 import { DEFAULT_CONFIG, EpisodeSchema } from '../tts/episodeConfig'
@@ -22,6 +24,7 @@ export const FILE_TIGGER_PATTERN = 'uploadFile'
  */
 export class UploadFileCommandHandler {
   triggerPatterns: string | RegExp | Selector | (string | RegExp | Selector)[] = FILE_TIGGER_PATTERN
+  downloadTriggerVerb = 'downloadExtractedText'
 
   /**
    * Sets up a new conversation
@@ -104,5 +107,32 @@ export class UploadFileCommandHandler {
       `Successfully extracted text from file: ${path.basename(conversation.documentPath)}`,
       conversation.config
     )
+  }
+
+  /**
+   * Handles the action to download the extracted text.
+   * @param context - The activity context.
+   */
+  async handleDownloadAction({ proactiveSend, proactiveSendCard, conversation }: ActivityContext) {
+    try {
+      const extractedText = await readFile(conversation.userId, conversation.documentId, EXTRACTED_TEXT)
+
+      const fileName = generateUniqueFileName('file_contents') + '.md'
+      const filePath = path.join(Config.FILES_DIR, `${conversation.documentId}_${fileName}`)
+      await fs.writeFile(filePath, extractedText, 'utf8')
+
+      const fileConsentCard = createFileConsentCard(filePath, fileName, 'File Contents in Markdown')
+
+      await proactiveSend({
+        type: 'message',
+        attachments: [fileConsentCard],
+      })
+
+      return 'Preparing download...'
+    } catch (error) {
+      log.error('Error handling download action:', error)
+      await proactiveSendCard(warningCard('Failed to prepare download.'))
+      return 'Error preparing download'
+    }
   }
 }

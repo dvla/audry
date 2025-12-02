@@ -48,13 +48,40 @@
       ]
     },
     {
-      "type": "ActionSet",
-      "actions": [
+      "type": "ColumnSet",
+      "columns": [
         {
-          "type": "Action.Execute",
-          "verb": "textToTranscript",
-          "title": "Text to Transcript",
-          "style": "positive"
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "ActionSet",
+              "actions": [
+                {
+                  "type": "Action.Execute",
+                  "verb": "textToTranscript",
+                  "title": "Text to Transcript",
+                  "style": "positive"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "auto",
+          "verticalContentAlignment": "Center",
+          "items": [
+            {
+              "type": "Icon",
+              "name": "ArrowDownload",
+              "size": "Small",
+              "selectAction": {
+                "type": "Action.Execute",
+                "verb": "downloadExtractedText"
+              }
+            }
+          ]
         }
       ]
     }

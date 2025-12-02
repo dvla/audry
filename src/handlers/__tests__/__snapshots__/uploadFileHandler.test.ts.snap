@@ -1,5 +1,64 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`UploadFileCommandHandler > should handle errors during download preparation 1`] = `
+[MockFunction warningCard] {
+  "calls": [
+    [
+      "Failed to prepare download.",
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": {
+        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+        "body": [
+          {
+            "bleed": true,
+            "items": [
+              {
+                "columns": [
+                  {
+                    "items": [
+                      {
+                        "size": "Large",
+                        "text": "⚠️",
+                        "type": "TextBlock",
+                      },
+                    ],
+                    "type": "Column",
+                    "width": "auto",
+                  },
+                  {
+                    "items": [
+                      {
+                        "color": "Default",
+                        "size": "Medium",
+                        "text": "Failed to prepare download.",
+                        "type": "TextBlock",
+                        "weight": "Bolder",
+                        "wrap": true,
+                      },
+                    ],
+                    "type": "Column",
+                    "width": "stretch",
+                  },
+                ],
+                "type": "ColumnSet",
+              },
+            ],
+            "style": "warning",
+            "type": "Container",
+          },
+        ],
+        "type": "AdaptiveCard",
+        "version": "1.6",
+      },
+    },
+  ],
+}
+`;
+
 exports[`UploadFileCommandHandler > should handle invalid config (safeParse fails) and send warning instead of updating card 1`] = `
 [MockFunction warningCard] {
   "calls": [
@@ -80,6 +139,40 @@ exports[`UploadFileCommandHandler > should handle saving config and update the c
     {
       "type": "return",
       "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`UploadFileCommandHandler > should prepare download successfully 1`] = `
+[MockFunction createFileConsentCard] {
+  "calls": [
+    [
+      "/tmp/test-files/doc123_file_contents_202401010000.md",
+      "file_contents_202401010000.md",
+      "File Contents in Markdown",
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": {
+        "content": {
+          "acceptContext": {
+            "fileId": "/tmp/test-files/doc123_file_contents_202401010000.md",
+            "fileName": "file_contents_202401010000.md",
+            "timestamp": "2024-01-01T00:00:00.000Z",
+          },
+          "declineContext": {
+            "fileId": "/tmp/test-files/doc123_file_contents_202401010000.md",
+            "fileName": "file_contents_202401010000.md",
+            "timestamp": "2024-01-01T00:00:00.000Z",
+          },
+          "description": "File Contents in Markdown",
+        },
+        "contentType": "application/vnd.microsoft.teams.card.file.consent",
+        "name": "file_contents_202401010000.md",
+      },
     },
   ],
 }

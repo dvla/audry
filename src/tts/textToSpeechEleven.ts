@@ -8,7 +8,7 @@ import * as path from 'path'
 import { TTSModelConfig } from '../features/featureTTS'
 import { Config } from '../internal/config'
 import { SERVICE_NAME, log } from '../internal/logger'
-import { generatePodcastFileName } from '../internal/utils/documentUtils'
+import { generateUniqueFileName } from '../internal/utils/documentUtils'
 import { EpisodeConfig, EpisodeIntro, EpisodeOutro, EpisodeVoices, LANGUAGE_CONFIG } from './episodeConfig'
 
 const OUTPUT_FORMAT = 'mp3_44100_128'
@@ -132,7 +132,7 @@ export const textToSpeech = async (
   languageCode: string,
   ping?: () => void
 ): Promise<{ outputFileName: string; outputFilePath: string }> => {
-  const outputFileName = generatePodcastFileName() + '.mp3'
+  const outputFileName = generateUniqueFileName('podcast') + '.mp3'
   const outputFilePath = path.join(Config.FILES_DIR, outputFileName)
   let span: Span | undefined
   let nonEmptyBuffers: Buffer[]

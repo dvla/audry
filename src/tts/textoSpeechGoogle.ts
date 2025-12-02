@@ -7,7 +7,7 @@ import * as wav from 'wav'
 import { TTSModelConfig } from '../features/featureTTS'
 import { Config } from '../internal/config'
 import { SERVICE_NAME, log } from '../internal/logger'
-import { generatePodcastFileName } from '../internal/utils/documentUtils'
+import { generateUniqueFileName } from '../internal/utils/documentUtils'
 import { DEFAULT_CONFIG, EpisodeConfig, EpisodeVoices, LANGUAGE_CONFIG } from './episodeConfig'
 
 let cloudClient: GoogleGenAI | null = null
@@ -132,7 +132,7 @@ export async function transcriptToSpeech(
       throw new Error(`No audio data generated from ${modelConfig.model}`)
     }
     const audioBuffers = Buffer.concat(audioData.map((data) => Buffer.from(data, 'base64')))
-    const outputFileName = generatePodcastFileName() + '.wav'
+    const outputFileName = generateUniqueFileName('podcast') + '.wav'
     const outputFilePath = path.join(Config.FILES_DIR, outputFileName)
     // Pre-create the empty file
     fs.writeFileSync(outputFilePath, '')

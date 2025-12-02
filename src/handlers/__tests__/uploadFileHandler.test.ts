@@ -2,8 +2,25 @@ import { ActivityTypes } from 'botbuilder'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as cards from '../../internal/cards'
+import { generateUniqueFileName, readFile } from '../../internal/utils/documentUtils'
 import { EpisodeKind, EpisodeVoices } from '../../tts/episodeConfig'
 import { ATTACHMENT_CONTENT_TYPE, UploadFileCommandHandler } from '../uploadFileHandler'
+
+const { mockFsWriteFile } = vi.hoisted(() => ({
+  mockFsWriteFile: vi.fn().mockResolvedValue(undefined),
+}))
+
+vi.mock('fs/promises', () => ({
+  default: {
+    writeFile: mockFsWriteFile,
+  },
+}))
+
+vi.mock('../../internal/utils/documentUtils', () => ({
+  readFile: vi.fn().mockResolvedValue('Extracted text content'),
+  EXTRACTED_TEXT: 'extracted_text',
+  generateUniqueFileName: vi.fn((prefix: string) => `${prefix}_202401010000`),
+}))
 
 vi.mock('../../internal/utils/fileUtils', () => ({
   extractAndWriteText: vi.fn().mockResolvedValue(undefined),
@@ -38,8 +55,15 @@ describe('UploadFileCommandHandler', () => {
   beforeEach(() => {
     handler = new UploadFileCommandHandler()
     vi.clearAllMocks()
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'))
     vi.spyOn(cards, 'warningCard')
     vi.spyOn(cards, 'uploadFileCard')
+    vi.spyOn(cards, 'createFileConsentCard')
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
   })
 
   it('should have correct trigger pattern', () => {
@@ -177,5 +201,57 @@ describe('UploadFileCommandHandler', () => {
 
     await handler.handleSaveConfig({ conversation, activity, updateCard, proactiveSendCard } as any)
     expect(cards.warningCard).toMatchSnapshot()
+  })
+
+  it('should prepare download successfully', async () => {
+    const mockProactiveSend = vi.fn()
+    const mockProactiveSendCard = vi.fn()
+    const conversation = {
+      userId: 'user123',
+      documentId: 'doc123',
+    }
+    const fileName = generateUniqueFileName('file_contents') + '.md'
+
+    vi.mocked(readFile).mockResolvedValue('Extracted text content')
+
+    const result = await handler.handleDownloadAction({
+      proactiveSend: mockProactiveSend,
+      proactiveSendCard: mockProactiveSendCard,
+      conversation,
+    } as any)
+
+    expect(readFile).toHaveBeenCalledWith('user123', 'doc123', 'extracted_text')
+    expect(mockFsWriteFile).toHaveBeenCalledWith(
+      expect.stringContaining(`doc123_${fileName}`),
+      'Extracted text content',
+      'utf8'
+    )
+    expect(cards.createFileConsentCard).toMatchSnapshot()
+    expect(mockProactiveSend).toHaveBeenCalledWith({
+      type: 'message',
+      attachments: [expect.anything()],
+    })
+    expect(result).toBe('Preparing download...')
+  })
+
+  it('should handle errors during download preparation', async () => {
+    const mockProactiveSend = vi.fn()
+    const mockProactiveSendCard = vi.fn()
+    const conversation = {
+      userId: 'user123',
+      documentId: 'doc123',
+    }
+
+    vi.mocked(readFile).mockRejectedValue(new Error('Read failed'))
+
+    const result = await handler.handleDownloadAction({
+      proactiveSend: mockProactiveSend,
+      proactiveSendCard: mockProactiveSendCard,
+      conversation,
+    } as any)
+
+    expect(cards.warningCard).toMatchSnapshot()
+    expect(mockProactiveSendCard).toHaveBeenCalled()
+    expect(result).toBe('Error preparing download')
   })
 })

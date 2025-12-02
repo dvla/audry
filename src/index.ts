@@ -67,6 +67,8 @@ app.adaptiveCards.actionExecute(MATCH_ALL, async (context: TurnContext, state) =
       return await transcriptToAudioHandler.handleActionInvoked(MessageHandler(context, state))
     case reviewHandler.triggerVerb:
       return await reviewHandler.handleActionInvoked(MessageHandler(context, state))
+    case uploadFileCommandHandler.downloadTriggerVerb:
+      return await uploadFileCommandHandler.handleDownloadAction(MessageHandler(context, state))
     default:
       log.warn(`Unhandled action: ${context.activity.value?.verb}`)
       return warningCard(`Unhandled action: ${context.activity.value?.action?.verb}`)
