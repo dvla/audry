@@ -1,5 +1,12 @@
 # ETL Audry Change Log
 
+# [1.6.0](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.5.0...v1.6.0) (2025-12-02)
+
+
+### Features
+
+* ET-1706: add download button and handler for extracted text ([bd90491](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/commit/bd904913f295844fdd37e781b30f5e25e5c4b67c))
+
 # [1.5.0](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.4.0...v1.5.0) (2025-12-01)
 
 
