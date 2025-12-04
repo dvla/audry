@@ -1,5 +1,12 @@
 # ETL Audry Change Log
 
+## [1.7.1](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.7.0...v1.7.1) (2025-12-04)
+
+
+### Bug Fixes
+
+* ET-1718: update zod dependency to version <4 ([884e4d1](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/commit/884e4d17fcf6435d5084e413285e3360a0943350))
+
 # [1.7.0](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.6.0...v1.7.0) (2025-12-02)
 
 
