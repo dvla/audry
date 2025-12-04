@@ -16,6 +16,9 @@
             "ignoreCves": [
                 "CVE-2020-28500"
             ]
+        },
+        "overrides": {
+            "zod": "<4"
         }
     },
     "scripts": {
