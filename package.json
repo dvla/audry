@@ -3,64 +3,44 @@
     "version": "1.7.1",
     "description": "Microsoft 365 Agents Toolkit Workflow Bot Sample",
     "engines": {
-        "node": ">=22.21.1",
-        "pnpm": ">=10.23.0",
-        "npm": "please-use-pnpm"
+        "node": ">=22.21.1"
     },
     "private": true,
     "author": "DVLA",
     "license": "MIT",
     "main": "./lib/src/index.js",
-    "pnpm": {
-        "auditConfig": {
-            "ignoreCves": [
-                "CVE-2020-28500"
-            ]
-        },
-        "overrides": {
-            "zod": "<4"
-        }
-    },
     "scripts": {
-        "dev:teamsfx": "env-cmd --silent -f .localConfigs pnpm dev",
-        "install:pnpm": "pnpm install",
+        "dev:teamsfx": "env-cmd --silent -f .localConfigs npm run dev",
         "dev": "nodemon --watch ./src --exec node --inspect=9239 --signal SIGINT -r ts-node/register ./src/index.ts",
         "build": "tsc --build && shx cp -r ./src/adaptiveCards ./lib/src && shx cp -r ./src/api/static ./lib/ && shx cp -rn ./src/audio ./lib/src",
         "start": "node ./lib/src/index.js",
         "api:dev": "tsx watch src/api/index.ts",
         "api": "node ./lib/src/api/index.js",
-        "graph": "pnpx @langchain/langgraph-cli dev --port 2024 --config langgraph.json",
-        "watch": "nodemon --watch ./src --exec \"pnpm start\"",
+        "graph": "npx @langchain/langgraph-cli dev --port 2024 --config langgraph.json",
+        "watch": "nodemon --watch ./src --exec \"npm run start\"",
         "prettier": "prettier . -c --log-level=warn --no-error-on-unmatched-pattern",
         "prettier:fix": "prettier . -w --log-level=warn --no-error-on-unmatched-pattern",
         "lint": "eslint . --ext .ts,.js",
         "lint:fix": "eslint . --ext .ts,.js --fix",
-        "outdated": "pnpm outdated || true",
-        "check": "pnpm build && pnpm lint && pnpm prettier && pnpm test && pnpm audit && pnpm run outdated",
+        "audit": "check-audit --registry=https://registry.npmjs.org",
+        "resolve-audit": "resolve-audit --registry=https://registry.npmjs.org",
+        "outdated": "ncu --errorLevel 2 --color -x npm-audit-resolver,eslint*",
+        "check": "npm run build && npm run lint && npm run prettier && npm run test && npm run audit && npm run outdated",
         "test": "vitest run --coverage",
         "release": "semantic-release"
     },
     "dependencies": {
         "@azure-rest/ai-document-intelligence": "1.1.0",
         "@azure/app-configuration-provider": "2.2.0",
-        "@azure/identity": "^4.13.0",
         "@azure/monitor-opentelemetry": "1.14.2",
-        "@azure/opentelemetry-instrumentation-azure-sdk": "1.0.0-beta.9",
-        "@azure/storage-blob": "^12.29.1",
         "@elevenlabs/elevenlabs-js": "2.24.1",
         "@google/genai": "1.30.0",
         "@hono/node-server": "1.19.6",
-        "@hono/zod-validator": "^0.7.5",
         "@langchain/core": "0.3.79",
         "@langchain/google-genai": "0.2.18",
         "@langchain/langgraph": "0.4.9",
         "@microsoft/feature-management": "2.2.0",
         "@microsoft/teams-ai": "1.7.4",
-        "@opentelemetry/api": "^1.9.0",
-        "@opentelemetry/instrumentation": "^0.208.0",
-        "@opentelemetry/resources": "^2.2.0",
-        "@opentelemetry/sdk-trace-node": "^2.2.0",
-        "@opentelemetry/semantic-conventions": "^1.38.0",
         "adaptive-expressions": "4.23.3",
         "adaptivecards-templating": "2.3.1",
         "botbuilder": "4.23.3",
@@ -96,6 +76,8 @@
         "eslint-plugin-prettier": "^5.5.4",
         "music-metadata": "^11.10.1",
         "nodemon": "^3.1.11",
+        "npm-audit-resolver": "^3.0.0-RC.0",
+        "npm-check-updates": "^19.1.2",
         "prettier": "^3.6.2",
         "semantic-release": "^25.0.2",
         "shx": "^0.4.0",

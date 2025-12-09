@@ -39,8 +39,8 @@ async generateTranscript({ proactiveSendCard }: ActivityContext) {
 ### Testing & Quality
 
 ```bash
-pnpm check       # Full CI pipeline: build + lint + prettier + test + audit + outdated
-pnpm test           # Vitest with coverage (excludes lib/ and adaptiveCards/)
+npm run check       # Full CI pipeline: build + lint + prettier + test + audit + outdated
+npm test           # Vitest with coverage (excludes lib/ and adaptiveCards/)
 ```
 
 ## Critical Dependencies & Integration Points

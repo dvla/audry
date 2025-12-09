@@ -9,7 +9,6 @@ There are 3 ways to run this project:
 
 ## Prerequisites
 - [Node.js](https://nodejs.org/), supported versions: 22
-- [pnpm](https://pnpm.io/) use ```npm install -g pnpm@latest-10```
 - For Teams integration use [Microsoft 365 Agents Toolkit Visual Studio Code Extension](https://aka.ms/teams-toolkit) version 5.0.0 and higher or [Microsoft 365 Agents Toolkit CLI](https://aka.ms/teamsfx-toolkit-cli)
 
 ## Quick Start (API only)
@@ -20,13 +19,13 @@ To get started quickly, you can use the following steps:
 
 2. Install dependencies and build the project:
    ```bash
-   pnpm install
-   pnpm build
+   npm install
+   npm run build
    ```
 
 3. Start the local **API server**:
    ```bash
-   pnpm api
+   npm run api
    ```
 
 4. Set up the Gemini API key in `/env/.env.local` to enable AI-powered transcript generation:
@@ -82,7 +81,7 @@ To deploy the bot using Azure AI Bot Service with client secrets, follow these s
 ## Langgraph AI Agent
 Audry uses Langgraph to create AI agents that process the transcript and generates show notes.
 
-To view the graph use `pnpm graph` which will generate a visual representation of the agent's workflow.
+To view the graph use `npm run graph` which will generate a visual representation of the agent's workflow.
 
 - Show Notes - Defined in `src/agents/show-notes/graph.ts`. It includes steps for summarizing the transcript, extracting key points, and generating a title and short summary.
 - Transcript Review - Defined in `src/agents/transcript-review/graph.ts`. It includes steps for reviewing the transcript, providing feedback, and re-drafting a new edition.
