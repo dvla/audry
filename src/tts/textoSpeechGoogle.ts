@@ -78,7 +78,6 @@ export const generateConfig = (
         speakerVoiceConfigs: generateVoiceConfig(voices),
       },
     },
-    temperature: modelConfig.temperature,
     abortSignal: AbortSignal.timeout(8 * 60 * 1000), // 8 minutes
     seed,
   }
@@ -111,9 +110,7 @@ export async function transcriptToSpeech(
 ): Promise<{ outputFileName: string; outputFilePath: string }> {
   const transcriptChunks = splitTranscript(transcript)
 
-  log.info(
-    `Start audio generation with model: ${modelConfig.model} and provider: ${modelConfig.provider} and temperature: ${modelConfig.temperature}`
-  )
+  log.info(`Start audio generation with model: ${modelConfig.model} and provider: ${modelConfig.provider}`)
   const tracer = trace.getTracer(SERVICE_NAME)
   return tracer.startActiveSpan('google-tts', { kind: SpanKind.CLIENT }, async (span: Span) => {
     const startTime = Date.now()

@@ -154,7 +154,7 @@ describe('TranscriptToAudioHandler', () => {
 
       expect(mockReadFile).toHaveBeenCalledExactlyOnceWith('test-user-456', 'test-doc-123', expect.any(String))
       expect(mockTranscriptToSpeech).toHaveBeenCalledExactlyOnceWith(
-        { model: 'gemini-tts-v1', provider: 'google', temperature: 0.2 },
+        { model: 'gemini-tts-v1', provider: 'google' },
         'Test transcript',
         DEFAULT_CONFIG
       )

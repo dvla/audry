@@ -19,12 +19,6 @@ export enum Providers {
 export const TTSModelSchema = z.strictObject({
   provider: z.nativeEnum(Providers).default(Providers.GOOGLE),
   model: z.string().default(DEFAULT_GEMINI_TTS_MODEL),
-  temperature: z
-    .number()
-    .min(0)
-    .max(1)
-    .default(0.2)
-    .describe('Controls the randomness of the output. Lower values make it more deterministic. Google default is 1.0'),
 })
 
 /**
