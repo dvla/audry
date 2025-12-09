@@ -1,5 +1,12 @@
 # ETL Audry Change Log
 
+## [1.7.3](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.7.2...v1.7.3) (2025-12-09)
+
+
+### Bug Fixes
+
+* ET-1702: remove temperature parameter from TTS model configuration ([7e08078](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/commit/7e080786d824b51b94e5447f60c81cc6070cc4bb))
+
 ## [1.7.2](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.7.1...v1.7.2) (2025-12-09)
 
 
