@@ -1,5 +1,12 @@
 # ETL Audry Change Log
 
+# [1.8.0](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.7.3...v1.8.0) (2025-12-15)
+
+
+### Features
+
+* ET-1699: Switch npm to pnpm ([36efde0](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/commit/36efde0e199d5568f28cb2540ba4c77350df93a5))
+
 ## [1.7.3](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.7.2...v1.7.3) (2025-12-09)
 
 

@@ -1,6 +1,6 @@
 {
     "name": "audry",
-    "version": "1.7.4",
+    "version": "1.8.0",
     "description": "Microsoft 365 Agents Toolkit Workflow Bot Sample",
     "engines": {
         "node": ">=22.21.1",
@@ -98,7 +98,6 @@
         "nodemon": "^3.1.11",
         "npm-audit-resolver": "^3.0.0-RC.0",
         "npm-check-updates": "^19.1.2",
-        "prettier": "^3.7.4",
         "prettier": "^3.6.2",
         "semantic-release": "^25.0.2",
         "shx": "^0.4.0",
