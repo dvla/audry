@@ -1,5 +1,12 @@
 # ETL Audry Change Log
 
+# [1.9.0](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.8.0...v1.9.0) (2025-12-15)
+
+
+### Features
+
+* ET-1715: add AI review transcript API and UI integration ([202a8e9](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/commit/202a8e902a9a359f6e267a2ea6d3881b326433d6))
+
 # [1.8.0](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.7.3...v1.8.0) (2025-12-15)
 
 
