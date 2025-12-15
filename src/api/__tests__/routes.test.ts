@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import * as fs from 'node:fs'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { reviewTranscript } from '../../internal/utils/graphUtils'
 import { DEFAULT_CONFIG, EpisodeConfig, EpisodeKind, EpisodeLanguages, EpisodeLength } from '../../tts/episodeConfig'
 import { toTranscript, transcriptToAudioProvider } from '../../tts/textToTranscript'
 import { routes } from '../routes'
@@ -12,6 +13,11 @@ vi.mock('../../tts/textToTranscript', () => ({
   transcriptToAudioProvider: vi.fn(),
 }))
 
+vi.mock('../../internal/utils/graphUtils', () => ({
+  reviewTranscript: vi.fn(),
+  generateShowNotes: vi.fn(),
+}))
+
 vi.mock('node:fs', () => ({
   readFileSync: vi.fn(),
 }))
@@ -19,6 +25,7 @@ vi.mock('node:fs', () => ({
 // Get typed mock functions
 const mockToTranscript = vi.mocked(toTranscript)
 const mockTranscriptToAudioProvider = vi.mocked(transcriptToAudioProvider)
+const mockReviewTranscript = vi.mocked(reviewTranscript)
 
 describe('API Routes', () => {
   let app: Hono
@@ -347,6 +354,59 @@ describe('API Routes', () => {
       )
       expect(mockTranscriptToAudioProvider).toHaveBeenCalledExactlyOnceWith(expect.objectContaining(customConfig))
       expect(mockAudioProvider).toHaveBeenCalledExactlyOnceWith(mockTranscript)
+    })
+  })
+
+  describe('POST /api/reviewtranscript', () => {
+    it('should return review feedback when given valid transcript input', async () => {
+      const mockReview = {
+        originalTranscript: 'Sample transcript to review',
+        bgFeedback: 'British grammar is correct',
+        crFeedback: 'Content is appropriate',
+        edaFeedback: 'Delivery is expressive',
+        finalTranscript: 'Final reviewed transcript',
+      }
+      mockReviewTranscript.mockResolvedValue(mockReview)
+
+      const response = await app.request('/api/reviewtranscript', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: 'Sample transcript to review',
+        }),
+      })
+
+      expect(response.status).toBe(200)
+      const result = await response.json()
+      expect(result).toEqual({
+        britishGrammarFeedback: mockReview.bgFeedback,
+        contentReviewerFeedback: mockReview.crFeedback,
+        expressiveDeliveryFeedback: mockReview.edaFeedback,
+        finalTranscript: mockReview.finalTranscript,
+      })
+      expect(mockReviewTranscript).toHaveBeenCalledOnce()
+      expect(mockReviewTranscript).toHaveBeenCalledWith(
+        'Sample transcript to review',
+        expect.stringMatching(/^API_ReviewTranscript_\d+$/)
+      )
+    })
+
+    it('should return 500 when reviewTranscript fails', async () => {
+      mockReviewTranscript.mockRejectedValue(new Error('Review service error'))
+
+      const response = await app.request('/api/reviewtranscript', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: 'Sample transcript to review',
+        }),
+      })
+
+      expect(response.status).toBe(500)
     })
   })
 

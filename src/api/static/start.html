@@ -90,6 +90,19 @@
           <p>Turn the input text into a podcast-style transcript.</p>
           <button hx-post="/api/texttotranscript" hx-swap="afterend" hx-disabled-elt="this">To Transcript</button>
         </section>
+        <section id="review-section" class="button-action">
+          <h2>Review Transcript</h2>
+          <p>Get AI feedback on the input text (generated transcript).</p>
+          <button
+            hx-post="/api/reviewtranscript"
+            hx-target="#review-results"
+            hx-swap="innerHTML"
+            hx-disabled-elt="this"
+          >
+            Review Transcript
+          </button>
+          <div id="review-results"></div>
+        </section>
         <section class="button-action">
           <h2>Transcript to Audio</h2>
           <p>Turn the input text into an audio file.</p>
@@ -153,6 +166,24 @@
           errorDiv.textContent = 'An unknown error occurred.'
         }
         errorDiv.hidden = false
+      })
+
+      document.body.addEventListener('htmx:afterSwap', function (event) {
+        if (event.detail.pathInfo.requestPath === '/api/reviewtranscript') {
+          const response = JSON.parse(event.detail.xhr.responseText)
+          document.getElementById('review-results').innerHTML = `
+            <div class="review-section">
+              <h3>British Grammar Feedback</h3>
+              <pre>${response.britishGrammarFeedback}</pre>
+              <h3>Content Reviewer Feedback</h3>
+              <pre>${response.contentReviewerFeedback}</pre>
+              <h3>Expressive Delivery Feedback</h3>
+              <pre>${response.expressiveDeliveryFeedback}</pre>
+              <h3>Final Transcript</h3>
+              <pre>${response.finalTranscript}</pre>
+            </div>
+          `
+        }
       })
 
       // For elements with `data-download="true"`,

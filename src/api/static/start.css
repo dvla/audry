@@ -254,3 +254,28 @@ fieldset legend {
     width: 100%;
   }
 }
+
+.review-section {
+  margin: 15px 0;
+  padding: 15px;
+  background-color: #eff2fb;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+.review-section h3 {
+  margin-bottom: 10px;
+  color: #3c52aa;
+}
+
+.review-section pre {
+  white-space: pre-wrap;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 0.9em;
+  color: #555;
+  margin: 0;
+  background-color: white;
+  padding: 10px;
+  border-radius: 5px;
+  overflow-x: auto;
+}

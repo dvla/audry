@@ -5,6 +5,7 @@ import * as fs from 'node:fs'
 import * as z from 'zod'
 
 import { log } from '../internal/logger'
+import { reviewTranscript } from '../internal/utils/graphUtils'
 import { EpisodeConfig, EpisodeSchema } from '../tts/episodeConfig'
 import { toTranscript, transcriptToAudioProvider } from '../tts/textToTranscript'
 
@@ -72,5 +73,18 @@ export const routes = (app: Hono) => {
     const { body, config } = await processRequest(c)
     const transcript = await toTranscript(body.text, config)
     return await transcriptAsAudio(config, transcript, c)
+  })
+
+  app.post('/api/reviewtranscript', zValidator('json', requestSchema), async (c) => {
+    const { body } = await processRequest(c)
+    const podcastId = 'API_ReviewTranscript_' + Date.now().toString()
+    const review = await reviewTranscript(body.text, podcastId)
+
+    return c.json({
+      britishGrammarFeedback: review.bgFeedback,
+      contentReviewerFeedback: review.crFeedback,
+      expressiveDeliveryFeedback: review.edaFeedback,
+      finalTranscript: review.finalTranscript,
+    })
   })
 }

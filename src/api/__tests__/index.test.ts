@@ -3,6 +3,14 @@ import { serveStatic } from '@hono/node-server/serve-static'
 import { Hono } from 'hono'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+vi.mock('../../internal/config', () => ({
+  Config: {
+    GEMINI_API_KEY: 'fake-api-key',
+    GEMINI_MODEL: 'gemini-model',
+  },
+  DEFAULT_GEMINI_TTS_MODEL: 'gemini-tts-v1',
+}))
+
 // Mock all external dependencies before importing
 vi.mock('@hono/node-server', () => ({
   serve: vi.fn(),
@@ -59,9 +67,8 @@ describe('API Server (index.ts)', () => {
     })
 
     it('should register API routes', async () => {
-      await import('../index.js')
-      // Wait for async server start
-      await new Promise((resolve) => setTimeout(resolve, 100))
+      const { start } = await import('../index.js')
+      await start()
 
       // We can't easily test the routes call with our current mock setup,
       // so we verify the server starts successfully which implies routes were loaded
