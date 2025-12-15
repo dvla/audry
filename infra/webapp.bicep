@@ -91,6 +91,7 @@ resource webApp 'Microsoft.Web/sites@2024-11-01' = {
     serverFarmId: appServicePlan.id
     httpsOnly: true
     siteConfig: {
+      appCommandLine: 'node ./lib/src/index.js'
       alwaysOn: true
       healthCheckPath: '/health'
       appSettings: [
