@@ -1,5 +1,12 @@
 # ETL Audry Change Log
 
+# [1.10.0](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.9.1...v1.10.0) (2025-12-17)
+
+
+### Features
+
+* ET-1719: Add microsoft-cognitiveservices-speech ([3d73305](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/commit/3d733052d3bad761da28abbb16945766be55d765))
+
 ## [1.9.1](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.9.0...v1.9.1) (2025-12-17)
 
 
