@@ -14,6 +14,7 @@ const {
   mockLogInfo,
   mockLogError,
   mockLogWarn,
+  mockLogDebug,
 } = vi.hoisted(() => ({
   mockBlobServiceClient: {
     getContainerClient: vi.fn(),
@@ -45,6 +46,7 @@ const {
   mockLogInfo: vi.fn(),
   mockLogError: vi.fn(),
   mockLogWarn: vi.fn(),
+  mockLogDebug: vi.fn(),
 }))
 
 // --- Mock the config module ---
@@ -81,6 +83,7 @@ vi.mock('../logger', () => ({
     info: mockLogInfo,
     error: mockLogError,
     warn: mockLogWarn,
+    debug: mockLogDebug,
   },
 }))
 
@@ -202,9 +205,8 @@ describe('BlobStorage', () => {
         'Failed to download file from blob storage: No readable stream available'
       )
 
-      expect(mockLogError).toHaveBeenCalledExactlyOnceWith(
-        'Error downloading file from blob storage: No readable stream available',
-        expect.any(Error)
+      expect(mockLogDebug).toHaveBeenCalledExactlyOnceWith(
+        'Error downloading file from blob storage: No readable stream available'
       )
     })
 
@@ -216,10 +218,7 @@ describe('BlobStorage', () => {
         'Failed to download file from blob storage: Download failed'
       )
 
-      expect(mockLogError).toHaveBeenCalledExactlyOnceWith(
-        'Error downloading file from blob storage: Download failed',
-        error
-      )
+      expect(mockLogDebug).toHaveBeenCalledExactlyOnceWith('Error downloading file from blob storage: Download failed')
     })
 
     it('should handle multiple chunks in stream', async () => {

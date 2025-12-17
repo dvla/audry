@@ -121,7 +121,7 @@ export class BlobStorage {
 
       return Buffer.concat(chunks)
     } catch (error) {
-      log.error(`Error downloading file from blob storage: ${error.message}`, error)
+      log.debug(`Error downloading file from blob storage: ${error.message}`)
       throw new Error(`Failed to download file from blob storage: ${error.message}`)
     }
   }
