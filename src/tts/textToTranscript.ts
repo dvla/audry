@@ -6,6 +6,7 @@ import { Config } from '../internal/config'
 import { SERVICE_NAME, log } from '../internal/logger'
 import { EpisodeConfig } from './episodeConfig'
 import { promptForTranscript } from './promptForTranscript'
+import { transcriptToSpeech as ttsAzure } from './textToSpeechAzure'
 import { transcriptToSpeech as ttsEleven } from './textToSpeechEleven'
 import { getGoogleClient, transcriptToSpeech as ttsGoogle } from './textoSpeechGoogle'
 
@@ -61,7 +62,11 @@ export const textToTranscript = async (prompt: string, extractedText: string) =>
 export const transcriptToAudioProvider = async (episodeConfig: EpisodeConfig): Promise<any> => {
   const modelConfig = (await getTTSModelConfig())?.configuration
   let toAudioProvider
+  log.info(`Using TTS Provider: ${modelConfig?.provider}, Model: ${modelConfig?.model}`)
   switch (modelConfig.provider) {
+    case Providers.AZURE:
+      toAudioProvider = (transcript: string) => ttsAzure(modelConfig, transcript, episodeConfig)
+      break
     case Providers.ELEVEN_LABS:
       toAudioProvider = (transcript: string) => ttsEleven(modelConfig, transcript, episodeConfig)
       break

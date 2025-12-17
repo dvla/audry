@@ -10,6 +10,7 @@ import { Feature, Variant, getVariant } from './featureFlags'
 export enum Providers {
   GOOGLE = 'google',
   ELEVEN_LABS = 'elevenlabs',
+  AZURE = 'azure',
 }
 
 /**
@@ -26,11 +27,10 @@ export const TTSModelSchema = z.strictObject({
  */
 export type TTSModelConfig = z.infer<typeof TTSModelSchema>
 export const DEFAULT_TTS_MODEL_CONFIG: TTSModelConfig = TTSModelSchema.parse({})
-// Use this for ElevenLabs model
-// export const DEFAULT_TTS_MODEL_CONFIG: TTSModelConfig = TTSModelSchema.parse({
-//   provider: Providers.ELEVEN_LABS,
-//   model: 'eleven_v3',
-// })
+
+const OVERRIDE_CONFIG: TTSModelConfig | null = process.env.TTS_MODEL_OVERRIDE
+  ? TTSModelSchema.parse(JSON.parse(process.env.TTS_MODEL_OVERRIDE))
+  : null
 export interface TTSVariant extends Variant {
   configuration: TTSModelConfig
 }
@@ -40,6 +40,13 @@ export interface TTSVariant extends Variant {
  * @returns Promise<Variant | undefined> with the TTS model configuration or undefined if not available
  */
 export const getTTSModelConfig = async (): Promise<TTSVariant | undefined> => {
+  if (OVERRIDE_CONFIG) {
+    log.info('Using overridden TTS model configuration' + JSON.stringify(OVERRIDE_CONFIG))
+    return {
+      name: 'overridden',
+      configuration: OVERRIDE_CONFIG,
+    }
+  }
   const config = await getVariant(Feature.TTSModel)
   let modelConfig = DEFAULT_TTS_MODEL_CONFIG
   if (config) {

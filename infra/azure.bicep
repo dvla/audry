@@ -39,6 +39,8 @@ module webapp './webapp.bicep' = {
     cosmosDbContainer: cosmosDB.outputs.cosmosDbContainer
     cosmosDbAuthKey: cosmosDB.outputs.cosmosDbAuthKey
     docIntEndpoint: docIntelligence.outputs.docIntEndpoint
+    speechServiceEndpoint: speech.outputs.speechEndpoint
+    speechServiceKey: speech.outputs.speechKey
     environmentName: environmentName
     geminiApiKey: geminiApiKey
     identityId: identity.outputs.identityId
@@ -96,6 +98,15 @@ module appInsights './appin.bicep' = {
     appInsightsName: 'appi-${resourceBaseName}-${environmentName}-uks'
     logAnalyticsWorkspaceName: 'log-${resourceBaseName}-${environmentName}-uks'
     userAssignedIdentityPrincipalId: identity.outputs.principalId
+  }
+}
+
+module speech './speech.bicep' = {
+  name: 'Azure-Speech'
+  scope: rg
+  params: {
+    speechName: 'speech-${resourceBaseName}-${environmentName}-uks'
+    location: location
   }
 }
 

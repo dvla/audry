@@ -1,8 +1,7 @@
 import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js'
 import { DialogueInput } from '@elevenlabs/elevenlabs-js/api'
-import { SpanKind, SpanStatusCode, trace } from '@opentelemetry/api'
+import { Span, SpanKind, SpanStatusCode, trace } from '@opentelemetry/api'
 import { promises as fs } from 'fs'
-import { Span } from 'node_modules/@opentelemetry/api/build/src/trace/span'
 import * as path from 'path'
 
 import { TTSModelConfig } from '../features/featureTTS'

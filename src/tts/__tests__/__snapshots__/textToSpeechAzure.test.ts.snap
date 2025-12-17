@@ -1,0 +1,31 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`transcriptToSpeech > successful synthesis > should be good SSML 1`] = `
+"<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="en-GB">
+<voice name="en-GB-OllieMultilingualNeural">
+  <mstts:express-as style="cheerful">
+    Hello there
+  </mstts:express-as>
+</voice>
+<voice name="en-GB-AdaMultilingualNeural">
+  <mstts:express-as style="cheerful">
+    Welcome to the show
+  </mstts:express-as>
+</voice>
+</speak>"
+`;
+
+exports[`transcriptToSpeech > successful synthesis > should be valid SSML 1`] = `
+"<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="en-GB">
+<voice name="en-GB-OllieMultilingualNeural">
+  <mstts:express-as style="cheerful">
+    Hello there
+  </mstts:express-as>
+</voice>
+<voice name="en-GB-AdaMultilingualNeural">
+  <mstts:express-as style="cheerful">
+    Welcome to the show
+  </mstts:express-as>
+</voice>
+</speak>"
+`;

@@ -4,6 +4,8 @@ param cosmosDbDatabase string
 param cosmosDbContainer string
 param cosmosDbAuthKey string
 param docIntEndpoint string
+param speechServiceEndpoint string
+param speechServiceKey string
 param environmentName string
 param geminiApiKey string
 param identityId string
@@ -33,6 +35,13 @@ var vFeatureFlags = [
     description: 'Controls the TTS model used by the bot'
     enabled: true
     variants: [
+      {
+        name: 'basic'
+        configuration_value: {
+          provider: 'azure'
+          model: 'not-used-tts'
+        }
+      }
       {
         name: 'general'
         configuration_value: {
@@ -64,7 +73,7 @@ var vFeatureFlags = [
         }
       ]
       default_when_enabled: 'general'
-      default_when_disabled: 'general'
+      default_when_disabled: 'basic'
     }
   }
   // Add more variant feature flags as needed
@@ -154,6 +163,14 @@ resource webApp 'Microsoft.Web/sites@2024-11-01' = {
         {
           name: 'DOCINT_ENDPOINT'
           value: docIntEndpoint
+        }
+        {
+          name: 'AZURE_SPEECH_SERVICE_ENDPOINT'
+          value: speechServiceEndpoint
+        }
+        {
+          name: 'AZURE_SPEECH_KEY'
+          value: speechServiceKey
         }
         {
           name: 'GEMINI_API_KEY'

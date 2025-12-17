@@ -56,7 +56,8 @@ export const Config = {
   COSMOSDB_CONTAINER: checkOptionalVariable(process.env.COSMOSDB_CONTAINER, DEFAULT_EMPTY),
   COSMOSDB_AUTH_KEY: checkOptionalVariable(process.env.COSMOSDB_AUTH_KEY, DEFAULT_EMPTY),
   DOCINT_ENDPOINT: checkOptionalVariable(process.env.DOCINT_ENDPOINT, DEFAULT_EMPTY),
-
+  SPEECH_SERVICE_ENDPOINT: checkOptionalVariable(process.env.AZURE_SPEECH_SERVICE_ENDPOINT, DEFAULT_EMPTY),
+  SPEECH_KEY: checkOptionalVariable(process.env.AZURE_SPEECH_KEY, DEFAULT_EMPTY),
   APP_CONFIG_ENDPOINT: checkOptionalVariable(process.env.AZURE_APP_CONFIG_ENDPOINT, DEFAULT_EMPTY),
   // Azure Blob Storage configuration
   STORAGE_ACCOUNT_NAME: checkOptionalVariable(process.env.STORAGE_ACCOUNT_NAME, DEFAULT_EMPTY),
