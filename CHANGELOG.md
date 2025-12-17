@@ -1,5 +1,12 @@
 # ETL Audry Change Log
 
+## [1.9.1](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.9.0...v1.9.1) (2025-12-17)
+
+
+### Bug Fixes
+
+* ET-1702: change blob storage error logging level to prevent excess error logs ([5a40f9a](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/commit/5a40f9add7f13c9cd49d9c986a0cc327e53ab59f))
+
 # [1.9.0](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.8.0...v1.9.0) (2025-12-15)
 
 
