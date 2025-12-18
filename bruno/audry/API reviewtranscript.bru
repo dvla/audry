@@ -1,0 +1,21 @@
+meta {
+  name: API reviewtranscript
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{HOST}}/api/reviewtranscript
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+  "text": "Speaker 1: You know, Ellie, sometimes I think about pigeons. Not like, 'oh, there's a pigeon,' but really *think* about them. They're these urban survivors, right? Navigating concrete jungles, dodging feet, and somehow, always finding food. Speaker 2: Wait, pigeons? Really? Umm, hmmm, right. But what's so interesting about them? I mean, they're kinda… everywhere. Like the squirrels of the sky. Speaker 1: Exactly! They ARE the squirrels of the sky! But think about it – they were once prized messengers! Imagine relying on a pigeon to deliver vital information. Now they're just...ignored. It's a wild career change, right? From hero to, 'ugh, another pigeon.' "
+  }
+}
+
+settings {
+  encodeUrl: true
+}
