@@ -198,13 +198,13 @@ resource webApp 'Microsoft.Web/sites@2024-11-01' = {
         }
         {
           name: 'WEBSITE_NODE_DEFAULT_VERSION'
-          value: '~22' // Set NodeJS version to 22.x for your site
+          value: '~24' // Set NodeJS version to 24.x for your site
         }
 
 
       ]
       ftpsState: 'FtpsOnly'
-      linuxFxVersion: 'NODE|22-lts' // Set NodeJS version to 22.x for your site
+      linuxFxVersion: 'NODE|24-lts' // Set NodeJS version to 24.x for your site
     }
   }
   identity: {

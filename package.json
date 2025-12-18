@@ -3,7 +3,7 @@
     "version": "1.11.0",
     "description": "Microsoft 365 Agents Toolkit Workflow Bot Sample",
     "engines": {
-        "node": ">=22.21.1",
+        "node": ">=24.12.0",
         "pnpm": ">=10.25.0",
         "npm": "please-use-pnpm"
     },

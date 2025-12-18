@@ -8,7 +8,7 @@ There are 3 ways to run this project:
 3. [**Langgraph API**](#langgraph-ai-agent): Uses Langgraph and Langsmith studio to visualise the graph element of the project.
 
 ## Prerequisites
-- [Node.js](https://nodejs.org/), supported versions: 22
+- [Node.js](https://nodejs.org/), supported versions: 24.12.0
 - [pnpm](https://pnpm.io/) use ```npm install -g pnpm@latest-10```
 - For Teams integration use [Microsoft 365 Agents Toolkit Visual Studio Code Extension](https://aka.ms/teams-toolkit) version 5.0.0 and higher or [Microsoft 365 Agents Toolkit CLI](https://aka.ms/teamsfx-toolkit-cli)
 
