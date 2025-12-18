@@ -1,5 +1,12 @@
 # ETL Audry Change Log
 
+# [1.11.0](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.10.0...v1.11.0) (2025-12-18)
+
+
+### Features
+
+* ET-1715: add Bruno API review transcript and update sequence numbers ([61ebaf1](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/commit/61ebaf1a4bb209850094490ddf535059895c0f22))
+
 # [1.10.0](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.9.1...v1.10.0) (2025-12-17)
 
 
