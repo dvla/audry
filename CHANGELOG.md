@@ -1,5 +1,12 @@
 # ETL Audry Change Log
 
+# [1.12.0](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.11.0...v1.12.0) (2025-12-18)
+
+
+### Features
+
+* ET-1703: Update Audry to Node.js LTS - 24 ([a06bd70](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/commit/a06bd70b120142b970c85607a53c1147345ea819))
+
 # [1.11.0](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.10.0...v1.11.0) (2025-12-18)
 
 
