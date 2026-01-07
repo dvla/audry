@@ -1,5 +1,12 @@
 # ETL Audry Change Log
 
+# [1.13.0](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.12.0...v1.13.0) (2026-01-07)
+
+
+### Features
+
+* ET-1720: add copy and loading functionality to API ([27440e6](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/commit/27440e6ab9e7e1b08bd9fbfff8910a241aa90a4c))
+
 # [1.12.0](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.11.0...v1.12.0) (2025-12-18)
 
 
