@@ -10,6 +10,10 @@
       crossorigin="anonymous"
     ></script>
     <script src="https://cdn.jsdelivr.net/gh/Emtyloc/json-enc-custom@v0.1.7/json-enc-custom.js"></script>
+    <!-- Handlebars JS -->
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+    <!-- Client Side Templates Extension -->
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/client-side-templates.js"></script>
     <!-- Fonts and Styling -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -22,6 +26,7 @@
       <h1>Audry API</h1>
       <p>Create podcast-style transcripts and audio files using AI.</p>
     </section>
+
     <!-- Get All Prompts -->
     <section class="border-top">
       <h2>Input Text</h2>
@@ -85,18 +90,28 @@
         </div>
         <!-- Error Message -->
         <div id="error-message" class="error-message" hidden></div>
-        <section class="button-action">
+        <section id="text-to-transcript-section" class="button-action" hx-ext="client-side-templates">
           <h2>Text to Transcript</h2>
           <p>Turn the input text into a podcast-style transcript.</p>
-          <button hx-post="/api/texttotranscript" hx-swap="afterend" hx-disabled-elt="this">To Transcript</button>
+          <button
+            hx-post="/api/texttotranscript"
+            hx-target="#transcript-results"
+            hx-swap="innerHTML"
+            handlebars-template="content-item-template"
+            hx-disabled-elt="this"
+          >
+            To Transcript
+          </button>
+          <div id="transcript-results"></div>
         </section>
-        <section id="review-section" class="button-action">
+        <section id="review-section" class="button-action" hx-ext="client-side-templates">
           <h2>Review Transcript</h2>
           <p>Get AI feedback on the input text (generated transcript).</p>
           <button
             hx-post="/api/reviewtranscript"
             hx-target="#review-results"
             hx-swap="innerHTML"
+            handlebars-template="content-item-template"
             hx-disabled-elt="this"
           >
             Review Transcript
@@ -131,7 +146,37 @@
         </section>
       </form>
     </section>
+
+    <!-- Handlebars template for text content items -->
+    <template id="content-item-template">
+      <div class="content-section">
+        {{#each .}}
+        <div class="content-item">
+          <div class="text-with-copy">
+            <h3 class="content-title">{{@key}}</h3>
+            <span
+              class="copy-icon"
+              title="Copy to clipboard"
+              data-content="{{this}}"
+              onclick="copyToClipboard(this.dataset.content)"
+            >
+              <img src="copy-button.svg" />
+            </span>
+          </div>
+          <pre class="content">{{this}}</pre>
+        </div>
+        {{/each}}
+      </div>
+    </template>
+
     <script>
+      // Function to copy text to clipboard
+      function copyToClipboard(text) {
+        if (text) {
+          navigator.clipboard.writeText(text)
+        }
+      }
+
       // Function to clear effect selection
       function clearEffect(effectType) {
         const radios = document.querySelectorAll(`input[name="config[${effectType}_effect]"]`)
@@ -166,24 +211,6 @@
           errorDiv.textContent = 'An unknown error occurred.'
         }
         errorDiv.hidden = false
-      })
-
-      document.body.addEventListener('htmx:afterSwap', function (event) {
-        if (event.detail.pathInfo.requestPath === '/api/reviewtranscript') {
-          const response = JSON.parse(event.detail.xhr.responseText)
-          document.getElementById('review-results').innerHTML = `
-            <div class="review-section">
-              <h3>British Grammar Feedback</h3>
-              <pre>${response.britishGrammarFeedback}</pre>
-              <h3>Content Reviewer Feedback</h3>
-              <pre>${response.contentReviewerFeedback}</pre>
-              <h3>Expressive Delivery Feedback</h3>
-              <pre>${response.expressiveDeliveryFeedback}</pre>
-              <h3>Final Transcript</h3>
-              <pre>${response.finalTranscript}</pre>
-            </div>
-          `
-        }
       })
 
       // For elements with `data-download="true"`,

@@ -56,7 +56,7 @@ describe('API Routes', () => {
       })
 
       expect(response.status).toBe(200)
-      expect(await response.text()).toBe(mockTranscript)
+      expect(await response.json()).toEqual({ Transcript: mockTranscript })
       expect(mockToTranscript).toHaveBeenCalledExactlyOnceWith('Sample input text', DEFAULT_CONFIG)
     })
 
@@ -381,10 +381,10 @@ describe('API Routes', () => {
       expect(response.status).toBe(200)
       const result = await response.json()
       expect(result).toEqual({
-        britishGrammarFeedback: mockReview.bgFeedback,
-        contentReviewerFeedback: mockReview.crFeedback,
-        expressiveDeliveryFeedback: mockReview.edaFeedback,
-        finalTranscript: mockReview.finalTranscript,
+        'British Grammar Feedback': mockReview.bgFeedback,
+        'Content Reviewer Feedback': mockReview.crFeedback,
+        'Expressive Delivery Feedback': mockReview.edaFeedback,
+        'Final Transcript': mockReview.finalTranscript,
       })
       expect(mockReviewTranscript).toHaveBeenCalledOnce()
       expect(mockReviewTranscript).toHaveBeenCalledWith(

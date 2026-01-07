@@ -255,20 +255,20 @@ fieldset legend {
   }
 }
 
-.review-section {
-  margin: 15px 0;
-  padding: 15px;
+.content-section {
+  padding: 0px 15px 0px 15px;
   background-color: #eff2fb;
   border-radius: 5px;
   border: 1px solid #ddd;
 }
 
-.review-section h3 {
+.content-section h3 {
+  margin-top: 10px;
   margin-bottom: 10px;
   color: #3c52aa;
 }
 
-.review-section pre {
+.content-section pre {
   white-space: pre-wrap;
   font-family: 'Quicksand', sans-serif;
   font-size: 0.9em;
@@ -278,4 +278,45 @@ fieldset legend {
   padding: 10px;
   border-radius: 5px;
   overflow-x: auto;
+}
+
+.copy-icon {
+  cursor: pointer;
+  display: inline-block;
+  margin-left: 8px;
+  vertical-align: middle;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+.copy-icon:hover {
+  opacity: 1;
+}
+.copy-icon img {
+  width: 18px;
+  height: 18px;
+}
+.text-with-copy {
+  position: relative;
+}
+.text-with-copy h3 {
+  display: inline-block;
+}
+
+/* Spinner */
+button.htmx-request::after {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-left: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

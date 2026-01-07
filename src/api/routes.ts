@@ -61,7 +61,7 @@ export const routes = (app: Hono) => {
   app.post('/api/texttotranscript', zValidator('json', requestSchema), async (c) => {
     const { body, config } = await processRequest(c)
     const transcript = await toTranscript(body.text, config)
-    return c.text(transcript)
+    return c.json({ Transcript: transcript })
   })
 
   app.post('/api/transcripttoaudio', zValidator('json', requestSchema), async (c) => {
@@ -81,10 +81,10 @@ export const routes = (app: Hono) => {
     const review = await reviewTranscript(body.text, podcastId)
 
     return c.json({
-      britishGrammarFeedback: review.bgFeedback,
-      contentReviewerFeedback: review.crFeedback,
-      expressiveDeliveryFeedback: review.edaFeedback,
-      finalTranscript: review.finalTranscript,
+      'British Grammar Feedback': review.bgFeedback,
+      'Content Reviewer Feedback': review.crFeedback,
+      'Expressive Delivery Feedback': review.edaFeedback,
+      'Final Transcript': review.finalTranscript,
     })
   })
 }
