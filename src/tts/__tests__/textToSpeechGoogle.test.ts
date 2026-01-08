@@ -36,11 +36,13 @@ const fakeGenerateContent = vi.fn()
 
 vi.mock('@google/genai', () => {
   return {
-    GoogleGenAI: vi.fn(() => ({
-      models: {
-        generateContent: fakeGenerateContent,
-      },
-    })),
+    GoogleGenAI: vi.fn().mockImplementation(function () {
+      return {
+        models: {
+          generateContent: fakeGenerateContent,
+        },
+      }
+    }),
   }
 })
 
@@ -52,11 +54,13 @@ const onMock = vi.fn().mockImplementation((event, cb) => {
 })
 
 vi.mock('wav', () => ({
-  FileWriter: vi.fn(() => ({
-    write: writeMock,
-    end: endMock,
-    on: onMock,
-  })),
+  FileWriter: vi.fn().mockImplementation(function () {
+    return {
+      write: writeMock,
+      end: endMock,
+      on: onMock,
+    }
+  }),
 }))
 
 // Setup config paths and API key for tests
@@ -114,7 +118,7 @@ describe('transcriptToSpeech', () => {
     })
 
     const transcript = 'Hello Vitest!'
-    const { outputFileName, outputFilePath } = await transcriptToSpeech(DEFAULT_TTS_MODEL_CONFIG, transcript)
+    const { outputFileName } = await transcriptToSpeech(DEFAULT_TTS_MODEL_CONFIG, transcript)
 
     expect(fakeGenerateContent).toHaveBeenCalledTimes(1)
     expect(outputFileName).toContain(`podcast`)

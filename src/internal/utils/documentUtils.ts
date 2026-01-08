@@ -105,7 +105,7 @@ export const generateUniqueFileName = (baseName: string): string => {
  * @returns An array of transcript strings.
  */
 export const getTranscripts = async (conversation: ConversationState) => {
-  let transcripts = []
+  const transcripts = []
 
   const originalTranscript = await readFile(conversation.userId, conversation.documentId, TRANSCRIPT_TEXT, false)
   if (originalTranscript) {

@@ -4,15 +4,17 @@ import { graph } from '../graph'
 
 // Mock the ChatGoogleGenerativeAI
 vi.mock('@langchain/google-genai', () => ({
-  ChatGoogleGenerativeAI: vi.fn().mockImplementation(() => ({
-    withStructuredOutput: vi.fn().mockReturnValue({
-      invoke: vi.fn().mockResolvedValue({
-        title: 'Great Episode Title',
-        shortSummary: 'Mock summary of the episode content with key points and insights.',
-        numOfWords: '42',
+  ChatGoogleGenerativeAI: vi.fn(function (this: any) {
+    return {
+      withStructuredOutput: vi.fn().mockReturnValue({
+        invoke: vi.fn().mockResolvedValue({
+          title: 'Great Episode Title',
+          shortSummary: 'Mock summary of the episode content with key points and insights.',
+          numOfWords: '42',
+        }),
       }),
-    }),
-  })),
+    }
+  }),
 }))
 
 const transcript = `Speaker 1: Ellie, welcome back to the show! Today, we're diving deep into something that might sound a little dry at first, but trust me, it affects every single one of us who has ever flown on a plane. We're talking about the UK Airspace Design Service, or UKADS. I think we can call this episode "Clearing the Air: Unpacking the UK's Ambitious Airspace Overhaul" What it means for smoother, greener, and quieter skies.

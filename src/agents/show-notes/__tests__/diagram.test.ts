@@ -1,15 +1,18 @@
 import { writeFileSync } from 'node:fs'
 import { stat } from 'node:fs/promises'
 import path from 'path'
+import { vi } from 'vitest'
 
 import { Config } from '../../../internal/config'
 import { graph } from '../graph'
 
 // Mock the ChatGoogleGenerativeAI
 vi.mock('@langchain/google-genai', () => ({
-  ChatGoogleGenerativeAI: vi.fn().mockImplementation(() => ({
-    withStructuredOutput: vi.fn(),
-  })),
+  ChatGoogleGenerativeAI: vi.fn(function (this: any) {
+    return {
+      withStructuredOutput: vi.fn(),
+    }
+  }),
 }))
 
 const filePath = path.join(Config.FILES_DIR, 'show-notes-diagram.txt')

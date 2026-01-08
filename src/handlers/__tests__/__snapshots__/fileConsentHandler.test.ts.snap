@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`FileConsentHandler > handleFileConsentInvoke > should handle decline action 1`] = `
-[MockFunction spy] {
+[MockFunction] {
   "calls": [
     [
       "File upload was declined. The audio file will not be shared.",
@@ -20,7 +20,7 @@ exports[`FileConsentHandler > handleFileConsentInvoke > should handle decline ac
 `;
 
 exports[`FileConsentHandler > handleFileConsentInvoke > should handle upload errors 1`] = `
-[MockFunction spy] {
+[MockFunction] {
   "calls": [
     [
       "Failed to upload audio file to Teams. Please try again.",

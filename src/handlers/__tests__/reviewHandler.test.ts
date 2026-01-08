@@ -3,15 +3,17 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ReviewHandler } from '../reviewHandler'
 
-const { mockReadFile, mockWriteFile, mockReviewTranscript } = vi.hoisted(() => ({
+const { mockReadFile, mockWriteFile, mockReviewTranscript, mockGetTranscripts } = vi.hoisted(() => ({
   mockReadFile: vi.fn(),
   mockWriteFile: vi.fn(),
   mockReviewTranscript: vi.fn(),
+  mockGetTranscripts: vi.fn(),
 }))
 
 vi.mock('../../internal/utils/documentUtils', () => ({
   readFile: mockReadFile,
   writeFile: mockWriteFile,
+  getTranscripts: mockGetTranscripts,
   TRANSCRIPT_TEXT: 'transcript.txt',
   EDITED_TRANSCRIPT_TEXT: 'transcript_edited.txt',
   EXTRACTED_TEXT: 'transcript_extracted.txt',

@@ -143,27 +143,25 @@ describe('fileUtils', () => {
 
   describe('generateUniqueFileName', () => {
     test('generates filename with current date and time', () => {
-      // Mock the Date constructor to return a fixed date
-      const mockDate = new Date('2024-03-15T14:30:00Z')
-      vi.spyOn(global, 'Date').mockImplementation(() => mockDate)
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2024-03-15T14:30:00Z'))
 
       const result = generateUniqueFileName('podcast')
 
       expect(result).toBe('podcast_20240315143000')
 
-      // Restore Date
-      vi.restoreAllMocks()
+      vi.useRealTimers()
     })
 
     test('pads single digit months and days with zeros', () => {
-      const mockDate = new Date('2024-01-05T09:05:00Z')
-      vi.spyOn(global, 'Date').mockImplementation(() => mockDate)
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2024-01-05T09:05:00Z'))
 
       const result = generateUniqueFileName('podcast')
 
       expect(result).toBe('podcast_20240105090500')
 
-      vi.restoreAllMocks()
+      vi.useRealTimers()
     })
   })
 

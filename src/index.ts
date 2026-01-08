@@ -20,7 +20,7 @@ const MATCH_ALL = /.*/g
 // This template uses `express` to serve HTTP responses.
 // Create express application.
 const expressApp = express()
-// eslint-disable-next-line import/no-named-as-default-member
+
 expressApp.use(express.json())
 
 expressApp.get('/', function (req, res) {

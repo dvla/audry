@@ -19,7 +19,6 @@ vi.mock('../../internal/utils/documentUtils', () => ({
 }))
 
 vi.mock('microsoft-cognitiveservices-speech-sdk', () => {
-  const mockSpeechSynthesizer = vi.fn()
   return {
     SpeechConfig: {
       fromEndpoint: vi.fn(() => ({
@@ -33,7 +32,7 @@ vi.mock('microsoft-cognitiveservices-speech-sdk', () => {
     AudioConfig: {
       fromAudioFileOutput: vi.fn((path: string) => ({ path })),
     },
-    SpeechSynthesizer: mockSpeechSynthesizer,
+    SpeechSynthesizer: vi.fn(),
   }
 })
 
@@ -48,7 +47,9 @@ describe('transcriptToSpeech', () => {
       speakSsmlAsync: vi.fn(),
       close: vi.fn(),
     }
-    vi.mocked(SpeechSynthesizer).mockReturnValue(mockSynthesizer as unknown as SpeechSynthesizer)
+    vi.mocked(SpeechSynthesizer).mockImplementation(function (this: any) {
+      return mockSynthesizer as unknown as SpeechSynthesizer
+    })
   })
 
   describe('successful synthesis', () => {

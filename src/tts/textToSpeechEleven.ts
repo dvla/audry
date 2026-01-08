@@ -137,7 +137,7 @@ export const textToSpeech = async (
   let nonEmptyBuffers: Buffer[]
   if (log.isDebugEnabled()) {
     for (let i = 0; i < dialogue.length; i++) {
-      let dialogueFilePath = path.join(Config.FILES_DIR, seed + '_' + i + '_dialogue.txt')
+      const dialogueFilePath = path.join(Config.FILES_DIR, seed + '_' + i + '_dialogue.txt')
       log.debug(`Writing dialogue ${i} to ${dialogueFilePath}`)
       await fs.writeFile(dialogueFilePath, JSON.stringify(dialogue[i], null, 2))
     }
@@ -175,7 +175,7 @@ export const textToSpeech = async (
   if (log.isDebugEnabled()) {
     for (let i = 0; i < nonEmptyBuffers.length; i++) {
       const buffer = nonEmptyBuffers[i]
-      let debugFilePath = path.join(Config.FILES_DIR, seed + '_' + i + '_' + outputFileName)
+      const debugFilePath = path.join(Config.FILES_DIR, seed + '_' + i + '_' + outputFileName)
       log.debug(`Writing chunk ${i} with ${buffer.length} bytes to ${debugFilePath}`)
       await fs.writeFile(debugFilePath, buffer)
     }

@@ -75,7 +75,7 @@ logger.transports.forEach((transport, idx) => {
   )
 })
 
-let secondLogger = logger.transports[1]
+const secondLogger = logger.transports[1]
 if (secondLogger) {
   logger.warn(`Second transport changing level from: ${secondLogger.level ?? 'undefined'} to ${Config.LOG_LEVEL}`)
   secondLogger.level = Config.LOG_LEVEL

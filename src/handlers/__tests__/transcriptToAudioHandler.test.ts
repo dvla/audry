@@ -16,9 +16,11 @@ const { mockFsWriteFile, mockFsReadFile } = vi.hoisted(() => ({
 
 // Mock the ChatGoogleGenerativeAI
 vi.mock('@langchain/google-genai', () => ({
-  ChatGoogleGenerativeAI: vi.fn().mockImplementation(() => ({
-    withStructuredOutput: vi.fn(),
-  })),
+  ChatGoogleGenerativeAI: vi.fn(function (this: any) {
+    return {
+      withStructuredOutput: vi.fn(),
+    }
+  }),
 }))
 
 // --- Mock the internal config module that BlobStorage uses ---

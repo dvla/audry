@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`EditTranscriptHandler > handleInvoked > should handle empty transcripts array 1`] = `
-[MockFunction spy] {
+[MockFunction] {
   "calls": [
     [
       {
@@ -66,7 +66,7 @@ exports[`EditTranscriptHandler > handleInvoked > should handle empty transcripts
 `;
 
 exports[`EditTranscriptHandler > handleInvoked > should handle single transcript 1`] = `
-[MockFunction spy] {
+[MockFunction] {
   "calls": [
     [
       {
@@ -222,7 +222,7 @@ exports[`EditTranscriptHandler > handleInvoked > should handle single transcript
 `;
 
 exports[`EditTranscriptHandler > handleInvoked > should send textToTranscriptCard with Edit Transcript title and transcripts 1`] = `
-[MockFunction spy] {
+[MockFunction] {
   "calls": [
     [
       {

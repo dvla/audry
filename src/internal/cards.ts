@@ -81,7 +81,7 @@ export const uploadFileCard = async (title: string, body: string, config: Episod
   // Create a deep copy so we don't mutate the original
   const uploadFileCardCopy = structuredClone(uploadFileCardJson) as any
   const columnSet = uploadFileCardCopy.body.find((item: any) => item.type === CARD_COLUMN_SET)
-  let actionSet = columnSet.columns[0].items.find((item: any) => item.type === CARD_ACTION_SET)
+  const actionSet = columnSet.columns[0].items.find((item: any) => item.type === CARD_ACTION_SET)
   if (actionSet) {
     actionSet.actions = [...actionSet.actions, episodeConfigCard(config, extendedConfig)]
   }

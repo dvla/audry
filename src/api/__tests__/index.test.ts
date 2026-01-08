@@ -29,7 +29,9 @@ vi.mock('hono', () => {
   }
 
   return {
-    Hono: vi.fn(() => mockApp),
+    Hono: vi.fn(function (this: any) {
+      return mockApp
+    }),
   }
 })
 

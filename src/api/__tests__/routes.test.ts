@@ -386,8 +386,7 @@ describe('API Routes', () => {
         'Expressive Delivery Feedback': mockReview.edaFeedback,
         'Final Transcript': mockReview.finalTranscript,
       })
-      expect(mockReviewTranscript).toHaveBeenCalledOnce()
-      expect(mockReviewTranscript).toHaveBeenCalledWith(
+      expect(mockReviewTranscript).toHaveBeenCalledExactlyOnceWith(
         'Sample transcript to review',
         expect.stringMatching(/^API_ReviewTranscript_\d+$/)
       )

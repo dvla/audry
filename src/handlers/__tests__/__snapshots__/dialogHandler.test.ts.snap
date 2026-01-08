@@ -212,7 +212,7 @@ exports[`DialogHandler > dialogCard > should render transcript dialog card snaps
 `;
 
 exports[`DialogHandler > handleDialogInvoke > should send dialog response with snapshot 1`] = `
-[MockFunction spy] {
+[MockFunction] {
   "calls": [
     [
       {
@@ -703,7 +703,7 @@ exports[`DialogHandler > handleDialogSubmit > should save transcript and close d
 `;
 
 exports[`DialogHandler > handleDialogSubmit > should toggle edit and refresh dialog and carousel cards 1`] = `
-[MockFunction spy] {
+[MockFunction] {
   "calls": [
     [
       {
@@ -1176,7 +1176,7 @@ exports[`DialogHandler > handleDialogSubmit > should toggle edit and refresh dia
 `;
 
 exports[`DialogHandler > should handle a transcript with text before Speaker 1 1`] = `
-[MockFunction spy] {
+[MockFunction] {
   "calls": [
     [
       {

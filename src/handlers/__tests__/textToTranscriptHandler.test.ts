@@ -5,15 +5,17 @@ import * as cards from '../../internal/cards'
 import { DEFAULT_CONFIG } from '../../tts/episodeConfig'
 import { TextToTranscriptHandler } from '../textToTranscriptHandler'
 
-const { mockReadFile, mockWriteFile } = vi.hoisted(() => {
+const { mockReadFile, mockWriteFile, EXTRACTED_TEXT } = vi.hoisted(() => {
   const EXTRACTED_TEXT = 'Information Technology Services Digital and Technology Strategic Plan 2021 24'
   return {
+    EXTRACTED_TEXT,
     mockReadFile: vi.fn().mockResolvedValue(EXTRACTED_TEXT),
     mockWriteFile: vi.fn().mockResolvedValue('path/to/transcript.txt'),
   }
 })
 
 vi.mock('../../internal/utils/documentUtils', () => ({
+  EXTRACTED_TEXT,
   readFile: mockReadFile,
   writeFile: mockWriteFile,
 }))

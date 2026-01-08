@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`ReviewHandler > should send warning card if no transcript found 1`] = `
-[MockFunction spy] {
+[MockFunction] {
   "calls": [
     [
       {
@@ -60,7 +60,7 @@ exports[`ReviewHandler > should send warning card if no transcript found 1`] = `
 `;
 
 exports[`ReviewHandler > should send warning card on error 1`] = `
-[MockFunction spy] {
+[MockFunction] {
   "calls": [
     [
       {

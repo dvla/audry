@@ -73,8 +73,12 @@ vi.mock('path', () => ({
 
 // --- Mock Azure Blob Storage ---
 vi.mock('@azure/storage-blob', () => ({
-  BlobServiceClient: vi.fn(() => mockBlobServiceClient),
-  ContainerClient: vi.fn(() => mockContainerClient),
+  BlobServiceClient: vi.fn(function (this: any) {
+    return mockBlobServiceClient
+  }),
+  ContainerClient: vi.fn(function (this: any) {
+    return mockContainerClient
+  }),
 }))
 
 // --- Mock logger ---

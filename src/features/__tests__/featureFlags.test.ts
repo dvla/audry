@@ -10,7 +10,11 @@ const mockFeatureManager = vi.hoisted(() => ({
   isEnabled: vi.fn(),
   getVariant: vi.fn(),
 }))
-const mockConfigurationMapFeatureFlagProvider = vi.hoisted(() => vi.fn(() => ({})))
+const mockConfigurationMapFeatureFlagProvider = vi.hoisted(() =>
+  vi.fn(function (this: any) {
+    return {}
+  })
+)
 const mockAppConfig = vi.hoisted(() => ({
   refresh: vi.fn(),
 }))
@@ -20,7 +24,9 @@ vi.mock('@azure/app-configuration-provider', () => ({
 
 vi.mock('@microsoft/feature-management', () => ({
   ConfigurationMapFeatureFlagProvider: mockConfigurationMapFeatureFlagProvider,
-  FeatureManager: vi.fn(() => mockFeatureManager),
+  FeatureManager: vi.fn(function (this: any) {
+    return mockFeatureManager
+  }),
 }))
 
 vi.mock('../../internal/config', async () => {
@@ -41,13 +47,16 @@ vi.mock('../../internal/utils/fileUtils', () => ({
 
 describe('featureFlags', () => {
   beforeEach(() => {
-    vi.resetAllMocks()
+    vi.clearAllMocks()
+    // Reset mock implementations before each test
+    mockFeatureManager.isEnabled = vi.fn()
+    mockFeatureManager.getVariant = vi.fn()
   })
 
   describe('isFeatureEnabled', () => {
     it('should return true when feature is enabled', async () => {
       mockLoad.mockResolvedValue(mockAppConfig)
-      mockFeatureManager.isEnabled.mockResolvedValue(true)
+      mockFeatureManager.isEnabled = vi.fn().mockResolvedValue(true)
 
       const result = await isFeatureEnabled(Feature.ExtendedConfig)
 
@@ -57,7 +66,7 @@ describe('featureFlags', () => {
 
     it('should return false when feature is disabled', async () => {
       mockLoad.mockResolvedValue(mockAppConfig)
-      mockFeatureManager.isEnabled.mockResolvedValue(false)
+      mockFeatureManager.isEnabled = vi.fn().mockResolvedValue(false)
 
       const result = await isFeatureEnabled(Feature.TTSModel)
 
@@ -67,7 +76,7 @@ describe('featureFlags', () => {
 
     it('should return false and log error when feature check throws', async () => {
       mockLoad.mockResolvedValue(mockAppConfig)
-      mockFeatureManager.isEnabled.mockRejectedValue(new Error('Connection failed'))
+      mockFeatureManager.isEnabled = vi.fn().mockRejectedValue(new Error('Connection failed'))
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
       const result = await isFeatureEnabled(Feature.ExtendedConfig)
@@ -88,8 +97,8 @@ describe('featureFlags', () => {
         name: 'test-variant',
         configuration: { key: 'value' },
       }
-      mockLoad.mockResolvedValue({})
-      mockFeatureManager.getVariant.mockResolvedValue(mockVariant)
+      mockLoad.mockResolvedValue(mockAppConfig)
+      mockFeatureManager.getVariant = vi.fn().mockResolvedValue(mockVariant)
 
       const result = await getVariant(Feature.TTSModel)
 
@@ -98,8 +107,8 @@ describe('featureFlags', () => {
     })
 
     it('should return undefined when no variant is available', async () => {
-      mockLoad.mockResolvedValue({})
-      mockFeatureManager.getVariant.mockResolvedValue(undefined)
+      mockLoad.mockResolvedValue(mockAppConfig)
+      mockFeatureManager.getVariant = vi.fn().mockResolvedValue(undefined)
 
       const result = await getVariant(Feature.ExtendedConfig)
 
@@ -108,8 +117,8 @@ describe('featureFlags', () => {
     })
 
     it('should return undefined and log error when variant retrieval throws', async () => {
-      mockLoad.mockResolvedValue({})
-      mockFeatureManager.getVariant.mockRejectedValue(new Error('Network error'))
+      mockLoad.mockResolvedValue(mockAppConfig)
+      mockFeatureManager.getVariant = vi.fn().mockRejectedValue(new Error('Network error'))
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
       const result = await getVariant(Feature.TTSModel)
@@ -133,7 +142,7 @@ describe('featureFlags', () => {
       const parsedConfig = { provider: 'google', model: 'gemini-1.5-flash' }
 
       mockLoad.mockResolvedValue(mockAppConfig)
-      mockFeatureManager.getVariant.mockResolvedValue(mockVariant)
+      mockFeatureManager.getVariant = vi.fn().mockResolvedValue(mockVariant)
       const result = await getTTSModelConfig()
 
       expect(result).toEqual({
@@ -143,8 +152,8 @@ describe('featureFlags', () => {
     })
 
     it('should return default config undefined configuration when no variant is available', async () => {
-      mockLoad.mockResolvedValue({})
-      mockFeatureManager.getVariant.mockResolvedValue(undefined)
+      mockLoad.mockResolvedValue(mockAppConfig)
+      mockFeatureManager.getVariant = vi.fn().mockResolvedValue(undefined)
 
       const result = await getTTSModelConfig()
 
@@ -157,8 +166,8 @@ describe('featureFlags', () => {
         configuration: { invalid: 'invalid-provider' },
       }
 
-      mockLoad.mockResolvedValue({})
-      mockFeatureManager.getVariant.mockResolvedValue(mockVariant)
+      mockLoad.mockResolvedValue(mockAppConfig)
+      mockFeatureManager.getVariant = vi.fn().mockResolvedValue(mockVariant)
 
       const result = await getTTSModelConfig()
       expect(result).toEqual({ name: 'invalid-variant', configuration: DEFAULT_TTS_MODEL_CONFIG })

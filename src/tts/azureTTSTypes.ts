@@ -537,7 +537,7 @@ export class SSMLBuilder {
     return this.build()
       .replace(/></g, '>\n<')
       .split('\n')
-      .map((line, i) => {
+      .map((line) => {
         const indent = '  '.repeat(Math.max(0, line.split('<').length - line.split('</').length - 1))
         return indent + line
       })

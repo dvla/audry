@@ -68,15 +68,17 @@ describe('textToSpeechEleven tests', () => {
     })
 
     vi.doMock('@elevenlabs/elevenlabs-js', () => ({
-      ElevenLabsClient: vi.fn().mockImplementation(() => ({
-        textToDialogue: {
-          stream: vi.fn().mockResolvedValue(
-            (async function* () {
-              yield Buffer.from('audio would be returned here')
-            })()
-          ),
-        },
-      })),
+      ElevenLabsClient: vi.fn().mockImplementation(function () {
+        return {
+          textToDialogue: {
+            stream: vi.fn().mockResolvedValue(
+              (async function* () {
+                yield Buffer.from('audio would be returned here')
+              })()
+            ),
+          },
+        }
+      }),
     }))
     const textToSpeechStreamModule = await import('../textToSpeechEleven.js')
     const myPingBack = vi.fn()
@@ -99,11 +101,13 @@ describe('textToSpeechEleven tests', () => {
 
   test('should throw error if no audio buffers generated', async () => {
     vi.doMock('@elevenlabs/elevenlabs-js', () => ({
-      ElevenLabsClient: vi.fn().mockImplementation(() => ({
-        textToDialogue: {
-          stream: vi.fn().mockResolvedValue((async function* () {})()),
-        },
-      })),
+      ElevenLabsClient: vi.fn().mockImplementation(function () {
+        return {
+          textToDialogue: {
+            stream: vi.fn().mockResolvedValue((async function* () {})()),
+          },
+        }
+      }),
     }))
     const textToSpeechStreamModule = await import('../textToSpeechEleven.js')
     const dialogue = [[{ text: '', voiceId: 'test-voice' }]]
@@ -114,15 +118,17 @@ describe('textToSpeechEleven tests', () => {
 
   test('should convert transcript to speech', async () => {
     vi.doMock('@elevenlabs/elevenlabs-js', () => ({
-      ElevenLabsClient: vi.fn().mockImplementation(() => ({
-        textToDialogue: {
-          stream: vi.fn().mockResolvedValue(
-            (async function* () {
-              yield Buffer.from('audio would be returned here')
-            })()
-          ),
-        },
-      })),
+      ElevenLabsClient: vi.fn().mockImplementation(function () {
+        return {
+          textToDialogue: {
+            stream: vi.fn().mockResolvedValue(
+              (async function* () {
+                yield Buffer.from('audio would be returned here')
+              })()
+            ),
+          },
+        }
+      }),
     }))
     const textToSpeechStreamModule = await import('../textToSpeechEleven.js')
     const dialogue = parseTranscriptToSpeakerDialogue(exampleTranscript, DEFAULT_VOICES)
