@@ -1,5 +1,12 @@
 # ETL Audry Change Log
 
+## [1.13.1](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.13.0...v1.13.1) (2026-01-12)
+
+
+### Bug Fixes
+
+* ET-1710: Upgrade dependencies, including zod ([0019e1b](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/commit/0019e1b78f4cfe2f3f4d0ffdb24c31a8ec4aa421))
+
 # [1.13.0](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.12.0...v1.13.0) (2026-01-07)
 
 
