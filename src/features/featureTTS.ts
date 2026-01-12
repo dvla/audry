@@ -18,7 +18,7 @@ export enum Providers {
  * Provides defaults and constraints for each field.
  */
 export const TTSModelSchema = z.strictObject({
-  provider: z.nativeEnum(Providers).default(Providers.GOOGLE),
+  provider: z.enum(Providers).default(Providers.GOOGLE),
   model: z.string().default(DEFAULT_GEMINI_TTS_MODEL),
 })
 

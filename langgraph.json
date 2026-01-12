@@ -1,5 +1,5 @@
 {
-  "node_version": "24.12.0",
+  "node_version": "22",
   "dependencies": ["."],
   "graphs": {
     "shownotes_agent": "./src/agents/show-notes/graph.ts:graph",

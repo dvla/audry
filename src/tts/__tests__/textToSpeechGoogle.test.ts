@@ -69,7 +69,7 @@ Config.GEMINI_API_KEY = 'fake-api-key'
 // Some reusable base64 audio data
 const fakeBase64Audio = Buffer.from('test audio').toString('base64')
 const voiceConfiguration = generateConfig(
-  { voices: [EpisodeVoices.MATTHEW, EpisodeVoices.ELLIE], language: EpisodeLanguages.ENGLISH },
+  { ...DEFAULT_CONFIG, voices: [EpisodeVoices.MATTHEW, EpisodeVoices.ELLIE], language: EpisodeLanguages.ENGLISH },
   123,
   DEFAULT_TTS_MODEL_CONFIG
 )

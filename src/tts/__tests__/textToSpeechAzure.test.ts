@@ -37,7 +37,7 @@ vi.mock('microsoft-cognitiveservices-speech-sdk', () => {
 })
 
 describe('transcriptToSpeech', () => {
-  const mockModelConfig = { provider: Providers.AZURE }
+  const mockModelConfig = { provider: Providers.AZURE, model: 'mock-model' }
   let mockSynthesizer: { speakSsmlAsync: ReturnType<typeof vi.fn>; close: ReturnType<typeof vi.fn> }
 
   beforeEach(() => {

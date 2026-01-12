@@ -87,13 +87,13 @@ export enum EpisodeOutro {
  * Provides defaults and constraints for each field.
  */
 export const EpisodeSchema = z.object({
-  kind: z.nativeEnum(EpisodeKind).default(EpisodeKind.PODCAST),
-  language: z.nativeEnum(EpisodeLanguages).default(EpisodeLanguages.ENGLISH),
-  length: z.nativeEnum(EpisodeLength).default(EpisodeLength.FULL),
-  voices: z.array(z.nativeEnum(EpisodeVoices)).min(1).max(2).default([EpisodeVoices.MATTHEW, EpisodeVoices.ELLIE]),
-  style: z.nativeEnum(EpisodeStyle).default(EpisodeStyle.CONVERSATIONAL),
-  intro_effect: z.nativeEnum(EpisodeIntro).optional(),
-  outro_effect: z.nativeEnum(EpisodeOutro).optional(),
+  kind: z.enum(EpisodeKind).default(EpisodeKind.PODCAST),
+  language: z.enum(EpisodeLanguages).default(EpisodeLanguages.ENGLISH),
+  length: z.enum(EpisodeLength).default(EpisodeLength.FULL),
+  voices: z.array(z.enum(EpisodeVoices)).min(1).max(2).default([EpisodeVoices.MATTHEW, EpisodeVoices.ELLIE]),
+  style: z.enum(EpisodeStyle).default(EpisodeStyle.CONVERSATIONAL),
+  intro_effect: z.enum(EpisodeIntro).optional(),
+  outro_effect: z.enum(EpisodeOutro).optional(),
 })
 
 /**
