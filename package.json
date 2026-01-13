@@ -1,10 +1,10 @@
 {
     "name": "audry",
-    "version": "1.13.1",
+    "version": "1.13.2",
     "description": "Microsoft 365 Agents Toolkit Workflow Bot Sample",
     "engines": {
         "node": ">=24.12.0",
-        "pnpm": ">=10.25.0",
+        "pnpm": ">=10.28.0",
         "npm": "please-use-pnpm"
     },
     "private": true,
@@ -55,7 +55,7 @@
         "@hono/zod-validator": "^0.7.6",
         "@langchain/core": "1.1.12",
         "@langchain/google-genai": "2.1.7",
-        "@langchain/langgraph": "1.0.13",
+        "@langchain/langgraph": "1.0.14",
         "@microsoft/feature-management": "2.2.0",
         "@microsoft/teams-ai": "1.7.4",
         "@opentelemetry/api": "^1.9.0",
@@ -78,13 +78,13 @@
     },
     "devDependencies": {
         "@eslint/js": "^9.39.2",
-        "@langchain/langgraph-cli": "^1.1.9",
+        "@langchain/langgraph-cli": "^1.1.10",
         "@semantic-release/changelog": "^6.0.3",
         "@semantic-release/git": "^10.0.1",
         "@trivago/prettier-plugin-sort-imports": "^6.0.2",
         "@types/express": "^5.0.6",
         "@types/json-schema": "^7.0.15",
-        "@types/node": "^25.0.3",
+        "@types/node": "^25.0.5",
         "@typescript-eslint/eslint-plugin": "^8.52.0",
         "@typescript-eslint/parser": "^8.52.0",
         "@vitest/coverage-v8": "^4.0.16",
