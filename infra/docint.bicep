@@ -4,7 +4,7 @@ param userAssignedIdentityPrincipalId string
 param docIntBaseName string
 param skuName string
 
-resource accounts_audry_docs_name_resource 'Microsoft.CognitiveServices/accounts@2025-06-01' = {
+resource accounts_audry_docs_name_resource 'Microsoft.CognitiveServices/accounts@2025-09-01' = {
   name: docIntName
   location: location
   sku: {

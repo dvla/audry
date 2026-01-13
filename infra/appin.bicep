@@ -5,7 +5,7 @@ param appInsightsName string
 param logAnalyticsWorkspaceName string
 
 // Create or reference an existing Log Analytics Workspace
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2025-02-01' = {
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2025-07-01' = {
   name: logAnalyticsWorkspaceName
   location: location
   properties: {

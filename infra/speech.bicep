@@ -1,7 +1,7 @@
 param speechName string
 param location string = resourceGroup().location
 
-resource speech_name_resource 'Microsoft.CognitiveServices/accounts@2025-06-01' = {
+resource speech_name_resource 'Microsoft.CognitiveServices/accounts@2025-09-01' = {
   name: speechName
   location: location
   sku: {

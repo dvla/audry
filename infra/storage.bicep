@@ -3,7 +3,7 @@ param location string = resourceGroup().location
 param containerName string
 param userAssignedIdentityPrincipalId string
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2025-01-01' = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2025-06-01' = {
   name: storageAccountName
   location: location
   
@@ -21,7 +21,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2025-01-01' = {
   }
 }
 
-resource blobContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2025-01-01' = {
+resource blobContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2025-06-01' = {
   name: '${storageAccount.name}/default/${containerName}'
   properties: {
     publicAccess: 'None'
@@ -38,7 +38,7 @@ resource storageBlobContributor 'Microsoft.Authorization/roleAssignments@2022-04
   }
 }
 
-resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2025-01-01' = {
+resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2025-06-01' = {
   parent: storageAccount
   name: 'default'
   properties: {
@@ -61,7 +61,7 @@ resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2025-01-01'
   }
 }
 
-resource storageMgmtPolicy 'Microsoft.Storage/storageAccounts/managementPolicies@2025-01-01' = {
+resource storageMgmtPolicy 'Microsoft.Storage/storageAccounts/managementPolicies@2025-06-01' = {
   name: 'default'
   dependsOn: [
     blobService
