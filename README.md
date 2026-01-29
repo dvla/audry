@@ -1,9 +1,9 @@
 # Project Overview
-Audry is a Microsoft Teams bot that converts documents into podcast-style transcripts and audio files using AI. Built with Microsoft Teams AI SDK, it handles file uploads, text extraction, AI-powered transcript generation (via Google Gemini), and text-to-speech conversion (via Google or ElevenLabs).
+Audry is a Microsoft Teams bot that converts documents into podcast-style transcripts and audio files using AI. Built with Microsoft Teams AI SDK, it handles file uploads, text extraction, AI-powered transcript generation (via Google Gemini), and text-to-speech conversion (via Google, Azure or ElevenLabs).
 
 There are 3 ways to run this project:
 
-1. [**Teams Bot**](#get-started-with-the-teams-bot): Runs the project as a Teams bot using the Microsoft 365 Agents Toolkit.
+1. [**Teams Bot**](#get-started-with-the-teams-bot): Runs the project as a Teams bot using the Microsoft 365 Agents Toolkit (requires setup).
 2. [**Local API Server**](#quick-start-api-only): Runs the project as a rest API server using Hono.
 3. [**Langgraph API**](#langgraph-ai-agent): Uses Langgraph and Langsmith studio to visualise the graph element of the project.
 
@@ -124,6 +124,32 @@ export const LANGUAGE_CONFIG = {
 }
 ```
 
+## Text-to-Speech Providers
+Audry supports multiple text-to-speech providers.  With MS Teams setup, a feature flag is used (see [infrastructure code](#infrastructure-code)). 
+
+You can configure the provider locally in the `/env/.env.local` file using the `TTS_MODEL_OVERRIDE` variable.
+
+**Google TTS is the default**, you don't need to set any additional variables for it, but you could override the model like this:
+
+```bash
+TTS_MODEL_OVERRIDE='{"provider": "google", "model": "gemini-2.5-pro-preview-tts"}'
+```
+
+For ElevenLabs TTS, set the following environment variable:
+
+```bash
+ELEVEN_LABS_API_KEY="your_elevenlabs_api_key"
+TTS_MODEL_OVERRIDE='{"provider": "elevenlabs", "model": "eleven_v3"}'
+```
+
+For Azure TTS, set the following environment variables:
+
+```bash
+AZURE_SPEECH_SERVICE_ENDPOINT=https://your_endpoint.cognitive.microsoft.com/
+AZURE_SPEECH_KEY="your_azure_speech_key"
+TTS_MODEL_OVERRIDE='{"provider": "azure", "model": "not_used"}'
+```
+
 ## Infrastructure Code
 
 The infrastructure code for provisioning Azure resources is located in the `/infra` folder. This folder contains templates and scripts to set up the necessary cloud resources for the application.
@@ -131,7 +157,7 @@ The infrastructure code for provisioning Azure resources is located in the `/inf
 ## License
 The MIT License (MIT)
 
-Copyright (c) 2025 DVLA
+Copyright (c) 2026 DVLA
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
