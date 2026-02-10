@@ -84,7 +84,7 @@ export async function extractTextFromFile(filePath: string): Promise<string> {
     return analyzeResult.content || 'No content extracted from the document.'
   } catch (error) {
     log.error('Error extracting text from document using Azure Document Intelligence.', error)
-    throw new Error('Failed to extract text from document')
+    throw new Error('Failed to extract text from document', { cause: error })
   }
 }
 
@@ -104,7 +104,7 @@ export async function writeContentToFile(contentUrl: string, filePath: string): 
     await pipeline(res.body, fileStream)
   } catch (error) {
     log.error('Error downloading the file.', error)
-    throw new Error('Failed to download file')
+    throw new Error('Failed to download file', { cause: error })
   }
 }
 
@@ -131,6 +131,6 @@ export async function extractAndWriteText(fileDownloadPath: string, userId: stri
     await writeFile(userId, documentId, EXTRACTED_TEXT, extractedText)
   } catch (error) {
     log.error('Failed to extract and write text file.', error)
-    throw new Error('Failed to extract and write text')
+    throw new Error('Failed to extract and write text', { cause: error })
   }
 }

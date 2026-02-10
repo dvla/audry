@@ -89,7 +89,7 @@ export class FileConsentHandler {
         }
       } catch (uploadError) {
         log.error(`[FileConsentAccept] Upload failed:`, uploadError)
-        throw new Error(`Upload failed: ${uploadError.message}`)
+        throw new Error(`Upload failed: ${uploadError.message}`, { cause: uploadError })
       }
     } catch (error) {
       log.error('[FileConsentAccept] Error handling file consent accept:', error)

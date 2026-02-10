@@ -86,7 +86,7 @@ export class BlobStorage {
       return blockBlobClient.url
     } catch (error) {
       log.error(`Error uploading file to blob storage: ${error.message}`, error)
-      throw new Error(`Failed to upload file to blob storage: ${error.message}`)
+      throw new Error(`Failed to upload file to blob storage: ${error.message}`, { cause: error })
     }
   }
 
@@ -122,7 +122,7 @@ export class BlobStorage {
       return Buffer.concat(chunks)
     } catch (error) {
       log.debug(`Error downloading file from blob storage: ${error.message}`)
-      throw new Error(`Failed to download file from blob storage: ${error.message}`)
+      throw new Error(`Failed to download file from blob storage: ${error.message}`, { cause: error })
     }
   }
 }

@@ -66,7 +66,7 @@ export const readFile = async (
     } catch (error) {
       if (errorIfMissing) {
         log.error(`Error reading ${fileName} from blob storage:`, error)
-        throw new Error(`Could not read ${fileName}: ${error.message}`)
+        throw new Error(`Could not read ${fileName}: ${error.message}`, { cause: error })
       } else {
         log.debug(`File ${fileName} not found, returning null.`)
         return null
@@ -81,7 +81,7 @@ export const readFile = async (
   } catch (error) {
     if (errorIfMissing) {
       log.error(`Error reading ${filePath}:`, error)
-      throw new Error(`Could not read ${fileName}: ${error.message}`)
+      throw new Error(`Could not read ${fileName}: ${error.message}`, { cause: error })
     } else {
       log.debug(`File ${filePath} not found, returning null.`)
       return null
