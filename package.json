@@ -1,10 +1,10 @@
 {
     "name": "audry",
-    "version": "1.13.7",
+    "version": "1.13.8",
     "description": "Microsoft 365 Agents Toolkit Workflow Bot Sample",
     "engines": {
         "node": ">=24.13.0",
-        "pnpm": ">=10.29.3",
+        "pnpm": ">=10.30.0",
         "npm": "please-use-pnpm"
     },
     "private": true,
@@ -84,12 +84,12 @@
         "@trivago/prettier-plugin-sort-imports": "^6.0.2",
         "@types/express": "^5.0.6",
         "@types/json-schema": "^7.0.15",
-        "@types/node": "^25.3.2",
+        "@types/node": "^25.3.3",
         "@typescript-eslint/eslint-plugin": "^8.56.1",
         "@typescript-eslint/parser": "^8.56.1",
         "@vitest/coverage-v8": "^4.0.18",
         "@vitest/eslint-plugin": "^1.6.9",
-        "conventional-changelog-conventionalcommits": "^9.1.0",
+        "conventional-changelog-conventionalcommits": "^9.2.0",
         "env-cmd": "^11.0.0",
         "eslint": "^10.0.2",
         "eslint-config-prettier": "^10.1.8",
