@@ -30,8 +30,8 @@ vi.mock('../../internal/config', () => ({
     GEMINI_API_KEY: 'fake-api-key',
     MAX_NUMBER_OF_LINES: '100',
     LINES_PER_CHUNK: '10',
+    GEMINI_TTS_MODEL: 'gemini-tts-v1',
   },
-  DEFAULT_GEMINI_TTS_MODEL: 'gemini-tts-v1', // Add this line
 }))
 
 // --- Mock fs/promises ---

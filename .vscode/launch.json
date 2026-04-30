@@ -66,6 +66,25 @@
             "internalConsoleOptions": "neverOpen"
         },
         {
+            "name": "Debug API",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "pnpm",
+            "runtimeArgs": [
+                "run",
+                "api"
+            ],
+            "console": "integratedTerminal",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "presentation": {
+                "group": "1-api",
+                "order": 1
+            },
+            "internalConsoleOptions": "neverOpen"
+        },
+        {
             "name": "Launch Remote (Desktop)",
             "type": "node",
             "request": "launch",

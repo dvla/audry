@@ -15,6 +15,7 @@ node_modules/
 
 # build
 lib/
+.pnpm-store/
 
 # Local data
 .localConfigs.playground
@@ -29,3 +30,4 @@ test/
 /coverage
 # LangGraph API
 .langgraph_api
+.devcontainer/devcontainer-lock.json

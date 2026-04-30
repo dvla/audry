@@ -46,6 +46,8 @@ export const Config = {
   GEMINI_API_KEY: checkOptionalVariable(process.env.GEMINI_API_KEY, DEFAULT_EMPTY),
   //Gemini Model
   GEMINI_MODEL: checkOptionalVariable(process.env.GEMINI_MODEL, DEFAULT_GEMINI_MODEL),
+  //Gemini TTS Model
+  GEMINI_TTS_MODEL: checkOptionalVariable(process.env.GEMINI_TTS_MODEL, DEFAULT_GEMINI_TTS_MODEL),
   // Max number of lines for transcript chunks
   MAX_NUMBER_OF_LINES: checkOptionalVariable(process.env.MAX_NUMBER_OF_LINES, DEFAULT_MAX_NUMBER_OF_LINES),
   // Number of lines per chunk for transcript processing

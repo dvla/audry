@@ -1,0 +1,65 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
+{
+  "name": "Audry API",
+  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+  // Includes Node.js, eslint, nvm, yarn, and the TypeScript compiler
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:dev-24",
+  "hostRequirements": {
+    "cpus": 2
+  },
+  "containerEnv": {
+    "GEMINI_MODEL": "gemini-2.5-flash",
+    "GEMINI_TTS_MODEL": "gemini-2.5-flash-preview-tts"
+  },
+  "onCreateCommand": "npm install -g pnpm@latest-10 && touch env/.env.local && grep -q '^GEMINI_API_KEY=' env/.env.local || echo 'GEMINI_API_KEY=\"your_gemini_api_key\"' >> env/.env.local",
+  "updateContentCommand": {
+    "install": "CI=true pnpm install"
+  },
+  "postStartCommand": {
+    "build": "pnpm build",
+    "node version": "node -v",
+    "show command": "echo 'Setup your .env.local file in the env directory with your Gemini API key to start using the Audry API'"
+  },
+  // Features to add to the dev container. More info: https://containers.dev/features.
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": "os-provided",
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/common-utils": {
+      "installZsh": true,
+      "installOhMyZsh": true,
+      "installOhMyZshConfig": true,
+      "configureZshAsDefaultShell": true
+    },
+    "ghcr.io/devcontainers-extra/features/zsh-plugins:0": {
+      "plugins": "zsh-autosuggestions zsh-syntax-highlighting",
+      "omzPlugins": "https://github.com/zsh-users/zsh-autosuggestions.git https://github.com/zsh-users/zsh-syntax-highlighting.git"
+    }
+  },
+  // Configure tool-specific properties.
+  "customizations": {
+    "vscode": {
+      "extensions": ["esbenp.prettier-vscode", "vitest.explorer"],
+      "settings": {
+        "files.exclude": {
+          ".coverage": true
+        },
+        "editor.tabSize": 4,
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "terminal.integrated.profiles.linux": {
+          "zsh": {
+            "path": "/bin/zsh",
+            "icon": "terminal-ubuntu"
+          }
+        }
+      }
+    }
+  },
+  "portsAttributes": {
+    "3000": {
+      "label": "Audry API"
+    }
+  },
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  "forwardPorts": [3000]
+}

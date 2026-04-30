@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { DEFAULT_GEMINI_TTS_MODEL } from '../internal/config'
+import { Config } from '../internal/config'
 import { log } from '../internal/logger'
 import { Feature, Variant, getVariant } from './featureFlags'
 
@@ -19,7 +19,7 @@ export enum Providers {
  */
 export const TTSModelSchema = z.strictObject({
   provider: z.enum(Providers).default(Providers.GOOGLE),
-  model: z.string().default(DEFAULT_GEMINI_TTS_MODEL),
+  model: z.string().default(Config.GEMINI_TTS_MODEL),
 })
 
 /**
