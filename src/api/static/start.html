@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Audry API</title>
     <!-- HTMX -->
     <script
@@ -22,130 +23,197 @@
   </head>
 
   <body>
-    <section class="header">
-      <h1>Audry API</h1>
-      <p>Create podcast-style transcripts and audio files using AI.</p>
-    </section>
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">API Tools</p>
+        <h1>Audry</h1>
+        <p>Create podcast-style transcripts and audio files using AI.</p>
+      </div>
+    </header>
 
-    <!-- Get All Prompts -->
-    <section class="border-top">
-      <h2>Input Text</h2>
-      <p>Enter your input text below:</p>
+    <main class="app-shell">
       <form hx-ext="json-enc-custom">
-        <textarea id="textinput" name="text" rows="10"></textarea>
-        <h2>Settings</h2>
-        <div id="config">
-          <select name="config[kind]" id="kind-select">
-            <option value="Podcast" selected>Podcast</option>
-            <option value="Brief Podcast">Brief Podcast</option>
-            <option value="News Briefing">News Briefing</option>
-          </select>
-          <select name="config[length]" id="length-select">
-            <option value="Brief">Brief</option>
-            <option value="Full" selected>Full</option>
-          </select>
-          <select name="config[voices][0]" id="voices-select0" required>
-            <option value="Matthew" selected>Matthew</option>
-            <option value="Ellie">Ellie</option>
-            <option value="Daniel">Daniel</option>
-            <option value="Jamie">Jamie</option>
-            <option value="Claire">Claire</option>
-            <option value="Samara">Samara</option>
-            <option value="Lucy">Lucy</option>
-            <option value="Emma">Emma</option>
-          </select>
-          <select name="config[voices][1]" id="voices-select1" required>
-            <option value="Matthew">Matthew</option>
-            <option value="Ellie" selected>Ellie</option>
-            <option value="Daniel">Daniel</option>
-            <option value="Jamie">Jamie</option>
-            <option value="Claire">Claire</option>
-            <option value="Samara">Samara</option>
-            <option value="Lucy">Lucy</option>
-            <option value="Emma">Emma</option>
-          </select>
-          <select name="config[language]" id="language-select">
-            <option value="English" selected>English</option>
-            <option value="Welsh">Welsh</option>
-          </select>
+        <div class="workspace-grid">
+          <section class="panel input-panel" aria-labelledby="input-heading">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Source</p>
+                <h2 id="input-heading">Input Text</h2>
+              </div>
+            </div>
+            <label class="field-label" for="textinput">Text or transcript</label>
+            <textarea
+              id="textinput"
+              name="text"
+              rows="18"
+              placeholder="Paste source notes, a draft transcript, or the text you want Audry to turn into audio."
+            ></textarea>
+          </section>
+
+          <aside class="panel settings-panel" aria-labelledby="settings-heading">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Output</p>
+                <h2 id="settings-heading">Settings</h2>
+              </div>
+            </div>
+            <div id="config" class="field-grid">
+              <label class="field">
+                <span>Format</span>
+                <select name="config[kind]" id="kind-select">
+                  <option value="Podcast" selected>Podcast</option>
+                  <option value="Brief Podcast">Brief Podcast</option>
+                  <option value="News Briefing">News Briefing</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Length</span>
+                <select name="config[length]" id="length-select">
+                  <option value="Brief">Brief</option>
+                  <option value="Full" selected>Full</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Voice 1</span>
+                <select name="config[voices][0]" id="voices-select0" required>
+                  <option value="Matthew" selected>Matthew</option>
+                  <option value="Ellie">Ellie</option>
+                  <option value="Daniel">Daniel</option>
+                  <option value="Jamie">Jamie</option>
+                  <option value="Claire">Claire</option>
+                  <option value="Samara">Samara</option>
+                  <option value="Lucy">Lucy</option>
+                  <option value="Emma">Emma</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Voice 2</span>
+                <select name="config[voices][1]" id="voices-select1" required>
+                  <option value="Matthew">Matthew</option>
+                  <option value="Ellie" selected>Ellie</option>
+                  <option value="Daniel">Daniel</option>
+                  <option value="Jamie">Jamie</option>
+                  <option value="Claire">Claire</option>
+                  <option value="Samara">Samara</option>
+                  <option value="Lucy">Lucy</option>
+                  <option value="Emma">Emma</option>
+                </select>
+              </label>
+              <label class="field field-wide">
+                <span>Language</span>
+                <select name="config[language]" id="language-select">
+                  <option value="English" selected>English</option>
+                  <option value="Welsh">Welsh</option>
+                </select>
+              </label>
+            </div>
+
+            <div id="extended-config" class="effects-grid">
+              <fieldset>
+                <legend>Intro Effect</legend>
+                <div class="radio-grid">
+                  <label><input type="radio" name="config[intro_effect]" value="beat5" /> Beat 5</label>
+                  <label><input type="radio" name="config[intro_effect]" value="in5" /> In 5</label>
+                  <label><input type="radio" name="config[intro_effect]" value="happy10" /> Happy 10</label>
+                  <label><input type="radio" name="config[intro_effect]" value="synth10" /> Synth 10</label>
+                  <label><input type="radio" name="config[intro_effect]" value="welcome10" /> Welcome 10</label>
+                </div>
+                <button class="ghost-button" type="button" onclick="clearEffect('intro')">Clear</button>
+              </fieldset>
+              <fieldset>
+                <legend>Outro Effect</legend>
+                <div class="radio-grid">
+                  <label><input type="radio" name="config[outro_effect]" value="beat5" /> Beat 5</label>
+                  <label><input type="radio" name="config[outro_effect]" value="in5" /> In 5</label>
+                  <label><input type="radio" name="config[outro_effect]" value="happy10" /> Happy 10</label>
+                  <label><input type="radio" name="config[outro_effect]" value="synth10" /> Synth 10</label>
+                </div>
+                <button class="ghost-button" type="button" onclick="clearEffect('outro')">Clear</button>
+              </fieldset>
+            </div>
+          </aside>
         </div>
-        <div id="extended-config">
-          <fieldset>
-            <legend>Intro Effect</legend>
-            <label><input type="radio" name="config[intro_effect]" value="beat5" /> Beat 5</label>
-            <label><input type="radio" name="config[intro_effect]" value="in5" /> In 5</label>
-            <label><input type="radio" name="config[intro_effect]" value="happy10" /> Happy 10</label>
-            <label><input type="radio" name="config[intro_effect]" value="synth10" /> Synth 10</label>
-            <label><input type="radio" name="config[intro_effect]" value="welcome10" /> Welcome 10</label>
-            <button type="button" onclick="clearEffect('intro')">Clear</button>
-          </fieldset>
-          <fieldset>
-            <legend>Outro Effect</legend>
-            <label><input type="radio" name="config[outro_effect]" value="beat5" /> Beat 5</label>
-            <label><input type="radio" name="config[outro_effect]" value="in5" /> In 5</label>
-            <label><input type="radio" name="config[outro_effect]" value="happy10" /> Happy 10</label>
-            <label><input type="radio" name="config[outro_effect]" value="synth10" /> Synth 10</label>
-            <button type="button" onclick="clearEffect('outro')">Clear</button>
-          </fieldset>
-        </div>
+
         <!-- Error Message -->
         <div id="error-message" class="error-message" hidden></div>
-        <section id="text-to-transcript-section" class="button-action" hx-ext="client-side-templates">
-          <h2>Text to Transcript</h2>
-          <p>Turn the input text into a podcast-style transcript.</p>
-          <button
-            hx-post="/api/texttotranscript"
-            hx-target="#transcript-results"
-            hx-swap="innerHTML"
-            handlebars-template="content-item-template"
-            hx-disabled-elt="this"
-          >
-            To Transcript
-          </button>
-          <div id="transcript-results"></div>
+
+        <section class="actions-panel" aria-labelledby="actions-heading">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Run</p>
+              <h2 id="actions-heading">Actions</h2>
+            </div>
+          </div>
+          <div class="action-grid">
+            <section id="text-to-transcript-section" class="button-action" hx-ext="client-side-templates">
+              <div>
+                <h3>Text to Transcript</h3>
+                <p>Generate a podcast-style script from the input.</p>
+              </div>
+              <button
+                hx-post="/api/texttotranscript"
+                hx-target="#transcript-results"
+                hx-swap="innerHTML"
+                handlebars-template="content-item-template"
+                hx-disabled-elt="this"
+              >
+                Generate
+              </button>
+            </section>
+            <section id="review-section" class="button-action" hx-ext="client-side-templates">
+              <div>
+                <h3>Review Transcript</h3>
+                <p>Check the generated transcript for quality.</p>
+              </div>
+              <button
+                hx-post="/api/reviewtranscript"
+                hx-target="#review-results"
+                hx-swap="innerHTML"
+                handlebars-template="content-item-template"
+                hx-disabled-elt="this"
+              >
+                Review
+              </button>
+            </section>
+            <section class="button-action">
+              <div>
+                <h3>Transcript to Audio</h3>
+                <p>Render the current transcript as an audio file.</p>
+              </div>
+              <button
+                hx-post="/api/transcripttoaudio"
+                hx-trigger="click"
+                hx-disabled-elt="this"
+                hx-swap="none"
+                data-download="true"
+              >
+                Download Audio
+              </button>
+            </section>
+            <section class="button-action primary-action">
+              <div>
+                <h3>Text to Audio</h3>
+                <p>Generate a transcript, then render audio.</p>
+              </div>
+              <button
+                hx-post="/api/texttoaudio"
+                hx-disabled-elt="this"
+                hx-confirm="Convert the input text into a transcript and then create an audio file?"
+                hx-swap="none"
+                data-download="true"
+              >
+                Create Audio
+              </button>
+            </section>
+          </div>
         </section>
-        <section id="review-section" class="button-action" hx-ext="client-side-templates">
-          <h2>Review Transcript</h2>
-          <p>Get AI feedback on the input text (generated transcript).</p>
-          <button
-            hx-post="/api/reviewtranscript"
-            hx-target="#review-results"
-            hx-swap="innerHTML"
-            handlebars-template="content-item-template"
-            hx-disabled-elt="this"
-          >
-            Review Transcript
-          </button>
+
+        <section class="results-panel" aria-label="Results">
+          <div id="transcript-results"></div>
           <div id="review-results"></div>
         </section>
-        <section class="button-action">
-          <h2>Transcript to Audio</h2>
-          <p>Turn the input text into an audio file.</p>
-          <button
-            hx-post="/api/transcripttoaudio"
-            hx-trigger="click"
-            hx-disabled-elt="this"
-            hx-swap="none"
-            data-download="true"
-          >
-            Text to Speech
-          </button>
-        </section>
-        <section class="button-action">
-          <h2>Text to Audio</h2>
-          <p>Turn the input text into a transcript and then an audio file (Combines the steps above).</p>
-          <button
-            hx-post="/api/texttoaudio"
-            hx-disabled-elt="this"
-            hx-confirm="Convert the input text into a transcript and then create an audio file?"
-            hx-swap="none"
-            data-download="true"
-          >
-            Text To Audio
-          </button>
-        </section>
       </form>
-    </section>
+    </main>
 
     <!-- Handlebars template for text content items -->
     <template id="content-item-template">
@@ -154,14 +222,16 @@
         <div class="content-item">
           <div class="text-with-copy">
             <h3 class="content-title">{{@key}}</h3>
-            <span
+            <button
               class="copy-icon"
+              type="button"
               title="Copy to clipboard"
               data-content="{{this}}"
               onclick="copyToClipboard(this.dataset.content)"
             >
-              <img src="copy-button.svg" />
-            </span>
+              <img src="copy-button.svg" alt="" />
+              <span class="visually-hidden">Copy {{@key}}</span>
+            </button>
           </div>
           <pre class="content">{{this}}</pre>
         </div>
