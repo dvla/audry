@@ -1,6 +1,6 @@
 {
     "name": "audry",
-    "version": "1.13.9",
+    "version": "1.14.0",
     "description": "Microsoft 365 Agents Toolkit Workflow Bot Sample",
     "engines": {
         "node": ">=24.13.0",

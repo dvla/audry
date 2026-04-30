@@ -1,5 +1,12 @@
 # ETL Audry Change Log
 
+# [1.14.0](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.13.1...v1.14.0) (2026-04-30)
+
+
+### Features
+
+* ET-1737: api-ui - enhance UI layout and styling ([c3a98da](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/commit/c3a98dae1fb4e99aa6995fca3461f12d247304fd))
+
 ## [1.13.1](https://dev.azure.com/DvlaEmergingTech/audry/_git/audry/compare/v1.13.0...v1.13.1) (2026-01-12)
 
 
