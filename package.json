@@ -96,7 +96,7 @@
         "eslint-import-resolver-typescript": "^4.4.4",
         "eslint-plugin-import": "^2.32.0",
         "eslint-plugin-prettier": "^5.5.5",
-        "music-metadata": "^11.12.1",
+        "music-metadata": "^11.16.0",
         "nodemon": "^3.1.14",
         "npm-audit-resolver": "3.0.0-RC.0",
         "npm-check-updates": "^19.6.3",
